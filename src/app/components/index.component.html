@@ -1,0 +1,33 @@
+<div>
+  <form>
+    <div>
+      <label for="workingDir">Working directory</label>
+      <input name="workingDir" id="workingDir" [(ngModel)]="workingDir" />
+    </div>
+    <div>
+      <button (click)="connect()">Connect</button>
+    </div>
+  </form>
+
+  <div>
+    <h2>Local operators</h2>
+    <ul>
+      <li *ngFor="let op of operators.getLocals()">{{ op.getName() }} <button>Open</button></li>
+      <li><input title="Operator name" /> <button>New</button></li>
+    </ul>
+  </div>
+
+  <div>
+    <h2>Library operators</h2>
+    <ul>
+      <li *ngFor="let op of operators.getLibraries()">{{ op.getName() }}</li>
+    </ul>
+  </div>
+
+  <div>
+    <h2>Elementary operators</h2>
+    <ul>
+      <li *ngFor="let op of operators.getElementaries()">{{ op.getName() }}</li>
+    </ul>
+  </div>
+</div>
