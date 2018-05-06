@@ -13,7 +13,7 @@ export class OperatorService {
   }
 
   public async refresh(workingDir: string) {
-    const response = await this.api.get('operator', {workingDir: workingDir});
+    const response = await this.api.get('operator/', {workingDir: workingDir});
 
     if (response['status'] === 'success') {
       for (const operatorData of (response['objects'] as Array<any>)) {
