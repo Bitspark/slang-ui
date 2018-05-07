@@ -9,15 +9,22 @@ import {safeDump, safeLoad} from 'js-yaml';
   styleUrls: []
 })
 export class OperatorComponent implements OnInit {
-
+  // General
   public operatorName = '';
   public operator: OperatorDef = null;
+  public status;
 
+  // YAML
   public yamlRepr = '';
 
-  public visualInsts = [];
+  // Visual
+  public visualInsts = {};
+  public visualSelectedInst = null;
 
-  public status;
+  // Dragging
+  private dragging = false;
+  private lastX: number;
+  private lastY: number;
 
   constructor(private route: ActivatedRoute, public operators: OperatorService) {
   }
@@ -75,22 +82,81 @@ export class OperatorComponent implements OnInit {
   // Visual
 
   public translateInstance(ins: any) {
-    return `translate(${Math.round(ins.x)},${Math.round(ins.y)})`;
+    return `translate(${Math.round(ins.posX)},${Math.round(ins.posY)})`;
+  }
+
+  public visualInstances() {
+    const instances = [];
+    for (const insName in this.visualInsts) {
+      if (this.visualInsts.hasOwnProperty(insName) && this.visualInsts[insName].visible) {
+        instances.push(this.visualInsts[insName]);
+      }
+    }
+    return instances;
+  }
+
+  public selectVisualInstance(ins: any) {
+    for (const insName in this.visualInsts) {
+      if (this.visualInsts.hasOwnProperty(insName)) {
+        this.visualInsts[insName].selected = false;
+      }
+    }
+    ins.selected = true;
+    this.visualSelectedInst = ins;
   }
 
   private displayVisual() {
-    this.visualInsts = [];
-
     const def = this.operator.getDef();
+    for (const insName in this.visualInsts) {
+      if (this.visualInsts.hasOwnProperty(insName)) {
+        this.visualInsts[insName].visible = false;
+      }
+    }
     for (const insName in def.operators) {
       if (def.operators.hasOwnProperty(insName)) {
         const ins = def.operators[insName];
-        this.visualInsts.push({
-          name: insName,
-          x: Math.random() * 600,
-          y: Math.random() * 400
-        });
+        let visualIns = this.visualInsts[insName];
+        if (typeof visualIns === 'undefined') {
+          visualIns = {
+            name: insName,
+            posX: Math.random() * 600,
+            posY: Math.random() * 400
+          };
+          this.visualInsts[insName] = visualIns;
+        }
+        visualIns.visible = true;
       }
+    }
+  }
+
+  // Dragging
+
+  private updateDrag(event, update?: boolean) {
+    if (update) {
+      this.visualSelectedInst.posX += (event.screenX - this.lastX);
+      this.visualSelectedInst.posY += (event.screenY - this.lastY);
+    }
+
+    this.lastX = event.screenX;
+    this.lastY = event.screenY;
+  }
+
+  public startDrag(event: any) {
+    this.dragging = true;
+    this.updateDrag(event);
+  }
+
+  public stopDrag(event: any) {
+    this.dragging = false;
+    this.updateDrag(event, true);
+  }
+
+  public drag(event: any) {
+    if (event.buttons === 0) {
+      this.dragging = false;
+    }
+    if (this.dragging) {
+      this.updateDrag(event, true);
     }
   }
 

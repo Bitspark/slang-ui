@@ -6,7 +6,7 @@
   <div>
     YAML view
   </div>
-  <textarea title="YAML representation" [ngModel]="yamlRepr" (ngModelChange)="updateYaml($event)" (blur)="storeYaml()">
+  <textarea cols="150" rows="15" title="YAML representation" [ngModel]="yamlRepr" (ngModelChange)="updateYaml($event)" (blur)="storeYaml()">
 </textarea>
 </div>
 
@@ -14,12 +14,25 @@
   <div>
     Visual view
   </div>
-  <svg width="800" height="600" style="border: 1px dotted black" xmlns="http://www.w3.org/2000/svg">
-    <g *ngFor="let ins of visualInsts" [attr.transform]="translateInstance(ins)">
-      <rect x="0" y="0" width="130" height="60" fill="blue"></rect>
-      <text text-anchor="middle" x="65" y="35" fill="white" font-family="Arial" font-size="16">{{ins.name}}</text>
-    </g>
-  </svg>
+  <div style="height: 700px">
+    <svg width="800" height="600" style="border: 1px dotted black; display: inline-block" xmlns="http://www.w3.org/2000/svg"
+         (mousedown)="startDrag($event)"
+         (mouseup)="stopDrag($event)"
+         (mousemove)="drag($event)">
+      <g *ngFor="let ins of visualInstances()" [attr.transform]="translateInstance(ins)">
+        <rect x="0" y="0" width="130" height="60" fill="orange" [attr.stroke]="ins.selected ? 'red' : ''" stroke-dasharray="3 3" stroke-width="2" (mousedown)="selectVisualInstance(ins)"></rect>
+        <text text-anchor="middle" x="65" y="35" fill="white" font-family="Arial" font-size="16" style="pointer-events: none">{{ins.name}}</text>
+      </g>
+    </svg>
+    <div style="border: 1px dotted black; display: inline-block; height: 600px; overflow: scroll; margin-left: 20px">
+      <div>
+        <h2>Elementary operators</h2>
+        <ul>
+          <li *ngFor="let op of operators.getElementaries()">{{ op.getName() }}</li>
+        </ul>
+      </div>
+    </div>
+  </div>
 </div>
 
 <div>
