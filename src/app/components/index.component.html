@@ -5,15 +5,15 @@
       <input name="workingDir" id="workingDir" [(ngModel)]="workingDir" />
     </div>
     <div>
-      <button (click)="connect()">Connect</button>
+      <button (click)="refreshOperators()">Refresh operators</button>
     </div>
   </form>
 
   <div>
     <h2>Local operators</h2>
     <ul>
-      <li *ngFor="let op of operators.getLocals()">{{ op.getName() }} <button>Open</button></li>
-      <li><input title="Operator name" /> <button>New</button></li>
+      <li *ngFor="let op of operators.getLocals()"><span [ngClass]="{'sl-saved': op.isSaved(), 'sl-unsaved': !op.isSaved()}">{{ op.getName() }}</span> <button (click)="openOperator(op)">Open</button></li>
+      <li><input title="Operator name" [(ngModel)]="newOperatorName" /> <button (click)="newOperator()">New</button></li>
     </ul>
   </div>
 
