@@ -1,7 +1,7 @@
 export class OperatorDef {
 
   private readonly name: string;
-  private readonly def: any;
+  private def: any;
   private readonly type: string;
   private saved: boolean;
 
@@ -18,6 +18,10 @@ export class OperatorDef {
 
   public getDef(): any {
     return this.def;
+  }
+
+  public setDef(def: any): any {
+    this.def = def;
   }
 
   public getType(): string {

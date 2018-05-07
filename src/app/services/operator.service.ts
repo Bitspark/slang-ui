@@ -1,4 +1,5 @@
 import {Injectable} from '@angular/core';
+import {Observable, Observer} from 'rxjs';
 import {ApiService} from './api.service';
 import {OperatorDef} from '../classes/operator-def.class';
 
@@ -9,12 +10,26 @@ export class OperatorService {
   private libraryOperators: Array<OperatorDef> = [];
   private elementaryOperators: Array<OperatorDef> = [];
   private workingDir: string;
+  private readonly loadingObservable: Observable<boolean>;
+  private loadingObserver: Observer<boolean>;
 
   constructor(private api: ApiService) {
+    this.loadingObservable = new Observable<boolean>(observer => this.loadingObserver = observer);
+    this.workingDir = localStorage.getItem('workingDir');
+    if (this.workingDir === null) {
+      this.workingDir = '';
+    } else {
+      this.refresh();
+    }
   }
 
   public setWorkingDir(workingDir: string) {
+    localStorage.setItem('workingDir', this.workingDir);
     this.workingDir = workingDir;
+  }
+
+  public getWorkingDir(): string {
+    return this.workingDir;
   }
 
   public async refresh() {
@@ -39,11 +54,13 @@ export class OperatorService {
             this.elementaryOperators.push(operator);
             break;
           default:
-            // TODO
+          // TODO
         }
       }
+      this.loadingObserver.next(true);
     } else {
       // TODO
+      this.loadingObserver.next(false);
     }
   }
 
@@ -65,6 +82,10 @@ export class OperatorService {
 
   public getLocal(operatorName: string): OperatorDef {
     return this.localOperators.find(op => op.getName() === operatorName);
+  }
+
+  public getLoadingObservable(): Observable<boolean> {
+    return this.loadingObservable;
   }
 
 }

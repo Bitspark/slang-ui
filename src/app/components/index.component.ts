@@ -13,6 +13,7 @@ export class IndexComponent {
   public newOperatorName = '';
 
   constructor (private router: Router, public operators: OperatorService) {
+    this.workingDir = operators.getWorkingDir();
   }
 
   public async refreshOperators() {
