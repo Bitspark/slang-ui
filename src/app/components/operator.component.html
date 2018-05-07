@@ -1,26 +1,27 @@
-<div *ngIf="operator">
-  <div>
-    <h2>Operator "{{operator.getName()}}"</h2>
-  </div>
+<div>
+  <h2>Operator "{{operatorName}}"</h2>
+</div>
 
+<div>
   <div>
-    <div>
-      YAML view
-    </div>
-    <textarea title="YAML representation" [ngModel]="yamlRepr" (ngModelChange)="updateYaml($event)" (blur)="storeYaml()">
-  </textarea>
+    YAML view
   </div>
+  <textarea title="YAML representation" [ngModel]="yamlRepr" (ngModelChange)="updateYaml($event)" (blur)="storeYaml()">
+</textarea>
+</div>
 
+<div>
   <div>
-    <div>
-      Visual view
-    </div>
-    <svg width="100" height="100" xmlns="http://www.w3.org/2000/svg">
-      <rect *ngFor="let ins of visualInsts"></rect>
-    </svg>
+    Visual view
   </div>
+  <svg width="800" height="600" style="border: 1px dotted black" xmlns="http://www.w3.org/2000/svg">
+    <g *ngFor="let ins of visualInsts" [attr.transform]="translateInstance(ins)">
+      <rect x="0" y="0" width="130" height="60" fill="blue"></rect>
+      <text text-anchor="middle" x="65" y="35" fill="white" font-family="Arial" font-size="16">{{ins.name}}</text>
+    </g>
+  </svg>
+</div>
 
-  <div>
-    Status: {{status}}
-  </div>
+<div>
+  Status: {{status}}
 </div>

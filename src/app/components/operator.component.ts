@@ -26,16 +26,26 @@ export class OperatorComponent implements OnInit {
     this.route.params.subscribe(routeParams => {
       this.operatorName = routeParams.operatorName;
       this.operator = this.operators.getLocal(routeParams.operatorName);
-      this.updateDef(this.operator.getDef());
+      if (this.operator) {
+        this.updateDef(this.operator.getDef());
+      } else {
+        this.status = `Operator "${this.operatorName}" not found.`;
+      }
     });
 
     this.operators.getLoadingObservable().subscribe((success) => {
       if (success) {
         this.operator = this.operators.getLocal(this.operatorName);
-        this.updateDef(this.operator.getDef());
+        if (this.operator) {
+          this.updateDef(this.operator.getDef());
+        } else {
+          this.status = `Operator "${this.operatorName}" not found.`;
+        }
       }
     });
   }
+
+  // YAML
 
   public updateYaml(newYaml) {
     this.yamlRepr = newYaml;
@@ -53,12 +63,19 @@ export class OperatorComponent implements OnInit {
 
   private updateDef(def: any) {
     this.operator.setDef(def);
+    this.status = `Updated definition of operator "${this.operatorName}".`;
     this.displayYaml();
     this.displayVisual();
   }
 
   private displayYaml() {
     this.yamlRepr = safeDump(this.operator.getDef());
+  }
+
+  // Visual
+
+  public translateInstance(ins: any) {
+    return `translate(${Math.round(ins.x)},${Math.round(ins.y)})`;
   }
 
   private displayVisual() {
@@ -68,7 +85,11 @@ export class OperatorComponent implements OnInit {
     for (const insName in def.operators) {
       if (def.operators.hasOwnProperty(insName)) {
         const ins = def.operators[insName];
-        console.log(ins);
+        this.visualInsts.push({
+          name: insName,
+          x: Math.random() * 600,
+          y: Math.random() * 400
+        });
       }
     }
   }
