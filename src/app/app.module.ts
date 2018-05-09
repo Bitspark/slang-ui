@@ -9,13 +9,14 @@ import {AppRoutes} from './app.routes';
 import {AppComponent} from './app.component';
 import {IndexComponent} from './components/index.component';
 import {OperatorComponent} from './components/operator.component';
+import {PortComponent} from './components/port.component';
 
 import {ApiService} from './services/api.service';
 import {OperatorService} from './services/operator.service';
 
 @NgModule({
   declarations: [
-    AppComponent, IndexComponent, OperatorComponent
+    AppComponent, IndexComponent, OperatorComponent, PortComponent
   ],
   imports: [
     RouterModule.forRoot(

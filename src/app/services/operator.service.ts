@@ -1,4 +1,4 @@
-import {Injectable} from '@angular/core';
+import {EventEmitter, Injectable} from '@angular/core';
 import {Observable, Observer} from 'rxjs';
 import {ApiService} from './api.service';
 import {OperatorDef} from '../classes/operator-def.class';
@@ -10,11 +10,10 @@ export class OperatorService {
   private libraryOperators: Array<OperatorDef> = [];
   private elementaryOperators: Array<OperatorDef> = [];
   private workingDir: string;
-  private readonly loadingObservable: Observable<boolean>;
-  private loadingObserver: Observer<boolean>;
+  private loadedEmitter: EventEmitter<boolean>;
 
   constructor(private api: ApiService) {
-    this.loadingObservable = new Observable<boolean>(observer => this.loadingObserver = observer);
+    this.loadedEmitter = new EventEmitter<boolean>();
     this.workingDir = localStorage.getItem('workingDir');
     if (this.workingDir === null) {
       this.workingDir = '';
@@ -24,7 +23,7 @@ export class OperatorService {
   }
 
   public setWorkingDir(workingDir: string) {
-    localStorage.setItem('workingDir', this.workingDir);
+    localStorage.setItem('workingDir', workingDir);
     this.workingDir = workingDir;
   }
 
@@ -57,10 +56,10 @@ export class OperatorService {
           // TODO
         }
       }
-      this.loadingObserver.next(true);
+      this.loadedEmitter.emit(true);
     } else {
       // TODO
-      this.loadingObserver.next(false);
+      this.loadedEmitter.emit(false);
     }
   }
 
@@ -84,8 +83,32 @@ export class OperatorService {
     return this.localOperators.find(op => op.getName() === operatorName);
   }
 
+  public getLibrary(operatorName: string): OperatorDef {
+    return this.libraryOperators.find(op => op.getName() === operatorName);
+  }
+
+  public getElementary(operatorName: string): OperatorDef {
+    return this.elementaryOperators.find(op => op.getName() === operatorName);
+  }
+
+  public getOperator(operatorName: string): OperatorDef {
+    let op = this.getLocal(operatorName);
+    if (op) {
+      return op;
+    }
+    op = this.getLibrary(operatorName);
+    if (op) {
+      return op;
+    }
+    op = this.getElementary(operatorName);
+    if (op) {
+      return op;
+    }
+    return null;
+  }
+
   public getLoadingObservable(): Observable<boolean> {
-    return this.loadingObservable;
+    return this.loadedEmitter;
   }
 
 }

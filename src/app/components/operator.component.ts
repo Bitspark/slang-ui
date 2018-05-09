@@ -115,6 +115,13 @@ export class OperatorComponent implements OnInit {
     for (const insName in def.operators) {
       if (def.operators.hasOwnProperty(insName)) {
         const ins = def.operators[insName];
+        let opName = ins.operator;
+        if (opName.startsWith('.')) {
+          const opSplit = this.operatorName.split('.');
+          opSplit[opSplit.length - 1] = opName.substr(1);
+          opName = opSplit.join('.');
+        }
+        const op = this.operators.getOperator(opName);
         let visualIns = this.visualInsts[insName];
         if (typeof visualIns === 'undefined') {
           visualIns = {
@@ -122,6 +129,10 @@ export class OperatorComponent implements OnInit {
             posX: Math.random() * 600,
             posY: Math.random() * 400
           };
+          const opDef = JSON.parse(JSON.stringify(op.getDef()));
+          OperatorDef.specifyOperatorDef(opDef, ins['generics'], ins['properties'], opDef['properties']);
+          visualIns['services'] = opDef['services'];
+          visualIns['delegates'] = opDef['delegates'];
           this.visualInsts[insName] = visualIns;
         }
         visualIns.visible = true;

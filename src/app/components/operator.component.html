@@ -15,14 +15,16 @@
     Visual view
   </div>
   <div style="height: 700px">
-    <svg width="800" height="600" style="border: 1px dotted black; display: inline-block" xmlns="http://www.w3.org/2000/svg"
+    <svg width="800" height="600" style="border: 1px dotted black; display: inline-block" xmlns:svg="http://www.w3.org/2000/svg"
          (mousedown)="startDrag($event)"
          (mouseup)="stopDrag($event)"
          (mousemove)="drag($event)">
-      <g *ngFor="let ins of visualInstances()" [attr.transform]="translateInstance(ins)">
-        <rect x="0" y="0" width="130" height="60" fill="orange" [attr.stroke]="ins.selected ? 'red' : ''" stroke-dasharray="3 3" stroke-width="2" (mousedown)="selectVisualInstance(ins)"></rect>
-        <text text-anchor="middle" x="65" y="35" fill="white" font-family="Arial" font-size="16" style="pointer-events: none">{{ins.name}}</text>
-      </g>
+      <svg:g *ngFor="let ins of visualInstances()" [attr.transform]="translateInstance(ins)">
+        <svg:rect x="0" y="0" width="130" height="60" fill="orange" [attr.stroke]="ins.selected ? 'red' : ''" stroke-dasharray="3 3" stroke-width="2" (mousedown)="selectVisualInstance(ins)"></svg:rect>
+        <svg:text text-anchor="middle" x="65" y="35" fill="white" font-family="Arial" font-size="16" style="pointer-events: none">{{ins.name}}</svg:text>
+        <svg:g transform="translate(0,0)" app-port [typeDef]="ins['services']['main']['in']"></svg:g>
+        <svg:g transform="translate(0,60) scale(1,-1)" app-port [typeDef]="ins['services']['main']['out']"></svg:g>
+      </svg:g>
     </svg>
     <div style="border: 1px dotted black; display: inline-block; height: 600px; overflow: scroll; margin-left: 20px">
       <div>
