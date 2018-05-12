@@ -128,6 +128,25 @@ export class OperatorComponent implements OnInit {
     }
   }
 
+  public addInstance(op: any) {
+    const def = this.operator.getDef();
+    const opSplit = op.name.split('.');
+    const opName = opSplit[opSplit.length - 1];
+    let insName = opName;
+    let i = 1;
+    if (!def.operators) {
+      def.operators = {};
+    }
+    while (def.operators[insName]) {
+      insName = opName + i;
+      i++;
+    }
+    def.operators[insName] = {
+      operator: op.name
+    };
+    this.updateDef(def);
+  }
+
   // Dragging
 
   private updateDrag(event, update?: boolean) {
