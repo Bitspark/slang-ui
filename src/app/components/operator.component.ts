@@ -91,16 +91,6 @@ export class OperatorComponent implements OnInit {
 
   public selectVisualInstance(ins: OperatorInstance) {
     this.visualSelectedInst = ins;
-    /*
-
-    for (const insName in this.visualInsts) {
-      if (this.visualInsts.hasOwnProperty(insName)) {
-        this.visualInsts[insName].selected = false;
-      }
-    }
-    ins.selected = true;
-    this.visualSelectedInst = ins;
-    */
   }
 
   private displayVisual() {
@@ -117,12 +107,15 @@ export class OperatorComponent implements OnInit {
         }
         const op = this.operators.getOperator(opName);
         let visualIns = this.visualInsts.get(insName);
-        if (typeof visualIns === 'undefined') {
-          const opDef = JSON.parse(JSON.stringify(op.getDef()));
-          OperatorDef.specifyOperatorDef(opDef, ins['generics'], ins['properties'], opDef['properties']);
-          visualIns = new OperatorInstance(insName, null, [Math.random() * 600, Math.random() * 400], [1, 1], 0, opDef);
-          this.visualInsts.set(insName, visualIns);
+        const pos: [number, number] = [Math.random() * 600, Math.random() * 400];
+        if (typeof visualIns !== 'undefined') {
+          pos[0] = visualIns.getPosX();
+          pos[1] = visualIns.getPosY();
         }
+        const opDef = JSON.parse(JSON.stringify(op.getDef()));
+        OperatorDef.specifyOperatorDef(opDef, ins['generics'], ins['properties'], opDef['properties']);
+        visualIns = new OperatorInstance(insName, null, pos, [1, 1], 0, opDef);
+        this.visualInsts.set(insName, visualIns);
         visualIns.show();
       }
     }
@@ -238,7 +231,6 @@ class OperatorInstance extends Composable implements Movable {
     let height = this.mainIn.getHeight() + 10;
 
     this.delegates = new Map<string, PortGroup>();
-
     if (opDef.delegates) {
       for (const dlgName in opDef.delegates) {
         if (opDef.delegates.hasOwnProperty(dlgName)) {
