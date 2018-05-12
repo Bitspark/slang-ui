@@ -91,16 +91,6 @@ export class OperatorComponent implements OnInit {
 
   public selectVisualInstance(ins: OperatorInstance) {
     this.visualSelectedInst = ins;
-    /*
-
-    for (const insName in this.visualInsts) {
-      if (this.visualInsts.hasOwnProperty(insName)) {
-        this.visualInsts[insName].selected = false;
-      }
-    }
-    ins.selected = true;
-    this.visualSelectedInst = ins;
-    */
   }
 
   private displayVisual() {
@@ -117,12 +107,15 @@ export class OperatorComponent implements OnInit {
         }
         const op = this.operators.getOperator(opName);
         let visualIns = this.visualInsts.get(insName);
-        if (typeof visualIns === 'undefined') {
-          const opDef = JSON.parse(JSON.stringify(op.getDef()));
-          OperatorDef.specifyOperatorDef(opDef, ins['generics'], ins['properties'], opDef['properties']);
-          visualIns = new OperatorInstance(insName, null, [Math.random() * 600, Math.random() * 400], [1, 1], 0, opDef);
-          this.visualInsts.set(insName, visualIns);
+        const pos: [number, number] = [Math.random() * 600, Math.random() * 400];
+        if (typeof visualIns !== 'undefined') {
+          pos[0] = visualIns.getPosX();
+          pos[1] = visualIns.getPosY();
         }
+        const opDef = JSON.parse(JSON.stringify(op.getDef()));
+        OperatorDef.specifyOperatorDef(opDef, ins['generics'], ins['properties'], opDef['properties']);
+        visualIns = new OperatorInstance(insName, null, pos, [1, 1], 0, opDef);
+        this.visualInsts.set(insName, visualIns);
         visualIns.show();
       }
     }
@@ -266,13 +259,12 @@ class OperatorInstance extends Composable implements Movable {
     let height = this.mainIn.getHeight() + 10;
 
     this.delegates = new Map<string, PortGroup>();
-
     if (opDef.delegates) {
       for (const dlgName in opDef.delegates) {
         if (opDef.delegates.hasOwnProperty(dlgName)) {
           height += 5;
           const dlgDef = opDef.delegates[dlgName];
-          const dlg = new PortGroup(this, [width, height], [1, 1], 90, dlgDef);
+          const dlg = new PortGroup(this, [width, height], [-1, -1], -90, dlgDef, true);
           this.delegates.set(dlgName, dlg);
           height += dlg.getWidth() + 5;
         }
@@ -326,10 +318,15 @@ class PortGroup extends Composable {
   private in: Port;
   private out: Port;
 
-  constructor(parent: Composable, pos: [number, number], scale: [number, number], rotation: number, portGrpDef: any) {
+  constructor(parent: Composable, pos: [number, number], scale: [number, number], rotation: number, portGrpDef: any, reversePorts: boolean) {
     super(parent, pos, scale, rotation);
-    this.in = new Port(this, [0, 0], [1, 1], 0, portGrpDef.in);
-    this.out = new Port(this, [this.in.getWidth() + 5, 0], [1, 1], 0, portGrpDef.out);
+    if (reversePorts) {
+      this.out = new Port(this, [0, 0], [1, 1], 0, portGrpDef.out);
+      this.in = new Port(this, [this.out.getWidth() + 5, 0], [1, 1], 0, portGrpDef.in);
+    } else {
+      this.in = new Port(this, [0, 0], [1, 1], 0, portGrpDef.in);
+      this.out = new Port(this, [this.in.getWidth() + 5, 0], [1, 1], 0, portGrpDef.out);
+    }
     this.dim = [this.in.getWidth() + this.out.getWidth() + 10, Math.max(this.in.getHeight(), this.out.getHeight())];
   }
 
@@ -371,7 +368,6 @@ export class Port extends Composable {
     super(parent, pos, scale, rotation);
     this.type = portDef.type;
     this.dim = [this.style.x, this.style.y];
-
 
     switch (this.type) {
       case 'generic':

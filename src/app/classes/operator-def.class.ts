@@ -17,18 +17,33 @@ export class OperatorDef {
   }
 
   public static specifyOperatorDef(def: any, gens: any, props: any, propDefs: any) {
+    const newSrvs = {};
     for (const srvName in def['services']) {
       if (def['services'].hasOwnProperty(srvName)) {
         this.specifyTypeDef(def['services'][srvName]['in'], gens, props, propDefs);
         this.specifyTypeDef(def['services'][srvName]['out'], gens, props, propDefs);
+
+        const expanded = expandProperties(srvName, props, propDefs);
+        for (const expand of expanded) {
+          newSrvs[expand] = def['services'][srvName];
+        }
       }
     }
+    def['services'] = newSrvs;
+
+    const newDlgs = {};
     for (const dlgName in def['delegates']) {
       if (def['delegates'].hasOwnProperty(dlgName)) {
         this.specifyTypeDef(def['delegates'][dlgName]['in'], gens, props, propDefs);
         this.specifyTypeDef(def['delegates'][dlgName]['out'], gens, props, propDefs);
+
+        const expanded = expandProperties(dlgName, props, propDefs);
+        for (const expand of expanded) {
+          newDlgs[expand] = def['delegates'][dlgName];
+        }
       }
     }
+    def['delegates'] = newDlgs;
   }
 
   public static specifyTypeDef(def: any, gens: any, props: any, propDefs: any) {
@@ -77,44 +92,6 @@ export class OperatorDef {
       return;
     }
     console.error('Unknown type', def['type']);
-  }
-
-  public static calcPortWidth(def: any): number {
-    if (this.isPrimitive(def) || def['type'] === 'generic') {
-      return 20;
-    }
-    if (def['type'] === 'stream') {
-      return this.calcPortWidth(def['stream']) + 10;
-    }
-    if (def['type'] === 'map') {
-      let width = 0;
-      for (const key in def['map']) {
-        if (def['map'].hasOwnProperty(key)) {
-          width += this.calcPortWidth(def['map'][key]) + 2;
-        }
-      }
-      return width;
-    }
-    return -1;
-  }
-
-  public static calcPortHeight(def: any): number {
-    if (this.isPrimitive(def) || def['type'] === 'generic') {
-      return 10;
-    }
-    if (def['type'] === 'stream') {
-      return this.calcPortHeight(def['stream']) + 5;
-    }
-    if (def['type'] === 'map') {
-      let height = 0;
-      for (const key in def['map']) {
-        if (def['map'].hasOwnProperty(key)) {
-          height = Math.max(height, this.calcPortHeight(def['map'][key]));
-        }
-      }
-      return height;
-    }
-    return -1;
   }
 
   constructor({name, def, type, saved}: { name: string, def: any, type: string, saved: boolean }) {
