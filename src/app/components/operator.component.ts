@@ -192,6 +192,15 @@ export class Transformable {
   public getHeight(): number {
     return this.dim[1];
   }
+
+  protected setPosX(x: number) {
+    this.pos[0] = x;
+  }
+
+  protected setPosY(y: number) {
+    this.pos[1] = y;
+  }
+
 }
 
 interface Movable {
@@ -253,7 +262,11 @@ class OperatorInstance extends Composable implements Movable {
     height = Math.max(height + 10, 60);
     this.mainOut = new Port(this, [0, height], [1, -1], 0, opDef.services['main']['out']);
     this.dim = [width, height];
+
+    this.mainIn.justifyHorizontally();
+    this.mainOut.justifyHorizontally();
   }
+
 
   public move(delta: [number, number]): [number, number] {
     this.pos[0] += delta[0];
@@ -394,5 +407,10 @@ export class Port extends Composable {
 
   public getStream(): Port {
     return this.stream;
+  }
+
+  public justifyHorizontally() {
+    const x = (this.getParent().getWidth() - this.getWidth()) / 2;
+    this.setPosX(x);
   }
 }
