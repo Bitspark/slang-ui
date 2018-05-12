@@ -4,7 +4,7 @@
   <svg:path *ngIf="port.isGeneric()" d="M0,0 a1,1 0 0,0 20,0" fill="purple"></svg:path>
   <!-- Stream -->
   <svg:rect *ngIf="port.isStream()" fill="white" stroke-width="1" stroke="black" [attr.height]="port.getHeight()" [attr.width]="port.getWidth()"></svg:rect>
-  <svg:g *ngIf="port.isStream()" transform="translate(5,0)" app-port [port]="port.getStream()"></svg:g>
+  <svg:g *ngIf="port.isStream()" [attr.transform]="transform(port.getStream())" app-port [port]="port.getStream()"></svg:g>
   <!-- Map -->
   <svg:g *ngIf="port.isMap()">
     <svg:g *ngFor="let entry of getEntries()" [attr.transform]="transform(entry)" app-port [port]="entry"></svg:g>
