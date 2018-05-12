@@ -13,10 +13,6 @@ export class PortComponent {
   @Input()
   public port: Port;
 
-  public isPrimitive(): boolean {
-    return OperatorDef.isPrimitive(this.port) || this.port['type'] === 'generic';
-  }
-
   public getEntries(): Array<Port> {
     return Array.from(this.port.getMap().values());
   }

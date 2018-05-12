@@ -198,7 +198,6 @@ interface Movable {
   move(delta: [number, number]): [number, number];
 }
 
-
 class Composable extends Transformable {
   constructor(private parent: Composable, pos: [number, number], scale: [number, number], rotation: number) {
     super(pos, scale, rotation);
@@ -235,22 +234,22 @@ class OperatorInstance extends Composable implements Movable {
     super(parent, pos, scale, rotation);
     this.mainIn = new Port(this, [0, 0], [1, 1], 0, opDef.services['main']['in']);
     const tmpMainOut = new Port(this, [0, 0], [1, 1], 0, opDef.services['main']['out']);
-    const width = Math.max(this.mainIn.getWidth(), tmpMainOut.getWidth());
-    let height = 5;
+    const width = Math.max(Math.max(this.mainIn.getWidth(), tmpMainOut.getWidth()) + 10, 130);
+    let height = this.mainIn.getHeight() + 10;
 
     this.delegates = new Map<string, PortGroup>();
 
     if (opDef.delegates) {
-      for (const dlgName of opDef.delegates) {
+      for (const dlgName in opDef.delegates) {
         if (opDef.delegates.hasOwnProperty(dlgName)) {
           const dlgDef = opDef.delegates[dlgName];
-          const dlg = new PortGroup(this, [width, height], [1, 1], -90, dlgDef);
+          const dlg = new PortGroup(this, [width, height], [1, 1], 90, dlgDef);
           this.delegates.set(dlgName, dlg);
           height += dlg.getWidth() + 5;
         }
       }
     }
-    height = Math.max(height, 60);
+    height = Math.max(height + 10, 60);
     this.mainOut = new Port(this, [0, height], [1, -1], 0, opDef.services['main']['out']);
     this.dim = [width, height];
   }
@@ -284,6 +283,10 @@ class OperatorInstance extends Composable implements Movable {
   public getName(): string {
     return this.name;
   }
+
+  public getDelegates(): Array<PortGroup> {
+    return Array.from(this.delegates.values());
+  }
 }
 
 class PortGroup extends Composable {
@@ -293,8 +296,16 @@ class PortGroup extends Composable {
   constructor(parent: Composable, pos: [number, number], scale: [number, number], rotation: number, portGrpDef: any) {
     super(parent, pos, scale, rotation);
     this.in = new Port(this, [0, 0], [1, 1], 0, portGrpDef.in);
-    this.out = new Port(this, [this.in.getWidth() + 5, 0], [-1, 1], 0, portGrpDef.out);
+    this.out = new Port(this, [this.in.getWidth() + 5, 0], [1, 1], 0, portGrpDef.out);
     this.dim = [this.in.getWidth() + this.out.getWidth() + 10, Math.max(this.in.getHeight(), this.out.getHeight())];
+  }
+
+  public getIn(): Port {
+    return this.in;
+  }
+
+  public getOut(): Port {
+    return this.out;
   }
 }
 
@@ -342,6 +353,10 @@ export class Port extends Composable {
       this.type === 'boolean' ||
       this.type === 'primitive' ||
       this.type === 'trigger';
+  }
+
+  public isGeneric(): boolean {
+    return this.type === 'generic';
   }
 
   public isStream(): boolean {

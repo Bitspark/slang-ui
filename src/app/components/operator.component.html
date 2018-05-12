@@ -28,6 +28,12 @@
         <svg:text text-anchor="middle" x="65" y="35" fill="white" font-family="Arial" font-size="16"
                   style="pointer-events: none">{{ins.getName()}}
         </svg:text>
+
+        <svg:g *ngFor="let dlg of ins.getDelegates()" [attr.transform]="transform(dlg)">
+          <svg:g [attr.transform]="transform(dlg.getIn())" app-port [port]="dlg.getIn()"></svg:g>
+          <svg:g [attr.transform]="transform(dlg.getOut())" app-port [port]="dlg.getOut()"></svg:g>
+        </svg:g>
+
         <svg:g [attr.transform]="transform(ins.getMainIn())" app-port [port]="ins.getMainIn()"></svg:g>
         <svg:g [attr.transform]="transform(ins.getMainOut())" app-port [port]="ins.getMainOut()"></svg:g>
       </svg:g>
