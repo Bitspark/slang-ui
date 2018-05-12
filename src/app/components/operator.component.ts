@@ -339,8 +339,8 @@ export class Port extends Composable {
     y: 10,
 
     str: {
-      px: 5,
-      py: 10,
+      px: 2,
+      py: 2,
     },
 
     map: {
