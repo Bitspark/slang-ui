@@ -235,7 +235,7 @@ class OperatorInstance extends Composable implements Movable {
       for (const dlgName in opDef.delegates) {
         if (opDef.delegates.hasOwnProperty(dlgName)) {
           const dlgDef = opDef.delegates[dlgName];
-          const dlg = new PortGroup(this, [width, height], [-1, -1], -90, dlgDef);
+          const dlg = new PortGroup(this, [width, height], [-1, -1], -90, dlgDef, true);
           this.delegates.set(dlgName, dlg);
           height += dlg.getWidth() + 5;
         }
@@ -285,10 +285,15 @@ class PortGroup extends Composable {
   private in: Port;
   private out: Port;
 
-  constructor(parent: Composable, pos: [number, number], scale: [number, number], rotation: number, portGrpDef: any) {
+  constructor(parent: Composable, pos: [number, number], scale: [number, number], rotation: number, portGrpDef: any, reversePorts: boolean) {
     super(parent, pos, scale, rotation);
-    this.in = new Port(this, [0, 0], [1, 1], 0, portGrpDef.in);
-    this.out = new Port(this, [this.in.getWidth() + 5, 0], [1, 1], 0, portGrpDef.out);
+    if (reversePorts) {
+      this.out = new Port(this, [0, 0], [1, 1], 0, portGrpDef.out);
+      this.in = new Port(this, [this.out.getWidth() + 5, 0], [1, 1], 0, portGrpDef.in);
+    } else {
+      this.in = new Port(this, [0, 0], [1, 1], 0, portGrpDef.in);
+      this.out = new Port(this, [this.in.getWidth() + 5, 0], [1, 1], 0, portGrpDef.out);
+    }
     this.dim = [this.in.getWidth() + this.out.getWidth() + 10, Math.max(this.in.getHeight(), this.out.getHeight())];
   }
 
