@@ -42,7 +42,7 @@
       <div>
         <h2>Elementary operators</h2>
         <ul>
-          <li *ngFor="let op of operators.getElementaries()">{{ op.getName() }}</li>
+          <li *ngFor="let op of operators.getElementaries()">{{ op.getName() }} <button (click)="addInstance(op)">+</button></li>
         </ul>
       </div>
     </div>
