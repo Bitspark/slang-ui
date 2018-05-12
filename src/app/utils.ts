@@ -42,5 +42,5 @@ export function expandProperties(str: string, props: any, propDefs: any): Array<
 }
 
 export function generateSvgTransform(trans: Transformable): string {
-  return `translate(${trans.getPosX()},${trans.getPosY()}) scale(${trans.getScaleX()},${trans.getScaleY()}) rotate(${trans.getRotation()})`;
+  return `translate(${trans.getPosX()},${trans.getPosY()}) rotate(${trans.getRotation()}) scale(${trans.getScaleX()},${trans.getScaleY()})`;
 }

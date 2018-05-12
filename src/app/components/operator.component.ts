@@ -235,7 +235,7 @@ class OperatorInstance extends Composable implements Movable {
       for (const dlgName in opDef.delegates) {
         if (opDef.delegates.hasOwnProperty(dlgName)) {
           const dlgDef = opDef.delegates[dlgName];
-          const dlg = new PortGroup(this, [width, height], [1, 1], 90, dlgDef);
+          const dlg = new PortGroup(this, [width, height], [-1, -1], -90, dlgDef);
           this.delegates.set(dlgName, dlg);
           height += dlg.getWidth() + 5;
         }
@@ -312,14 +312,13 @@ export class Port extends Composable {
     this.type = portDef.type;
     this.dim = [20, 10];
 
-
     switch (this.type) {
       case 'generic':
         this.generic = portDef.generic;
         break;
       case 'stream':
         this.stream = new Port(this, [5, 0], [1, 1], 0, portDef.stream);
-        this.dim = [this.stream.getWidth() + 10, this.stream.getHeight() + 5];
+        this.dim = [this.stream.getWidth() + 5, this.stream.getHeight() + 5];
         break;
       case 'map':
         let x = 0;
