@@ -1,3 +1,5 @@
+import {Transformable} from './components/operator.component';
+
 function expandExpressionPart(exprPart: string, props: any, propDefs: any): Array<string> {
   const vals = [];
   const prop = props[exprPart];
@@ -37,4 +39,8 @@ export function expandProperties(str: string, props: any, propDefs: any): Array<
     exprs = newExprs;
   }
   return exprs;
+}
+
+export function generateSvgTransform(trans: Transformable): string {
+  return `translate(${trans.getPosX()},${trans.getPosY()}) scale(${trans.getScaleX()},${trans.getScaleY()}) rotate(${trans.getRotation()})`;
 }
