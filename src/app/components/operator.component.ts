@@ -131,13 +131,9 @@ export class OperatorComponent implements OnInit {
   // Dragging
 
   private updateDrag(event, update?: boolean) {
-    /*
-    if (update) {
-      this.visualSelectedInst.posX += (event.screenX - this.lastX);
-      this.visualSelectedInst.posY += (event.screenY - this.lastY);
+    if (this.visualSelectedInst && update) {
+      this.visualSelectedInst.move([event.screenX - this.lastX, event.screenY - this.lastY]);
     }
-    */
-
     this.lastX = event.screenX;
     this.lastY = event.screenY;
   }
@@ -166,7 +162,7 @@ export class OperatorComponent implements OnInit {
 export class Transformable {
   protected dim: [number, number];
 
-  constructor(private pos: [number, number], private scale: [number, number], private rotation: number) {
+  constructor(protected pos: [number, number], private scale: [number, number], private rotation: number) {
   }
 
   public getPosX(): number {
@@ -198,6 +194,11 @@ export class Transformable {
   }
 }
 
+interface Movable {
+  move(delta: [number, number]): [number, number];
+}
+
+
 class Composable extends Transformable {
   constructor(private parent: Composable, pos: [number, number], scale: [number, number], rotation: number) {
     super(pos, scale, rotation);
@@ -223,7 +224,7 @@ class Composable extends Transformable {
 
 }
 
-class OperatorInstance extends Composable {
+class OperatorInstance extends Composable implements Movable {
   private mainIn: Port;
   private mainOut: Port;
   private services: Map<string, PortGroup>;
@@ -252,6 +253,12 @@ class OperatorInstance extends Composable {
     height = Math.max(height, 60);
     this.mainOut = new Port(this, [0, height], [1, -1], 0, opDef.services['main']['out']);
     this.dim = [width, height];
+  }
+
+  public move(delta: [number, number]): [number, number] {
+    this.pos[0] += delta[0];
+    this.pos[1] += delta[1];
+    return this.pos;
   }
 
   public getMainIn(): Port {
