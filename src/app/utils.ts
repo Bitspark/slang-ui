@@ -2,6 +2,9 @@ import {Transformable} from './components/operator.component';
 
 function expandExpressionPart(exprPart: string, props: any, propDefs: any): Array<string> {
   const vals = [];
+  if (!props) {
+    return vals;
+  }
   const prop = props[exprPart];
   if (!prop) {
     console.error('missing property', exprPart);

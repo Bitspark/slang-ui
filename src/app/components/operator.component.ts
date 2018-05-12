@@ -121,6 +121,25 @@ export class OperatorComponent implements OnInit {
     }
   }
 
+  public addInstance(op: any) {
+    const def = this.operator.getDef();
+    const opSplit = op.name.split('.');
+    const opName = opSplit[opSplit.length - 1];
+    let insName = opName;
+    let i = 1;
+    if (!def.operators) {
+      def.operators = {};
+    }
+    while (def.operators[insName]) {
+      insName = opName + i;
+      i++;
+    }
+    def.operators[insName] = {
+      operator: op.name
+    };
+    this.updateDef(def);
+  }
+
   // Dragging
 
   private updateDrag(event, update?: boolean) {
@@ -185,6 +204,15 @@ export class Transformable {
   public getHeight(): number {
     return this.dim[1];
   }
+
+  protected setPosX(x: number) {
+    this.pos[0] = x;
+  }
+
+  protected setPosY(y: number) {
+    this.pos[1] = y;
+  }
+
 }
 
 interface Movable {
@@ -234,6 +262,7 @@ class OperatorInstance extends Composable implements Movable {
     if (opDef.delegates) {
       for (const dlgName in opDef.delegates) {
         if (opDef.delegates.hasOwnProperty(dlgName)) {
+          height += 5;
           const dlgDef = opDef.delegates[dlgName];
           const dlg = new PortGroup(this, [width, height], [-1, -1], -90, dlgDef, true);
           this.delegates.set(dlgName, dlg);
@@ -244,7 +273,11 @@ class OperatorInstance extends Composable implements Movable {
     height = Math.max(height + 10, 60);
     this.mainOut = new Port(this, [0, height], [1, -1], 0, opDef.services['main']['out']);
     this.dim = [width, height];
+
+    this.mainIn.justifyHorizontally();
+    this.mainOut.justifyHorizontally();
   }
+
 
   public move(delta: [number, number]): [number, number] {
     this.pos[0] += delta[0];
@@ -312,18 +345,37 @@ export class Port extends Composable {
   private stream: Port;
   private map: Map<string, Port>;
 
+  style = {
+    /*
+        x: width [px]
+        y: height [px]
+        p*: padding [px]
+     */
+    x: 20,
+    y: 10,
+
+    str: {
+      px: 2,
+      py: 2,
+    },
+
+    map: {
+      px: 2,
+    }
+  };
+
   constructor(parent: Composable, pos: [number, number], scale: [number, number], rotation: number, portDef: any) {
     super(parent, pos, scale, rotation);
     this.type = portDef.type;
-    this.dim = [20, 10];
+    this.dim = [this.style.x, this.style.y];
 
     switch (this.type) {
       case 'generic':
         this.generic = portDef.generic;
         break;
       case 'stream':
-        this.stream = new Port(this, [5, 0], [1, 1], 0, portDef.stream);
-        this.dim = [this.stream.getWidth() + 5, this.stream.getHeight() + 5];
+        this.stream = new Port(this, [this.style.str.px, 0], [1, 1], 0, portDef.stream);
+        this.dim = [2 * this.style.str.px + this.stream.getWidth(), this.style.str.py + this.stream.getHeight()];
         break;
       case 'map':
         let x = 0;
@@ -333,10 +385,11 @@ export class Port extends Composable {
           if (portDef.map.hasOwnProperty(k)) {
             const p = new Port(this, [x, 0], [1, 1], 0, portDef.map[k]);
             this.map.set(k, p);
-            x += p.getWidth() + 5;
+            x += p.getWidth() + this.style.map.px;
             height = Math.max(height, p.getHeight());
           }
         }
+        x -= this.style.map.px;
         this.dim = [x, height];
         break;
     }
@@ -371,4 +424,8 @@ export class Port extends Composable {
     return this.stream;
   }
 
+  public justifyHorizontally() {
+    const x = (this.getParent().getWidth() - this.getWidth()) / 2;
+    this.setPosX(x);
+  }
 }
