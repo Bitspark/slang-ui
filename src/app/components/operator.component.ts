@@ -3,6 +3,7 @@ import {ActivatedRoute} from '@angular/router';
 import {OperatorService} from '../services/operator.service';
 import {OperatorDef} from '../classes/operator-def.class';
 import {safeDump, safeLoad} from 'js-yaml';
+import {generateSvgTransform} from '../utils';
 
 @Component({
   templateUrl: './operator.component.html',
@@ -39,7 +40,6 @@ export class OperatorComponent implements OnInit {
         this.status = `Operator "${this.operatorName}" not found.`;
       }
     });
-
     this.operators.getLoadingObservable().subscribe((success) => {
       if (success) {
         this.operator = this.operators.getLocal(this.operatorName);
@@ -81,13 +81,12 @@ export class OperatorComponent implements OnInit {
 
   // Visual
 
-  public transform(trans: Transformable) {
-    return `translate(${Math.round(trans.getPosX())},${Math.round(trans.getPosY())})`;
+  public transform(trans: Transformable): string {
+    return generateSvgTransform(trans);
   }
 
   public visualInstances() {
-    const x = Array.from(this.visualInsts.values()).filter(ins => ins.isVisible());
-    return x;
+    return Array.from(this.visualInsts.values()).filter(ins => ins.isVisible());
   }
 
   public selectVisualInstance(ins: OperatorInstance) {
@@ -164,7 +163,7 @@ export class OperatorComponent implements OnInit {
 
 }
 
-class Transformable {
+export class Transformable {
   protected dim: [number, number];
 
   constructor(private pos: [number, number], private scale: [number, number], private rotation: number) {
@@ -250,6 +249,7 @@ class OperatorInstance extends Composable {
         }
       }
     }
+    height = Math.max(height, 60);
     this.mainOut = new Port(this, [0, height], [1, -1], 0, opDef.services['main']['out']);
     this.dim = [width, height];
   }
@@ -291,7 +291,6 @@ class PortGroup extends Composable {
   }
 }
 
-
 export class Port extends Composable {
   private type: string;
   private generic: string;
@@ -301,7 +300,7 @@ export class Port extends Composable {
   constructor(parent: Composable, pos: [number, number], scale: [number, number], rotation: number, portDef: any) {
     super(parent, pos, scale, rotation);
     this.type = portDef.type;
-    this.dim = [10, 20];
+    this.dim = [20, 10];
 
 
     switch (this.type) {
@@ -310,7 +309,7 @@ export class Port extends Composable {
         break;
       case 'stream':
         this.stream = new Port(this, [5, 0], [1, 1], 0, portDef.stream);
-        this.dim = [this.stream.getHeight() + 5, this.stream.getWidth() + 10];
+        this.dim = [this.stream.getWidth() + 10, this.stream.getHeight() + 5];
         break;
       case 'map':
         let x = 0;
@@ -337,4 +336,21 @@ export class Port extends Composable {
       this.type === 'primitive' ||
       this.type === 'trigger';
   }
+
+  public isStream(): boolean {
+    return this.type === 'stream';
+  }
+
+  public isMap(): boolean {
+    return this.type === 'map';
+  }
+
+  public getMap(): Map<string, Port> {
+    return this.map;
+  }
+
+  public getStream(): Port {
+    return this.stream;
+  }
+
 }

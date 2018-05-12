@@ -1,11 +1,11 @@
 <svg:g xmlns:svg="http://www.w3.org/2000/svg">
   <!-- Primitive -->
-  <svg:path *ngIf="isPrimitive()" d="M0,0 a1,1 0 0,0 20,0" fill="blue"></svg:path>
+  <svg:path *ngIf="port.isPrimitive()" d="M0,0 a1,1 0 0,0 20,0" fill="blue"></svg:path>
   <!-- Stream -->
-  <svg:rect *ngIf="isStream()" fill="white" stroke-width="1" stroke="black" [attr.height]="getHeight()" [attr.width]="getWidth()"></svg:rect>
-  <svg:g *ngIf="isStream()" transform="translate(5,0)" app-port [typeDef]="typeDef['stream']"></svg:g>
+  <svg:rect *ngIf="port.isStream()" fill="white" stroke-width="1" stroke="black" [attr.height]="port.getHeight()" [attr.width]="port.getWidth()"></svg:rect>
+  <svg:g *ngIf="port.isStream()" transform="translate(5,0)" app-port [port]="port.getStream()"></svg:g>
   <!-- Map -->
-  <svg:g *ngIf="isMap()">
-    <svg:g *ngFor="let entry of getEntries()" [attr.transform]="translateEntry(entry)" app-port [typeDef]="entry.typeDef"></svg:g>
+  <svg:g *ngIf="port.isMap()">
+    <svg:g *ngFor="let entry of getEntries()" [attr.transform]="transform(entry)" app-port [port]="entry"></svg:g>
   </svg:g>
 </svg:g>

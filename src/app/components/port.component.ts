@@ -1,5 +1,7 @@
 import {Component, Input} from '@angular/core';
 import {OperatorDef} from '../classes/operator-def.class';
+import {Port, Transformable} from './operator.component';
+import {generateSvgTransform} from '../utils';
 
 @Component({
   selector: 'app-port,[app-port]',
@@ -9,47 +11,17 @@ import {OperatorDef} from '../classes/operator-def.class';
 export class PortComponent {
 
   @Input()
-  public typeDef: any = {};
+  public port: Port;
 
   public isPrimitive(): boolean {
-    return OperatorDef.isPrimitive(this.typeDef) || this.typeDef['type'] === 'generic';
+    return OperatorDef.isPrimitive(this.port) || this.port['type'] === 'generic';
   }
 
-  public isStream(): boolean {
-    return this.typeDef['type'] === 'stream';
+  public getEntries(): Array<Port> {
+    return Array.from(this.port.getMap().values());
   }
 
-  public isMap(): boolean {
-    return this.typeDef['type'] === 'map';
+  public transform(trans: Transformable): string {
+    return generateSvgTransform(trans);
   }
-
-  public getWidth(): number {
-    return OperatorDef.calcPortWidth(this.typeDef);
-  }
-
-  public getHeight(): number {
-    return OperatorDef.calcPortHeight(this.typeDef);
-  }
-
-  public getEntries(): Array<any> {
-    const entries = [];
-    let x = 0;
-    for (const key in this.typeDef['map']) {
-      if (this.typeDef['map'].hasOwnProperty(key)) {
-        const entry = {
-          name: key,
-          x: x,
-          typeDef: this.typeDef['map'][key]
-        };
-        entries.push(entry);
-        x += OperatorDef.calcPortWidth(entry.typeDef) + 5;
-      }
-    }
-    return entries;
-  }
-
-  public translateEntry(entry: any): string {
-    return `translate(${entry.x},0)`;
-  }
-
 }

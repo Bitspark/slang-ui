@@ -22,16 +22,14 @@
          (mouseup)="stopDrag($event)"
          (mousemove)="drag($event)">
       <svg:g *ngFor="let ins of visualInstances()" [attr.transform]="transform(ins)">
-        <svg:rect x="0" y="0" width="130" height="60" fill="orange"
+        <svg:rect x="0" y="0" [attr.width]="ins.getWidth()" [attr.height]="ins.getHeight()" fill="orange"
                   [attr.stroke]="ins === visualSelectedInst ? 'red' : ''" stroke-dasharray="3 3" stroke-width="2"
                   (mousedown)="selectVisualInstance(ins)"></svg:rect>
         <svg:text text-anchor="middle" x="65" y="35" fill="white" font-family="Arial" font-size="16"
                   style="pointer-events: none">{{ins.getName()}}
         </svg:text>
-        <svg:g [attr.transform]="transform(ins.getMainIn())" app-port [typeDef]="ins.getMainIn()"></svg:g>
-        <!--
-        <svg:g [attr.transform]="transform(ins.getMainOut()) scale(1,-1)" app-port [port]="ins['services']['main']['out']"></svg:g>
-        -->
+        <svg:g [attr.transform]="transform(ins.getMainIn())" app-port [port]="ins.getMainIn()"></svg:g>
+        <svg:g [attr.transform]="transform(ins.getMainOut())" app-port [port]="ins.getMainOut()"></svg:g>
       </svg:g>
     </svg>
     <div style="border: 1px dotted black; display: inline-block; height: 600px; overflow: scroll; margin-left: 20px">
