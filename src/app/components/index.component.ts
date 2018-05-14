@@ -1,6 +1,6 @@
 import {Component} from '@angular/core';
 import {OperatorService} from '../services/operator.service';
-import {OperatorDef} from '../classes/operator-def.class';
+import {OperatorDef} from '../classes/operator';
 import {Router} from '@angular/router';
 
 @Component({

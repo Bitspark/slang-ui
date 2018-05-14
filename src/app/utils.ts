@@ -1,4 +1,4 @@
-import {Transformable} from './components/operator.component';
+import {Transformable} from './classes/operator';
 
 function expandExpressionPart(exprPart: string, props: any, propDefs: any): Array<string> {
   const vals = [];
