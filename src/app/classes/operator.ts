@@ -1,4 +1,5 @@
 import {expandProperties} from '../utils';
+import {OperatorService} from '../services/operator.service';
 
 export class OperatorDef {
 
@@ -201,22 +202,28 @@ export class OperatorInstance extends Composable implements Movable {
   private mainOut: Port;
   private services: Map<string, PortGroup>;
   private delegates: Map<string, PortGroup>;
-  private operators: Map<string, OperatorInstance>;
+  private instances: Map<string, OperatorInstance>;
   private visible: boolean;
 
-  constructor(private name: string, parent: Composable, pos: [number, number], scale: [number, number], rotation: number, opDef: any) {
+  constructor(private operatorSrv: OperatorService,
+              private name: string,
+              parent: Composable,
+              pos: [number, number],
+              scale: [number, number],
+              rotation: number,
+              def: any) {
     super(parent, pos, scale, rotation);
-    this.mainIn = new Port(this, [0, 0], [1, 1], 0, opDef.services['main']['in']);
-    const tmpMainOut = new Port(this, [0, 0], [1, 1], 0, opDef.services['main']['out']);
+    this.mainIn = new Port(this, [0, 0], [1, 1], 0, def.services['main']['in']);
+    const tmpMainOut = new Port(this, [0, 0], [1, 1], 0, def.services['main']['out']);
     const width = Math.max(Math.max(this.mainIn.getWidth(), tmpMainOut.getWidth()) + 10, 130);
     let height = this.mainIn.getHeight() + 10;
 
     this.delegates = new Map<string, PortGroup>();
-    if (opDef.delegates) {
-      for (const dlgName in opDef.delegates) {
-        if (opDef.delegates.hasOwnProperty(dlgName)) {
+    if (def.delegates) {
+      for (const dlgName in def.delegates) {
+        if (def.delegates.hasOwnProperty(dlgName)) {
           height += 5;
-          const dlgDef = opDef.delegates[dlgName];
+          const dlgDef = def.delegates[dlgName];
           const dlg = new PortGroup(this, [width, height], [-1, -1], -90, dlgDef, true);
           this.delegates.set(dlgName, dlg);
           height += dlg.getWidth() + 5;
@@ -224,14 +231,43 @@ export class OperatorInstance extends Composable implements Movable {
       }
     }
     height = Math.max(height + 10, 60);
-    this.mainOut = new Port(this, [0, height], [1, -1], 0, opDef.services['main']['out']);
+    this.mainOut = new Port(this, [0, height], [1, -1], 0, def.services['main']['out']);
     this.dim = [width, height];
 
     this.mainIn.justifyHorizontally();
     this.mainOut.justifyHorizontally();
 
-    if (opDef.operators) {
-      this.operators = new Map<string, OperatorInstance>();
+    this.instances = new Map<string, OperatorInstance>();
+    this.updateInstances(def.operators);
+  }
+
+  public updateInstances(instances: any) {
+    if (!instances) {
+      return;
+    }
+
+    for (const insName in instances) {
+      if (instances.hasOwnProperty(insName)) {
+        const ins = instances[insName];
+        let opName = ins.operator;
+        if (opName.startsWith('.')) {
+          const opSplit = this.name.split('.');
+          opSplit[opSplit.length - 1] = opName.substr(1);
+          opName = opSplit.join('.');
+        }
+        const op = this.operatorSrv.getOperator(opName);
+        let visualIns = this.instances.get(insName);
+        const ipos: [number, number] = [Math.random() * 600, Math.random() * 400];
+        if (typeof visualIns !== 'undefined') {
+          ipos[0] = visualIns.getPosX();
+          ipos[1] = visualIns.getPosY();
+        }
+        const opDef = JSON.parse(JSON.stringify(op.getDef()));
+        OperatorDef.specifyOperatorDef(opDef, ins['generics'], ins['properties'], opDef['properties']);
+        visualIns = new OperatorInstance(this.operatorSrv, insName, null, ipos, [1, 1], 0, opDef);
+        this.instances.set(insName, visualIns);
+        visualIns.show();
+      }
     }
   }
 
@@ -267,6 +303,10 @@ export class OperatorInstance extends Composable implements Movable {
 
   public getDelegates(): Array<PortGroup> {
     return Array.from(this.delegates.values());
+  }
+
+  public getInstances(): Map<string, OperatorInstance> {
+    return this.instances;
   }
 }
 

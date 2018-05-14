@@ -12,14 +12,14 @@ import {generateSvgTransform} from '../utils';
 export class OperatorComponent implements OnInit {
   // General
   public operatorName = '';
-  public operator: OperatorDef = null;
+  public operatorDef: OperatorDef = null;
+  public operator: OperatorInstance = null;
   public status;
 
   // YAML
   public yamlRepr = '';
 
   // Visual
-  public visualInsts = new Map<string, OperatorInstance>();
   public visualSelectedInst: OperatorInstance = null;
   public scale = 0.6;
 
@@ -46,18 +46,22 @@ export class OperatorComponent implements OnInit {
   ngOnInit() {
     this.route.params.subscribe(routeParams => {
       this.operatorName = routeParams.operatorName;
-      this.operator = this.operators.getLocal(routeParams.operatorName);
-      if (this.operator) {
-        this.updateDef(this.operator.getDef());
+      this.operatorDef = this.operators.getLocal(routeParams.operatorName);
+      if (this.operatorDef) {
+        const def = this.operatorDef.getDef();
+        this.operator = new OperatorInstance(this.operators, '', null, [0, 0], [1, 1], 0, def);
+        this.updateDef(this.operatorDef.getDef());
       } else {
         this.status = `Operator "${this.operatorName}" not found.`;
       }
     });
     this.operators.getLoadingObservable().subscribe((success) => {
       if (success) {
-        this.operator = this.operators.getLocal(this.operatorName);
-        if (this.operator) {
-          this.updateDef(this.operator.getDef());
+        this.operatorDef = this.operators.getLocal(this.operatorName);
+        if (this.operatorDef) {
+          const def = this.operatorDef.getDef();
+          this.operator = new OperatorInstance(this.operators, '', null, [0, 0], [1, 1], 0, def);
+          this.updateDef(def);
         } else {
           this.status = `Operator "${this.operatorName}" not found.`;
         }
@@ -82,14 +86,14 @@ export class OperatorComponent implements OnInit {
   }
 
   private updateDef(def: any) {
-    this.operator.setDef(def);
+    this.operatorDef.setDef(def);
     this.status = `Updated definition of operator "${this.operatorName}".`;
     this.displayYaml();
     this.displayVisual();
   }
 
   private displayYaml() {
-    this.yamlRepr = safeDump(this.operator.getDef());
+    this.yamlRepr = safeDump(this.operatorDef.getDef());
   }
 
   // Visual
@@ -98,8 +102,11 @@ export class OperatorComponent implements OnInit {
     return generateSvgTransform(trans);
   }
 
-  public visualInstances() {
-    return Array.from(this.visualInsts.values()).filter(ins => ins.isVisible());
+  public visualInstances(): Array<OperatorInstance> {
+    if (!this.operator) {
+      return [];
+    }
+    return Array.from(this.operator.getInstances().values()).filter(ins => ins.isVisible());
   }
 
   public selectVisualInstance(ins: OperatorInstance) {
@@ -107,35 +114,13 @@ export class OperatorComponent implements OnInit {
   }
 
   private displayVisual() {
-    const def = this.operator.getDef();
-    this.visualInsts.forEach(ins => ins.hide());
-    for (const insName in def.operators) {
-      if (def.operators.hasOwnProperty(insName)) {
-        const ins = def.operators[insName];
-        let opName = ins.operator;
-        if (opName.startsWith('.')) {
-          const opSplit = this.operatorName.split('.');
-          opSplit[opSplit.length - 1] = opName.substr(1);
-          opName = opSplit.join('.');
-        }
-        const op = this.operators.getOperator(opName);
-        let visualIns = this.visualInsts.get(insName);
-        const pos: [number, number] = [Math.random() * 600, Math.random() * 400];
-        if (typeof visualIns !== 'undefined') {
-          pos[0] = visualIns.getPosX();
-          pos[1] = visualIns.getPosY();
-        }
-        const opDef = JSON.parse(JSON.stringify(op.getDef()));
-        OperatorDef.specifyOperatorDef(opDef, ins['generics'], ins['properties'], opDef['properties']);
-        visualIns = new OperatorInstance(insName, null, pos, [1, 1], 0, opDef);
-        this.visualInsts.set(insName, visualIns);
-        visualIns.show();
-      }
-    }
+    const def = this.operatorDef.getDef();
+    this.operator.getInstances().forEach(ins => ins.hide());
+    this.operator.updateInstances(def.operators);
   }
 
   public addInstance(op: any) {
-    const def = this.operator.getDef();
+    const def = this.operatorDef.getDef();
     const opSplit = op.name.split('.');
     const opName = opSplit[opSplit.length - 1];
     let insName = opName;
