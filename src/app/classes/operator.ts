@@ -201,6 +201,7 @@ export class OperatorInstance extends Composable implements Movable {
   private mainOut: Port;
   private services: Map<string, PortGroup>;
   private delegates: Map<string, PortGroup>;
+  private operators: Map<string, OperatorInstance>;
   private visible: boolean;
 
   constructor(private name: string, parent: Composable, pos: [number, number], scale: [number, number], rotation: number, opDef: any) {
@@ -228,8 +229,11 @@ export class OperatorInstance extends Composable implements Movable {
 
     this.mainIn.justifyHorizontally();
     this.mainOut.justifyHorizontally();
-  }
 
+    if (opDef.operators) {
+      this.operators = new Map<string, OperatorInstance>();
+    }
+  }
 
   public move(delta: [number, number]): [number, number] {
     this.pos[0] += delta[0];

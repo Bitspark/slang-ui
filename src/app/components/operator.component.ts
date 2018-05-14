@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, HostListener, OnInit} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 import {OperatorService} from '../services/operator.service';
 import {OperatorDef, OperatorInstance, Transformable} from '../classes/operator';
@@ -7,7 +7,7 @@ import {generateSvgTransform} from '../utils';
 
 @Component({
   templateUrl: './operator.component.html',
-  styleUrls: []
+  styleUrls: ['./operator.component.css']
 })
 export class OperatorComponent implements OnInit {
   // General
@@ -21,11 +21,24 @@ export class OperatorComponent implements OnInit {
   // Visual
   public visualInsts = new Map<string, OperatorInstance>();
   public visualSelectedInst: OperatorInstance = null;
+  public scale = 0.6;
 
   // Dragging
   private dragging = false;
   private lastX: number;
   private lastY: number;
+
+  @HostListener('window:keyup', ['$event'])
+  keyEvent(event: KeyboardEvent) {
+    switch (event.key) {
+      case '+':
+        this.scale *= 1.1;
+        break;
+      case '-':
+        this.scale /= 1.1;
+        break;
+    }
+  }
 
   constructor(private route: ActivatedRoute, public operators: OperatorService) {
   }
@@ -144,7 +157,7 @@ export class OperatorComponent implements OnInit {
 
   private updateDrag(event, update?: boolean) {
     if (this.visualSelectedInst && update) {
-      this.visualSelectedInst.move([event.screenX - this.lastX, event.screenY - this.lastY]);
+      this.visualSelectedInst.move([(event.screenX - this.lastX) / this.scale, (event.screenY - this.lastY) / this.scale]);
     }
     this.lastX = event.screenX;
     this.lastY = event.screenY;
