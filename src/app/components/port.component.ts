@@ -1,5 +1,4 @@
 import {Component, Input} from '@angular/core';
-import {OperatorDef} from '../classes/operator-def.class';
 import {Port, Transformable} from './operator.component';
 import {generateSvgTransform} from '../utils';
 
@@ -19,5 +18,24 @@ export class PortComponent {
 
   public transform(trans: Transformable): string {
     return generateSvgTransform(trans);
+  }
+
+  public color(): string {
+    switch (this.port.getType()) {
+      case 'primitive':
+        return 'violet';
+      case 'number':
+        return 'green';
+      case 'string':
+        return 'cyan';
+      case 'boolean':
+        return 'red';
+      case 'binary':
+        return 'yellow';
+      case 'trigger':
+        return 'gray';
+      case 'generic':
+        return 'purple';
+    }
   }
 }

@@ -395,6 +395,10 @@ export class Port extends Composable {
     }
   }
 
+  public getType(): string {
+    return this.type;
+  }
+
   public isPrimitive(): boolean {
     return this.type === 'number' ||
       this.type === 'string' ||
