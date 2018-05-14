@@ -361,6 +361,16 @@ export class Port extends Composable {
 
     map: {
       px: 2,
+    },
+
+    portColors: {
+      primitive: 'violet',
+      number: 'green',
+      string: 'cyan',
+      boolean: 'red',
+      binary: 'yellow',
+      trigger: 'gray',
+      generic: 'purple',
     }
   };
 
@@ -431,5 +441,9 @@ export class Port extends Composable {
   public justifyHorizontally() {
     const x = (this.getParent().getWidth() - this.getWidth()) / 2;
     this.setPosX(x);
+  }
+
+  public getColor(): string {
+    return this.style.portColors[this.type];
   }
 }
