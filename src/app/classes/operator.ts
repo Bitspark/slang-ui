@@ -206,6 +206,7 @@ export class OperatorInstance extends Composable implements Movable {
   private visible: boolean;
 
   constructor(private operatorSrv: OperatorService,
+              private fqOperator: string,
               private name: string,
               parent: Composable,
               pos: [number, number],
@@ -251,7 +252,7 @@ export class OperatorInstance extends Composable implements Movable {
         const ins = instances[insName];
         let opName = ins.operator;
         if (opName.startsWith('.')) {
-          const opSplit = this.name.split('.');
+          const opSplit = this.fqOperator.split('.');
           opSplit[opSplit.length - 1] = opName.substr(1);
           opName = opSplit.join('.');
         }
@@ -262,9 +263,12 @@ export class OperatorInstance extends Composable implements Movable {
           ipos[0] = visualIns.getPosX();
           ipos[1] = visualIns.getPosY();
         }
+        if (!op) {
+          continue;
+        }
         const opDef = JSON.parse(JSON.stringify(op.getDef()));
         OperatorDef.specifyOperatorDef(opDef, ins['generics'], ins['properties'], opDef['properties']);
-        visualIns = new OperatorInstance(this.operatorSrv, insName, null, ipos, [1, 1], 0, opDef);
+        visualIns = new OperatorInstance(this.operatorSrv, opName, insName, null, ipos, [1, 1], 0, opDef);
         this.instances.set(insName, visualIns);
         visualIns.show();
       }
@@ -305,12 +309,159 @@ export class OperatorInstance extends Composable implements Movable {
     return Array.from(this.delegates.values());
   }
 
+  public getDelegate(dlg: string): PortGroup {
+    return this.delegates.get(dlg);
+  }
+
+  public getServices(): Array<PortGroup> {
+    return Array.from(this.services.values());
+  }
+
+  public getService(srv: string): PortGroup {
+    return this.services.get(srv);
+  }
+
   public getInstances(): Map<string, OperatorInstance> {
     return this.instances;
   }
+
+  public getPort(ref: string): Port {
+    if (ref.length === 0) {
+      return null;
+    }
+
+    let dirIn = false;
+    let sep = '';
+    let opIdx = 0;
+    let portIdx = 0;
+    if (ref.indexOf('(') !== -1) {
+      dirIn = true;
+      sep = '(';
+      opIdx = 1;
+      portIdx = 0;
+    } else if (ref.indexOf(')') !== -1) {
+      dirIn = false;
+      sep = ')';
+      opIdx = 0;
+      portIdx = 1;
+    } else {
+      return null;
+    }
+
+    const refSplit = ref.split(sep);
+    if (refSplit.length !== 2) {
+      return null;
+    }
+    const opPart = refSplit[opIdx];
+    const portPart = refSplit[portIdx];
+
+    let o: OperatorInstance = null;
+    let p: Port = null;
+    if (opPart === '') {
+      o = this;
+      if (dirIn) {
+        p = o.getMainIn();
+      } else {
+        p = o.getMainOut();
+      }
+    } else {
+      if (opPart.indexOf('.') !== -1 && opPart.indexOf('@') !== -1) {
+        return null;
+      }
+      if (opPart.indexOf('.') !== -1) {
+        const opSplit = opPart.split('.');
+        if (opSplit.length !== 2) {
+          return null;
+        }
+        const opName = opSplit[0];
+        const dlgName = opSplit[1];
+        if (opName === '') {
+          o = this;
+        } else {
+          o = this.instances.get(opName);
+          if (!o) {
+            return null;
+          }
+        }
+        const dlg = o.getDelegate(dlgName);
+        if (dlg) {
+          if (dirIn) {
+            p = dlg.getIn();
+          } else {
+            p = dlg.getOut();
+          }
+        } else {
+          return null;
+        }
+      } else if (opPart.indexOf('@') !== -1) {
+        const opSplit = opPart.split('@');
+        if (opSplit.length !== 2) {
+          return null;
+        }
+        const opName = opSplit[1];
+        const srvName = opSplit[0];
+        if (opName === '') {
+          o = this;
+        } else {
+          o = this.instances.get(opName);
+          if (!o) {
+            return null;
+          }
+        }
+        const srv = o.getService(srvName);
+        if (srv) {
+          if (dirIn) {
+            p = srv.getIn();
+          } else {
+            p = srv.getOut();
+          }
+        } else {
+          return null;
+        }
+      } else {
+        o = this.instances.get(opPart);
+        if (!o) {
+          return null;
+        }
+        if (dirIn) {
+          p = o.getMainIn();
+        } else {
+          p = o.getMainOut();
+        }
+      }
+    }
+
+    const pathSplit = portPart.split('.');
+    if (pathSplit.length === 1 && pathSplit[0] === '') {
+      return p;
+    }
+
+    for (let i = 0; i < pathSplit.length; i++) {
+      if (pathSplit[i] === '~') {
+        p = p.getStream();
+        if (!p) {
+          return null;
+        }
+        continue;
+      }
+
+      if (p.getType() !== 'map') {
+        return null;
+      }
+
+      const k = pathSplit[i];
+      p = p.getEntry(k);
+      if (!p) {
+        return null;
+      }
+    }
+
+    return p;
+  }
 }
 
-export class PortGroup extends Composable {
+export class PortGroup
+  extends Composable {
   private in: Port;
   private out: Port;
 
@@ -397,6 +548,10 @@ export class Port extends Composable {
     }
   }
 
+  public getType(): string {
+    return this.type;
+  }
+
   public isPrimitive(): boolean {
     return this.type === 'number' ||
       this.type === 'string' ||
@@ -424,6 +579,10 @@ export class Port extends Composable {
 
   public getStream(): Port {
     return this.stream;
+  }
+
+  public getEntry(entry: string): Port {
+    return this.map.get(entry);
   }
 
   public justifyHorizontally() {
