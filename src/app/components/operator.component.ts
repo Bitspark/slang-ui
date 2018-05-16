@@ -1,7 +1,7 @@
 import {Component, HostListener, OnInit} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 import {OperatorService} from '../services/operator.service';
-import {OperatorDef, OperatorInstance, Transformable} from '../classes/operator';
+import {Connection, OperatorDef, OperatorInstance, Transformable} from '../classes/operator';
 import {safeDump, safeLoad} from 'js-yaml';
 import {generateSvgTransform} from '../utils';
 
@@ -109,6 +109,13 @@ export class OperatorComponent implements OnInit {
     return Array.from(this.operator.getInstances().values()).filter(ins => ins.isVisible());
   }
 
+  public visualConnections(): Array<Connection> {
+    if (!this.operator) {
+      return [];
+    }
+    return Array.from(this.operator.getConnections().values());
+  }
+
   public selectVisualInstance(ins: OperatorInstance) {
     this.visualSelectedInst = ins;
   }
@@ -116,7 +123,7 @@ export class OperatorComponent implements OnInit {
   private displayVisual() {
     const def = this.operatorDef.getDef();
     this.operator.getInstances().forEach(ins => ins.hide());
-    this.operator.updateInstances(def.operators);
+    this.operator.updateInstances(def.operators, def.connections);
   }
 
   public addInstance(op: any) {

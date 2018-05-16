@@ -203,6 +203,7 @@ export class OperatorInstance extends Composable implements Movable {
   private services: Map<string, PortGroup>;
   private delegates: Map<string, PortGroup>;
   private instances: Map<string, OperatorInstance>;
+  private connections: Set<Connection>;
   private visible: boolean;
 
   constructor(private operatorSrv: OperatorService,
@@ -239,38 +240,48 @@ export class OperatorInstance extends Composable implements Movable {
     this.mainOut.justifyHorizontally();
 
     this.instances = new Map<string, OperatorInstance>();
-    this.updateInstances(def.operators);
+    this.updateInstances(def.operators, def.connections);
   }
 
-  public updateInstances(instances: any) {
-    if (!instances) {
-      return;
+  public updateInstances(instances: any, connections: any) {
+    if (instances) {
+      for (const insName in instances) {
+        if (instances.hasOwnProperty(insName)) {
+          const ins = instances[insName];
+          let opName = ins.operator;
+          if (opName.startsWith('.')) {
+            const opSplit = this.fqOperator.split('.');
+            opSplit[opSplit.length - 1] = opName.substr(1);
+            opName = opSplit.join('.');
+          }
+          const op = this.operatorSrv.getOperator(opName);
+          let visualIns = this.instances.get(insName);
+          const ipos: [number, number] = [Math.random() * 600, Math.random() * 400];
+          if (typeof visualIns !== 'undefined') {
+            ipos[0] = visualIns.getPosX();
+            ipos[1] = visualIns.getPosY();
+          }
+          if (!op) {
+            continue;
+          }
+          const opDef = JSON.parse(JSON.stringify(op.getDef()));
+          OperatorDef.specifyOperatorDef(opDef, ins['generics'], ins['properties'], opDef['properties']);
+          visualIns = new OperatorInstance(this.operatorSrv, opName, insName, null, ipos, [1, 1], 0, opDef);
+          this.instances.set(insName, visualIns);
+          visualIns.show();
+        }
+      }
     }
 
-    for (const insName in instances) {
-      if (instances.hasOwnProperty(insName)) {
-        const ins = instances[insName];
-        let opName = ins.operator;
-        if (opName.startsWith('.')) {
-          const opSplit = this.fqOperator.split('.');
-          opSplit[opSplit.length - 1] = opName.substr(1);
-          opName = opSplit.join('.');
+    if (connections) {
+      this.connections = new Set<Connection>();
+      for (const src in connections) {
+        if (connections.hasOwnProperty(src)) {
+          for (const dst of connections[src]) {
+            const conns = this.getPort(src).connectDeep(this.getPort(dst));
+            conns.forEach(conn => this.connections.add(conn));
+          }
         }
-        const op = this.operatorSrv.getOperator(opName);
-        let visualIns = this.instances.get(insName);
-        const ipos: [number, number] = [Math.random() * 600, Math.random() * 400];
-        if (typeof visualIns !== 'undefined') {
-          ipos[0] = visualIns.getPosX();
-          ipos[1] = visualIns.getPosY();
-        }
-        if (!op) {
-          continue;
-        }
-        const opDef = JSON.parse(JSON.stringify(op.getDef()));
-        OperatorDef.specifyOperatorDef(opDef, ins['generics'], ins['properties'], opDef['properties']);
-        visualIns = new OperatorInstance(this.operatorSrv, opName, insName, null, ipos, [1, 1], 0, opDef);
-        this.instances.set(insName, visualIns);
-        visualIns.show();
       }
     }
   }
@@ -323,6 +334,10 @@ export class OperatorInstance extends Composable implements Movable {
 
   public getInstances(): Map<string, OperatorInstance> {
     return this.instances;
+  }
+
+  public getConnections(): Set<Connection> {
+    return this.connections;
   }
 
   public getPort(ref: string): Port {
@@ -460,6 +475,25 @@ export class OperatorInstance extends Composable implements Movable {
   }
 }
 
+export class Connection {
+  constructor(private src: Port, private dst: Port) {
+    if (!src) {
+      console.error('source null', src);
+    }
+    if (!dst) {
+      console.error('destination null', dst);
+    }
+  }
+
+  public getSource(): Port {
+    return this.src;
+  }
+
+  public getDestination(): Port {
+    return this.dst;
+  }
+}
+
 export class PortGroup
   extends Composable {
   private in: Port;
@@ -583,6 +617,27 @@ export class Port extends Composable {
 
   public getEntry(entry: string): Port {
     return this.map.get(entry);
+  }
+
+  public connectDeep(dst: Port): Set<Connection> {
+    if (!dst) {
+      return new Set<Connection>();
+    }
+    if (dst.isPrimitive()) {
+      return new Set<Connection>([new Connection(this, dst)]);
+    } else if (this.isMap()) {
+      const conns = new Set<Connection>();
+      this.map.forEach((entryPort, entryKey) => {
+        entryPort.connectDeep(dst.map.get(entryKey)).forEach(conn => {
+          conns.add(conn);
+        });
+      });
+      return conns;
+    } else if (this.isStream()) {
+      return this.getStream().connectDeep(dst.getStream());
+    } else if (this.isGeneric()) {
+      return new Set<Connection>([new Connection(this, dst)]);
+    }
   }
 
   public justifyHorizontally() {

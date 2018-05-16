@@ -13,7 +13,11 @@ function expandExpressionPart(exprPart: string, props: any, propDefs: any): Arra
   const propDef = propDefs[exprPart];
   if (propDef['type'] === 'stream') {
     for (const el of prop) {
-      vals.push(JSON.stringify(el));
+      if (typeof el !== 'string') {
+        vals.push(JSON.stringify(el));
+      } else {
+        vals.push(el);
+      }
     }
   } else {
     vals.push(JSON.stringify(prop));
