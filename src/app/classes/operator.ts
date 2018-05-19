@@ -242,7 +242,7 @@ export class OperatorInstance extends Composable {
         if (def.delegates.hasOwnProperty(dlgName)) {
           height += 5;
           const dlgDef = def.delegates[dlgName];
-          const dlg = new PortGroup(this, dlgDef, true);
+          const dlg = new PortGroup(this, dlgDef);
           dlg.scale([-1, 1]);
           dlg.rotate(Math.PI / 2);
           dlg.translate([width, dlg.getWidth() + height]);
@@ -519,18 +519,11 @@ export class PortGroup
   private out: Port;
 
   constructor(parent: Composable,
-              portGrpDef: any,
-              reversePorts: boolean) {
+              portGrpDef: any) {
     super(parent);
-    if (reversePorts) {
-      this.out = new Port(this, portGrpDef.out);
-      this.in = new Port(this, portGrpDef.in);
-      this.in.translate([this.out.getWidth() + 5, 0]);
-    } else {
-      this.in = new Port(this, portGrpDef.in);
-      this.out = new Port(this, portGrpDef.out);
-      this.out.translate([this.in.getWidth() + 5, 0]);
-    }
+    this.in = new Port(this, portGrpDef.in);
+    this.out = new Port(this, portGrpDef.out);
+    this.out.translate([this.in.getWidth() + 5, 0]);
     this.dim = [this.in.getWidth() + this.out.getWidth() + 10, Math.max(this.in.getHeight(), this.out.getHeight())];
   }
 
