@@ -29,6 +29,13 @@
                     fill="transparent"
                     [attr.stroke]="operator === visualSelectedInst ? 'red' : 'orange'" stroke-dasharray="3 3" stroke-width="3"
                     (mousedown)="selectVisualInstance(operator)"></svg:rect>
+          <svg:g *ngFor="let dlg of operator.getDelegates()" [attr.transform]="transform(dlg)">
+            <svg:g [attr.transform]="transform(dlg.getIn())" app-port [port]="dlg.getIn()"></svg:g>
+            <svg:g [attr.transform]="transform(dlg.getOut())" app-port [port]="dlg.getOut()"></svg:g>
+          </svg:g>
+          <svg:g [attr.transform]="transform(operator.getMainIn())" app-port [port]="operator.getMainIn()"></svg:g>
+          <svg:g [attr.transform]="transform(operator.getMainOut())" app-port [port]="operator.getMainOut()"></svg:g>
+
           <svg:g *ngFor="let ins of visualInstances()" [attr.transform]="transform(ins)">
             <svg:rect x="0" y="0" [attr.width]="ins.getWidth()" [attr.height]="ins.getHeight()" fill="orange"
                       [attr.stroke]="ins === visualSelectedInst ? 'red' : ''" stroke-dasharray="3 3" stroke-width="2"
