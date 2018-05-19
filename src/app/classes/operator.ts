@@ -220,7 +220,7 @@ export class OperatorInstance extends Composable {
     super(parent);
     this.mainIn = new Port(this, def.services['main']['in']);
     const tmpMainOut = new Port(this, def.services['main']['out']);
-    const width = Math.max(Math.max(this.mainIn.getWidth(), tmpMainOut.getWidth()) + 10, 130);
+    let width = Math.max(Math.max(this.mainIn.getWidth(), tmpMainOut.getWidth()) + 10, 130);
     let height = this.mainIn.getHeight() + 10;
 
     this.delegates = new Map<string, PortGroup>();
@@ -239,10 +239,11 @@ export class OperatorInstance extends Composable {
       }
     }
     height = Math.max(height + 10, 60);
+
+    this.dim = [width, height] = (!dim) ? [width, height] : [dim[0], dim[1]];
     this.mainOut = new Port(this, def.services['main']['out']);
     this.mainOut.scale([1, -1]);
     this.mainOut.translate([0, height]);
-    this.dim = (!dim) ? [width, height] : [dim[0], dim[1]];
 
     this.mainIn.justifyHorizontally();
     this.mainOut.justifyHorizontally();
