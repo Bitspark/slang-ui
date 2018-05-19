@@ -23,21 +23,25 @@
            (mousedown)="startDrag($event)"
            (mouseup)="stopDrag($event)"
            (mousemove)="drag($event)">
-        <svg:g *ngFor="let ins of visualInstances()" [attr.transform]="transform(ins)">
-          <svg:rect x="0" y="0" [attr.width]="ins.getWidth()" [attr.height]="ins.getHeight()" fill="orange"
-                    [attr.stroke]="ins === visualSelectedInst ? 'red' : ''" stroke-dasharray="3 3" stroke-width="2"
-                    (mousedown)="selectVisualInstance(ins)"></svg:rect>
-          <svg:text text-anchor="middle" x="65" y="35" fill="white" font-family="Arial" font-size="16"
-                    style="pointer-events: none">{{ins.getName()}}
-          </svg:text>
 
-          <svg:g *ngFor="let dlg of ins.getDelegates()" [attr.transform]="transform(dlg)">
-            <svg:g [attr.transform]="transform(dlg.getIn())" app-port [port]="dlg.getIn()"></svg:g>
-            <svg:g [attr.transform]="transform(dlg.getOut())" app-port [port]="dlg.getOut()"></svg:g>
+        <svg:g [attr.transform]="transform(operator)">
+          <svg:rect x="0" y="0" [attr.width]="operator.getWidth()" [attr.height]="operator.getHeight()" fill="transparent"
+                    stroke="orange" stroke-width="3"
+          ></svg:rect>
+          <svg:g *ngFor="let ins of visualInstances()" [attr.transform]="transform(ins)">
+            <svg:rect x="0" y="0" [attr.width]="ins.getWidth()" [attr.height]="ins.getHeight()" fill="orange"
+                      [attr.stroke]="ins === visualSelectedInst ? 'red' : ''" stroke-dasharray="3 3" stroke-width="2"
+                      (mousedown)="selectVisualInstance(ins)"></svg:rect>
+            <svg:text text-anchor="middle" x="65" y="35" fill="white" font-family="Arial" font-size="16"
+                      style="pointer-events: none">{{ins.getName()}}
+            </svg:text>
+            <svg:g *ngFor="let dlg of ins.getDelegates()" [attr.transform]="transform(dlg)">
+              <svg:g [attr.transform]="transform(dlg.getIn())" app-port [port]="dlg.getIn()"></svg:g>
+              <svg:g [attr.transform]="transform(dlg.getOut())" app-port [port]="dlg.getOut()"></svg:g>
+            </svg:g>
+            <svg:g [attr.transform]="transform(ins.getMainIn())" app-port [port]="ins.getMainIn()"></svg:g>
+            <svg:g [attr.transform]="transform(ins.getMainOut())" app-port [port]="ins.getMainOut()"></svg:g>
           </svg:g>
-
-          <svg:g [attr.transform]="transform(ins.getMainIn())" app-port [port]="ins.getMainIn()"></svg:g>
-          <svg:g [attr.transform]="transform(ins.getMainOut())" app-port [port]="ins.getMainOut()"></svg:g>
         </svg:g>
         <svg:line *ngFor="let c of visualConnections()"
                   stroke="green"
