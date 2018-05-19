@@ -1,7 +1,7 @@
 import {EventEmitter, Injectable} from '@angular/core';
 import {Observable, Observer} from 'rxjs';
 import {ApiService} from './api.service';
-import {OperatorDef} from '../classes/operator-def.class';
+import {OperatorDef} from '../classes/operator';
 
 @Injectable()
 export class OperatorService {

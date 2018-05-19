@@ -1,6 +1,6 @@
 import {Component, Input} from '@angular/core';
-import {Port, Transformable} from './operator.component';
 import {generateSvgTransform} from '../utils';
+import {Port, Transformable} from '../classes/operator';
 
 @Component({
   selector: 'app-port,[app-port]',

@@ -1,4 +1,4 @@
-import {Transformable} from './components/operator.component';
+import {Transformable} from './classes/operator';
 
 function expandExpressionPart(exprPart: string, props: any, propDefs: any): Array<string> {
   const vals = [];
@@ -13,7 +13,11 @@ function expandExpressionPart(exprPart: string, props: any, propDefs: any): Arra
   const propDef = propDefs[exprPart];
   if (propDef['type'] === 'stream') {
     for (const el of prop) {
-      vals.push(JSON.stringify(el));
+      if (typeof el !== 'string') {
+        vals.push(JSON.stringify(el));
+      } else {
+        vals.push(el);
+      }
     }
   } else {
     vals.push(JSON.stringify(prop));
@@ -44,6 +48,7 @@ export function expandProperties(str: string, props: any, propDefs: any): Array<
   return exprs;
 }
 
-export function generateSvgTransform(trans: Transformable): string {
-  return `translate(${trans.getPosX()},${trans.getPosY()}) rotate(${trans.getRotation()}) scale(${trans.getScaleX()},${trans.getScaleY()})`;
+export function generateSvgTransform(t: Transformable): string {
+  const cols = t.col(0).slice(0, 2).concat(t.col(1).slice(0, 2).concat(t.col(2).slice(0, 2)));
+  return `matrix(${cols.join(',')})`;
 }
