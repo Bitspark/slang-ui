@@ -123,7 +123,7 @@ export class OperatorComponent implements OnInit {
   private displayVisual() {
     const def = this.operatorDef.getDef();
     this.operator.getInstances().forEach(ins => ins.hide());
-    /*this.operator.updateInstances(def.operators, def.connections);*/
+    this.operator.updateInstances(def.operators, def.connections);
   }
 
   public addInstance(op: any) {

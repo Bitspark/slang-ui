@@ -49,6 +49,6 @@ export function expandProperties(str: string, props: any, propDefs: any): Array<
 }
 
 export function generateSvgTransform(t: Transformable): string {
-  const cols = t.col(0).concat(t.col(1).concat(t.col(2)));
-  return `matrix(${cols.join(",")})`;
+  const cols = t.col(0).slice(0, 2).concat(t.col(1).slice(0, 2).concat(t.col(2).slice(0, 2)));
+  return `matrix(${cols.join(',')})`;
 }

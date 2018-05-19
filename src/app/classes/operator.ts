@@ -130,11 +130,11 @@ export class Transformable {
   protected mat: Mat3;
 
   constructor() {
-    this.mat = Mat3.identity;
+    this.mat = Mat3.identity.copy();
   }
 
   public translate(vec: [number, number]) {
-    this.mat = this.mat.multiply(new Mat3([
+    this.mat.multiply(new Mat3([
       1, 0, vec[0],
       0, 1, vec[1],
       0, 0, 1
@@ -142,16 +142,16 @@ export class Transformable {
   }
 
   public scale(vec: [number, number]) {
-    this.mat = this.mat.multiply(new Mat3([
+    this.mat.multiply(new Mat3([
       vec[0], 0, 0,
       0, vec[1], 0,
-      0, 0, vec[2]
+      0, 0, 1
     ]));
   }
 
   public rotate(angle: number) {
     const rot = Mat2.identity.rotate(angle).all();
-    this.mat = this.mat.multiply(new Mat3([
+    this.mat.multiply(new Mat3([
       rot[0], rot[1], 0,
       rot[2], rot[3], 0,
       0, 0, 1
@@ -170,15 +170,15 @@ export class Transformable {
     return this.mat.col(idx);
   }
 
-  /*
   public getPosX(): number {
-    return this.pos[0];
+    return this.mat.at(3);
   }
 
   public getPosY(): number {
-    return this.pos[1];
+    return this.mat.at(6);
   }
 
+  /*
   public getScaleX(): number {
     return this.scale[0];
   }
@@ -248,9 +248,9 @@ export class OperatorInstance extends Composable {
           height += 5;
           const dlgDef = def.delegates[dlgName];
           const dlg = new PortGroup(this, dlgDef, true);
-          dlg.translate([width, height]);
-          dlg.scale([-1, -1]);
-          dlg.rotate(-90);
+          dlg.scale([-1, 1]);
+          dlg.rotate(Math.PI / 4);
+          dlg.translate([width, dlg.getWidth() + height]);
           this.delegates.set(dlgName, dlg);
           height += dlg.getWidth() + 5;
         }
@@ -258,21 +258,17 @@ export class OperatorInstance extends Composable {
     }
     height = Math.max(height + 10, 60);
     this.mainOut = new Port(this, def.services['main']['out']);
+    this.mainOut.scale([1, -1]);
     this.mainOut.translate([0, height]);
-    this.scale([1, -1]);
     this.dim = [width, height];
 
     this.mainIn.justifyHorizontally();
     this.mainOut.justifyHorizontally();
 
     this.instances = new Map<string, OperatorInstance>();
-
-    /*
     this.updateInstances(def.operators, def.connections);
-    */
   }
 
-  /*
   public updateInstances(instances: any, connections: any) {
     if (instances) {
       for (const insName in instances) {
@@ -296,7 +292,8 @@ export class OperatorInstance extends Composable {
           }
           const opDef = JSON.parse(JSON.stringify(op.getDef()));
           OperatorDef.specifyOperatorDef(opDef, ins['generics'], ins['properties'], opDef['properties']);
-          visualIns = new OperatorInstance(this.operatorSrv, opName, insName, null, ipos, [1, 1], 0, opDef);
+          visualIns = new OperatorInstance(this.operatorSrv, opName, insName, null, opDef);
+          visualIns.translate(ipos);
           this.instances.set(insName, visualIns);
           visualIns.show();
         }
@@ -315,7 +312,6 @@ export class OperatorInstance extends Composable {
       }
     }
   }
-  */
 
   public getMainIn(): Port {
     return this.mainIn;
