@@ -208,7 +208,6 @@ class Composable extends Transformable {
   }
 
   public getAbsX(): number {
-    console.log(this.getAbsMat3().all());
     return this.getAbsMat3().at(2);
   }
 
@@ -230,7 +229,8 @@ export class OperatorInstance extends Composable {
               private fqOperator: string,
               private name: string,
               parent: Composable,
-              def: any) {
+              def: any,
+              dim?: [number, number]) {
     super(parent);
     this.mainIn = new Port(this, def.services['main']['in']);
     const tmpMainOut = new Port(this, def.services['main']['out']);
@@ -256,7 +256,7 @@ export class OperatorInstance extends Composable {
     this.mainOut = new Port(this, def.services['main']['out']);
     this.mainOut.scale([1, -1]);
     this.mainOut.translate([0, height]);
-    this.dim = [width, height];
+    this.dim = (!dim) ? [width, height] : [dim[0], dim[1]];
 
     this.mainIn.justifyHorizontally();
     this.mainOut.justifyHorizontally();
@@ -288,7 +288,7 @@ export class OperatorInstance extends Composable {
           }
           const opDef = JSON.parse(JSON.stringify(op.getDef()));
           OperatorDef.specifyOperatorDef(opDef, ins['generics'], ins['properties'], opDef['properties']);
-          opIns = new OperatorInstance(this.operatorSrv, opName, insName, null, opDef);
+          opIns = new OperatorInstance(this.operatorSrv, opName, insName, this, opDef);
           opIns.translate(ipos);
           this.instances.set(insName, opIns);
           opIns.show();
