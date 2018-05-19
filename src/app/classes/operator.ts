@@ -1,5 +1,6 @@
 import {expandProperties} from '../utils';
 import {OperatorService} from '../services/operator.service';
+import {Mat2, Mat3} from './matrix';
 
 export class OperatorDef {
 
@@ -126,10 +127,50 @@ export class OperatorDef {
 
 export class Transformable {
   protected dim: [number, number];
+  protected mat: Mat3;
 
-  constructor(protected pos: [number, number], private scale: [number, number], private rotation: number) {
+  constructor() {
+    this.mat = Mat3.identity;
   }
 
+  public translate(vec: [number, number]) {
+    this.mat = this.mat.multiply(new Mat3([
+      1, 0, vec[0],
+      0, 1, vec[1],
+      0, 0, 1
+    ]));
+  }
+
+  public scale(vec: [number, number]) {
+    this.mat = this.mat.multiply(new Mat3([
+      vec[0], 0, 0,
+      0, vec[1], 0,
+      0, 0, vec[2]
+    ]));
+  }
+
+  public rotate(angle: number) {
+    const rot = Mat2.identity.rotate(angle).all();
+    this.mat = this.mat.multiply(new Mat3([
+      rot[0], rot[1], 0,
+      rot[2], rot[3], 0,
+      0, 0, 1
+    ]));
+  }
+
+  public getWidth(): number {
+    return this.dim[0];
+  }
+
+  public getHeight(): number {
+    return this.dim[1];
+  }
+
+  public col(idx): number[] {
+    return this.mat.col(idx);
+  }
+
+  /*
   public getPosX(): number {
     return this.pos[0];
   }
@@ -149,55 +190,38 @@ export class Transformable {
   public getRotation(): number {
     return this.rotation;
   }
-
-  public getWidth(): number {
-    return this.dim[0];
-  }
-
-  public getHeight(): number {
-    return this.dim[1];
-  }
-
-  protected setPosX(x: number) {
-    this.pos[0] = x;
-  }
-
-  protected setPosY(y: number) {
-    this.pos[1] = y;
-  }
-
+  */
 }
 
-interface Movable {
-  move(delta: [number, number]): [number, number];
-}
 
 class Composable extends Transformable {
-  constructor(private parent: Composable, pos: [number, number], scale: [number, number], rotation: number) {
-    super(pos, scale, rotation);
+  constructor(private parent: Composable) {
+    super();
   }
 
   public getParent(): Composable {
     return this.parent;
   }
 
-  public getAbsX(): number {
-    if (!this.parent) {
-      return this.getPosX();
+  /*
+    public getAbsX(): number {
+      if (!this.parent) {
+        return this.mat;
+      }
+      return this.parent.mat + this.mat;
     }
-    return this.parent.getAbsX() + this.getPosX();
-  }
 
-  public getAbsY(): number {
-    if (!this.parent) {
-      return this.getPosY();
+    public getAbsY(): number {
+      if (!this.parent) {
+        return this.getPosY();
+      }
+      return this.parent.getAbsY() + this.getPosY();
     }
-    return this.parent.getAbsY() + this.getPosY();
-  }
+    */
 
 }
 
-export class OperatorInstance extends Composable implements Movable {
+export class OperatorInstance extends Composable {
   private mainIn: Port;
   private mainOut: Port;
   private services: Map<string, PortGroup>;
@@ -210,13 +234,10 @@ export class OperatorInstance extends Composable implements Movable {
               private fqOperator: string,
               private name: string,
               parent: Composable,
-              pos: [number, number],
-              scale: [number, number],
-              rotation: number,
               def: any) {
-    super(parent, pos, scale, rotation);
-    this.mainIn = new Port(this, [0, 0], [1, 1], 0, def.services['main']['in']);
-    const tmpMainOut = new Port(this, [0, 0], [1, 1], 0, def.services['main']['out']);
+    super(parent);
+    this.mainIn = new Port(this, def.services['main']['in']);
+    const tmpMainOut = new Port(this, def.services['main']['out']);
     const width = Math.max(Math.max(this.mainIn.getWidth(), tmpMainOut.getWidth()) + 10, 130);
     let height = this.mainIn.getHeight() + 10;
 
@@ -226,23 +247,32 @@ export class OperatorInstance extends Composable implements Movable {
         if (def.delegates.hasOwnProperty(dlgName)) {
           height += 5;
           const dlgDef = def.delegates[dlgName];
-          const dlg = new PortGroup(this, [width, height], [-1, -1], -90, dlgDef, true);
+          const dlg = new PortGroup(this, dlgDef, true);
+          dlg.translate([width, height]);
+          dlg.scale([-1, -1]);
+          dlg.rotate(-90);
           this.delegates.set(dlgName, dlg);
           height += dlg.getWidth() + 5;
         }
       }
     }
     height = Math.max(height + 10, 60);
-    this.mainOut = new Port(this, [0, height], [1, -1], 0, def.services['main']['out']);
+    this.mainOut = new Port(this, def.services['main']['out']);
+    this.mainOut.translate([0, height]);
+    this.scale([1, -1]);
     this.dim = [width, height];
 
     this.mainIn.justifyHorizontally();
     this.mainOut.justifyHorizontally();
 
     this.instances = new Map<string, OperatorInstance>();
+
+    /*
     this.updateInstances(def.operators, def.connections);
+    */
   }
 
+  /*
   public updateInstances(instances: any, connections: any) {
     if (instances) {
       for (const insName in instances) {
@@ -285,12 +315,7 @@ export class OperatorInstance extends Composable implements Movable {
       }
     }
   }
-
-  public move(delta: [number, number]): [number, number] {
-    this.pos[0] += delta[0];
-    this.pos[1] += delta[1];
-    return this.pos;
-  }
+  */
 
   public getMainIn(): Port {
     return this.mainIn;
@@ -500,18 +525,17 @@ export class PortGroup
   private out: Port;
 
   constructor(parent: Composable,
-              pos: [number, number],
-              scale: [number, number],
-              rotation: number,
               portGrpDef: any,
               reversePorts: boolean) {
-    super(parent, pos, scale, rotation);
+    super(parent);
     if (reversePorts) {
-      this.out = new Port(this, [0, 0], [1, 1], 0, portGrpDef.out);
-      this.in = new Port(this, [this.out.getWidth() + 5, 0], [1, 1], 0, portGrpDef.in);
+      this.out = new Port(this, portGrpDef.out);
+      this.in = new Port(this, portGrpDef.in);
+      this.in.translate([this.out.getWidth() + 5, 0]);
     } else {
-      this.in = new Port(this, [0, 0], [1, 1], 0, portGrpDef.in);
-      this.out = new Port(this, [this.in.getWidth() + 5, 0], [1, 1], 0, portGrpDef.out);
+      this.in = new Port(this, portGrpDef.in);
+      this.out = new Port(this, portGrpDef.out);
+      this.out.translate([this.in.getWidth() + 5, 0]);
     }
     this.dim = [this.in.getWidth() + this.out.getWidth() + 10, Math.max(this.in.getHeight(), this.out.getHeight())];
   }
@@ -551,8 +575,8 @@ export class Port extends Composable {
   private stream: Port;
   private map: Map<string, Port>;
 
-  constructor(parent: Composable, pos: [number, number], scale: [number, number], rotation: number, portDef: any) {
-    super(parent, pos, scale, rotation);
+  constructor(parent: Composable, portDef: any) {
+    super(parent);
     this.type = portDef.type;
     this.dim = [Port.style.x, Port.style.y];
 
@@ -561,7 +585,8 @@ export class Port extends Composable {
         this.generic = portDef.generic;
         break;
       case 'stream':
-        this.stream = new Port(this, [Port.style.str.px, 0], [1, 1], 0, portDef.stream);
+        this.stream = new Port(this, portDef.stream);
+        this.stream.translate([Port.style.str.px, 0]);
         this.dim = [2 * Port.style.str.px + this.stream.getWidth(), Port.style.str.py + this.stream.getHeight()];
         break;
       case 'map':
@@ -570,7 +595,8 @@ export class Port extends Composable {
         this.map = new Map<string, Port>();
         for (const k in portDef.map) {
           if (portDef.map.hasOwnProperty(k)) {
-            const p = new Port(this, [x, 0], [1, 1], 0, portDef.map[k]);
+            const p = new Port(this, portDef.map[k]);
+            p.translate([x, 0]);
             this.map.set(k, p);
             x += p.getWidth() + Port.style.map.px;
             height = Math.max(height, p.getHeight());
@@ -642,6 +668,6 @@ export class Port extends Composable {
 
   public justifyHorizontally() {
     const x = (this.getParent().getWidth() - this.getWidth()) / 2;
-    this.setPosX(x);
+    this.translate([x, 0]);
   }
 }

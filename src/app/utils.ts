@@ -48,6 +48,7 @@ export function expandProperties(str: string, props: any, propDefs: any): Array<
   return exprs;
 }
 
-export function generateSvgTransform(trans: Transformable): string {
-  return `translate(${trans.getPosX()},${trans.getPosY()}) rotate(${trans.getRotation()}) scale(${trans.getScaleX()},${trans.getScaleY()})`;
+export function generateSvgTransform(t: Transformable): string {
+  const cols = t.col(0).concat(t.col(1).concat(t.col(2)));
+  return `matrix(${cols.join(",")})`;
 }

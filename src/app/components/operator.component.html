@@ -39,6 +39,7 @@
           <svg:g [attr.transform]="transform(ins.getMainIn())" app-port [port]="ins.getMainIn()"></svg:g>
           <svg:g [attr.transform]="transform(ins.getMainOut())" app-port [port]="ins.getMainOut()"></svg:g>
         </svg:g>
+        <!--
         <svg:line *ngFor="let c of visualConnections()"
                   stroke="green"
                   stroke-width="2px"
@@ -46,6 +47,7 @@
                   [attr.y1]="c.getSource().getAbsY()"
                   [attr.x2]="c.getDestination().getAbsX() + c.getDestination().getWidth()/2"
                   [attr.y2]="c.getDestination().getAbsY()"></svg:line>
+                  -->
       </svg>
     </div>
     <div style="border: 1px dotted black; display: inline-block; height: 600px; overflow: scroll; margin-left: 20px">

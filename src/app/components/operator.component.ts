@@ -49,7 +49,7 @@ export class OperatorComponent implements OnInit {
       this.operatorDef = this.operators.getLocal(routeParams.operatorName);
       if (this.operatorDef) {
         const def = this.operatorDef.getDef();
-        this.operator = new OperatorInstance(this.operators, this.operatorName, '', null, [0, 0], [1, 1], 0, def);
+        this.operator = new OperatorInstance(this.operators, this.operatorName, '', null, def);
         this.updateDef(this.operatorDef.getDef());
       } else {
         this.status = `Operator "${this.operatorName}" not found.`;
@@ -60,7 +60,7 @@ export class OperatorComponent implements OnInit {
         this.operatorDef = this.operators.getLocal(this.operatorName);
         if (this.operatorDef) {
           const def = this.operatorDef.getDef();
-          this.operator = new OperatorInstance(this.operators, this.operatorName, '', null, [0, 0], [1, 1], 0, def);
+          this.operator = new OperatorInstance(this.operators, this.operatorName, '', null, def);
           this.updateDef(def);
         } else {
           this.status = `Operator "${this.operatorName}" not found.`;
@@ -123,7 +123,7 @@ export class OperatorComponent implements OnInit {
   private displayVisual() {
     const def = this.operatorDef.getDef();
     this.operator.getInstances().forEach(ins => ins.hide());
-    this.operator.updateInstances(def.operators, def.connections);
+    /*this.operator.updateInstances(def.operators, def.connections);*/
   }
 
   public addInstance(op: any) {
@@ -149,7 +149,7 @@ export class OperatorComponent implements OnInit {
 
   private updateDrag(event, update?: boolean) {
     if (this.visualSelectedInst && update) {
-      this.visualSelectedInst.move([(event.screenX - this.lastX) / this.scale, (event.screenY - this.lastY) / this.scale]);
+      this.visualSelectedInst.translate([(event.screenX - this.lastX) / this.scale, (event.screenY - this.lastY) / this.scale]);
     }
     this.lastX = event.screenX;
     this.lastY = event.screenY;
