@@ -49,7 +49,7 @@ export class OperatorComponent implements OnInit {
       this.operatorDef = this.operators.getLocal(routeParams.operatorName);
       if (this.operatorDef) {
         const def = this.operatorDef.getDef();
-        this.operator = new OperatorInstance(this.operators, this.operatorName, '', null, def);
+        this.operator = new OperatorInstance(this.operators, this.operatorName, '', null, def, [800, 480]);
         this.updateDef(this.operatorDef.getDef());
       } else {
         this.status = `Operator "${this.operatorName}" not found.`;
@@ -60,7 +60,7 @@ export class OperatorComponent implements OnInit {
         this.operatorDef = this.operators.getLocal(this.operatorName);
         if (this.operatorDef) {
           const def = this.operatorDef.getDef();
-          this.operator = new OperatorInstance(this.operators, this.operatorName, '', null, def);
+          this.operator = new OperatorInstance(this.operators, this.operatorName, '', null, def, [800, 480]);
           this.updateDef(def);
         } else {
           this.status = `Operator "${this.operatorName}" not found.`;

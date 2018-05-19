@@ -511,8 +511,7 @@ export class Connection {
   }
 }
 
-export class PortGroup
-  extends Composable {
+export class PortGroup extends Composable {
   private in: Port;
   private out: Port;
 
