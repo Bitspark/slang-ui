@@ -203,22 +203,18 @@ class Composable extends Transformable {
     return this.parent;
   }
 
-  /*
-    public getAbsX(): number {
-      if (!this.parent) {
-        return this.mat;
-      }
-      return this.parent.mat + this.mat;
-    }
+  protected getAbsMat3() {
+    return (this.parent) ? this.parent.mat.copy().multiply(this.mat) : this.mat.copy();
+  }
 
-    public getAbsY(): number {
-      if (!this.parent) {
-        return this.getPosY();
-      }
-      return this.parent.getAbsY() + this.getPosY();
-    }
-    */
+  public getAbsX(): number {
+    console.log(this.getAbsMat3().all());
+    return this.getAbsMat3().at(2);
+  }
 
+  public getAbsY(): number {
+    return this.getAbsMat3().at(5);
+  }
 }
 
 export class OperatorInstance extends Composable {
@@ -249,7 +245,7 @@ export class OperatorInstance extends Composable {
           const dlgDef = def.delegates[dlgName];
           const dlg = new PortGroup(this, dlgDef, true);
           dlg.scale([-1, 1]);
-          dlg.rotate(Math.PI / 4);
+          dlg.rotate(Math.PI / 2);
           dlg.translate([width, dlg.getWidth() + height]);
           this.delegates.set(dlgName, dlg);
           height += dlg.getWidth() + 5;
@@ -266,7 +262,6 @@ export class OperatorInstance extends Composable {
     this.mainOut.justifyHorizontally();
 
     this.instances = new Map<string, OperatorInstance>();
-    this.updateInstances(def.operators, def.connections);
   }
 
   public updateInstances(instances: any, connections: any) {
@@ -281,21 +276,22 @@ export class OperatorInstance extends Composable {
             opName = opSplit.join('.');
           }
           const op = this.operatorSrv.getOperator(opName);
-          let visualIns = this.instances.get(insName);
-          const ipos: [number, number] = [Math.random() * 600, Math.random() * 400];
-          if (typeof visualIns !== 'undefined') {
-            ipos[0] = visualIns.getPosX();
-            ipos[1] = visualIns.getPosY();
+          let opIns = this.instances.get(insName);
+          let ipos: [number, number];
+          if (typeof opIns !== 'undefined') {
+            ipos = [opIns.getPosX(), opIns.getPosY()];
+          } else {
+            ipos = [Math.random() * 600, Math.random() * 400];
           }
           if (!op) {
             continue;
           }
           const opDef = JSON.parse(JSON.stringify(op.getDef()));
           OperatorDef.specifyOperatorDef(opDef, ins['generics'], ins['properties'], opDef['properties']);
-          visualIns = new OperatorInstance(this.operatorSrv, opName, insName, null, opDef);
-          visualIns.translate(ipos);
-          this.instances.set(insName, visualIns);
-          visualIns.show();
+          opIns = new OperatorInstance(this.operatorSrv, opName, insName, null, opDef);
+          opIns.translate(ipos);
+          this.instances.set(insName, opIns);
+          opIns.show();
         }
       }
     }
