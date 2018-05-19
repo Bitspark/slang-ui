@@ -1,5 +1,6 @@
 import {expandProperties} from '../utils';
 import {OperatorService} from '../services/operator.service';
+import {Mat2, Mat3} from './matrix';
 
 export class OperatorDef {
 
@@ -126,28 +127,35 @@ export class OperatorDef {
 
 export class Transformable {
   protected dim: [number, number];
+  protected mat: Mat3;
 
-  constructor(protected pos: [number, number], private scale: [number, number], private rotation: number) {
+  constructor() {
+    this.mat = Mat3.identity.copy();
   }
 
-  public getPosX(): number {
-    return this.pos[0];
+  public translate(vec: [number, number]) {
+    this.mat.multiply(new Mat3([
+      1, 0, vec[0],
+      0, 1, vec[1],
+      0, 0, 1
+    ]));
   }
 
-  public getPosY(): number {
-    return this.pos[1];
+  public scale(vec: [number, number]) {
+    this.mat.multiply(new Mat3([
+      vec[0], 0, 0,
+      0, vec[1], 0,
+      0, 0, 1
+    ]));
   }
 
-  public getScaleX(): number {
-    return this.scale[0];
-  }
-
-  public getScaleY(): number {
-    return this.scale[1];
-  }
-
-  public getRotation(): number {
-    return this.rotation;
+  public rotate(angle: number) {
+    const rot = Mat2.identity.copy().rotate(angle).all();
+    this.mat.multiply(new Mat3([
+      rot[0], rot[1], 0,
+      rot[2], rot[3], 0,
+      0, 0, 1
+    ]));
   }
 
   public getWidth(): number {
@@ -158,46 +166,43 @@ export class Transformable {
     return this.dim[1];
   }
 
-  protected setPosX(x: number) {
-    this.pos[0] = x;
+  public col(idx): number[] {
+    return this.mat.col(idx);
   }
 
-  protected setPosY(y: number) {
-    this.pos[1] = y;
+  public getPosX(): number {
+    return this.mat.at(2);
   }
 
+  public getPosY(): number {
+    return this.mat.at(5);
+  }
 }
 
-interface Movable {
-  move(delta: [number, number]): [number, number];
-}
 
 class Composable extends Transformable {
-  constructor(private parent: Composable, pos: [number, number], scale: [number, number], rotation: number) {
-    super(pos, scale, rotation);
+  constructor(private parent: Composable) {
+    super();
   }
 
   public getParent(): Composable {
     return this.parent;
   }
 
+  protected getAbsMat3() {
+    return !!this.parent ? this.mat.copy().multiply(this.parent.getAbsMat3()) : this.mat.copy();
+  }
+
   public getAbsX(): number {
-    if (!this.parent) {
-      return this.getPosX();
-    }
-    return this.parent.getAbsX() + this.getPosX();
+    return this.getAbsMat3().at(2);
   }
 
   public getAbsY(): number {
-    if (!this.parent) {
-      return this.getPosY();
-    }
-    return this.parent.getAbsY() + this.getPosY();
+    return this.getAbsMat3().at(5);
   }
-
 }
 
-export class OperatorInstance extends Composable implements Movable {
+export class OperatorInstance extends Composable {
   private mainIn: Port;
   private mainOut: Port;
   private services: Map<string, PortGroup>;
@@ -210,14 +215,12 @@ export class OperatorInstance extends Composable implements Movable {
               private fqOperator: string,
               private name: string,
               parent: Composable,
-              pos: [number, number],
-              scale: [number, number],
-              rotation: number,
-              def: any) {
-    super(parent, pos, scale, rotation);
-    this.mainIn = new Port(this, [0, 0], [1, 1], 0, def.services['main']['in']);
-    const tmpMainOut = new Port(this, [0, 0], [1, 1], 0, def.services['main']['out']);
-    const width = Math.max(Math.max(this.mainIn.getWidth(), tmpMainOut.getWidth()) + 10, 130);
+              def: any,
+              dim?: [number, number]) {
+    super(parent);
+    this.mainIn = new Port(this, def.services['main']['in']);
+    const tmpMainOut = new Port(this, def.services['main']['out']);
+    let width = Math.max(Math.max(this.mainIn.getWidth(), tmpMainOut.getWidth()) + 10, 130);
     let height = this.mainIn.getHeight() + 10;
 
     this.delegates = new Map<string, PortGroup>();
@@ -226,21 +229,26 @@ export class OperatorInstance extends Composable implements Movable {
         if (def.delegates.hasOwnProperty(dlgName)) {
           height += 5;
           const dlgDef = def.delegates[dlgName];
-          const dlg = new PortGroup(this, [width, height], [-1, -1], -90, dlgDef, true);
+          const dlg = new PortGroup(this, dlgDef);
+          dlg.scale([-1, 1]);
+          dlg.rotate(Math.PI / 2);
+          dlg.translate([width, dlg.getWidth() + height]);
           this.delegates.set(dlgName, dlg);
           height += dlg.getWidth() + 5;
         }
       }
     }
     height = Math.max(height + 10, 60);
-    this.mainOut = new Port(this, [0, height], [1, -1], 0, def.services['main']['out']);
-    this.dim = [width, height];
+
+    this.dim = [width, height] = (!dim) ? [width, height] : [dim[0], dim[1]];
+    this.mainOut = new Port(this, def.services['main']['out']);
+    this.mainOut.scale([1, -1]);
+    this.mainOut.translate([0, height]);
 
     this.mainIn.justifyHorizontally();
     this.mainOut.justifyHorizontally();
 
     this.instances = new Map<string, OperatorInstance>();
-    this.updateInstances(def.operators, def.connections);
   }
 
   public updateInstances(instances: any, connections: any) {
@@ -255,20 +263,22 @@ export class OperatorInstance extends Composable implements Movable {
             opName = opSplit.join('.');
           }
           const op = this.operatorSrv.getOperator(opName);
-          let visualIns = this.instances.get(insName);
-          const ipos: [number, number] = [Math.random() * 600, Math.random() * 400];
-          if (typeof visualIns !== 'undefined') {
-            ipos[0] = visualIns.getPosX();
-            ipos[1] = visualIns.getPosY();
+          let opIns = this.instances.get(insName);
+          let ipos: [number, number];
+          if (typeof opIns !== 'undefined') {
+            ipos = [opIns.getPosX(), opIns.getPosY()];
+          } else {
+            ipos = [Math.random() * 600, Math.random() * 400];
           }
           if (!op) {
             continue;
           }
           const opDef = JSON.parse(JSON.stringify(op.getDef()));
           OperatorDef.specifyOperatorDef(opDef, ins['generics'], ins['properties'], opDef['properties']);
-          visualIns = new OperatorInstance(this.operatorSrv, opName, insName, null, ipos, [1, 1], 0, opDef);
-          this.instances.set(insName, visualIns);
-          visualIns.show();
+          opIns = new OperatorInstance(this.operatorSrv, opName, insName, this, opDef);
+          opIns.translate(ipos);
+          this.instances.set(insName, opIns);
+          opIns.show();
         }
       }
     }
@@ -284,12 +294,6 @@ export class OperatorInstance extends Composable implements Movable {
         }
       }
     }
-  }
-
-  public move(delta: [number, number]): [number, number] {
-    this.pos[0] += delta[0];
-    this.pos[1] += delta[1];
-    return this.pos;
   }
 
   public getMainIn(): Port {
@@ -494,25 +498,16 @@ export class Connection {
   }
 }
 
-export class PortGroup
-  extends Composable {
+export class PortGroup extends Composable {
   private in: Port;
   private out: Port;
 
   constructor(parent: Composable,
-              pos: [number, number],
-              scale: [number, number],
-              rotation: number,
-              portGrpDef: any,
-              reversePorts: boolean) {
-    super(parent, pos, scale, rotation);
-    if (reversePorts) {
-      this.out = new Port(this, [0, 0], [1, 1], 0, portGrpDef.out);
-      this.in = new Port(this, [this.out.getWidth() + 5, 0], [1, 1], 0, portGrpDef.in);
-    } else {
-      this.in = new Port(this, [0, 0], [1, 1], 0, portGrpDef.in);
-      this.out = new Port(this, [this.in.getWidth() + 5, 0], [1, 1], 0, portGrpDef.out);
-    }
+              portGrpDef: any) {
+    super(parent);
+    this.in = new Port(this, portGrpDef.in);
+    this.out = new Port(this, portGrpDef.out);
+    this.out.translate([this.in.getWidth() + 5, 0]);
     this.dim = [this.in.getWidth() + this.out.getWidth() + 10, Math.max(this.in.getHeight(), this.out.getHeight())];
   }
 
@@ -551,8 +546,8 @@ export class Port extends Composable {
   private stream: Port;
   private map: Map<string, Port>;
 
-  constructor(parent: Composable, pos: [number, number], scale: [number, number], rotation: number, portDef: any) {
-    super(parent, pos, scale, rotation);
+  constructor(parent: Composable, portDef: any) {
+    super(parent);
     this.type = portDef.type;
     this.dim = [Port.style.x, Port.style.y];
 
@@ -561,7 +556,8 @@ export class Port extends Composable {
         this.generic = portDef.generic;
         break;
       case 'stream':
-        this.stream = new Port(this, [Port.style.str.px, 0], [1, 1], 0, portDef.stream);
+        this.stream = new Port(this, portDef.stream);
+        this.stream.translate([Port.style.str.px, 0]);
         this.dim = [2 * Port.style.str.px + this.stream.getWidth(), Port.style.str.py + this.stream.getHeight()];
         break;
       case 'map':
@@ -570,7 +566,8 @@ export class Port extends Composable {
         this.map = new Map<string, Port>();
         for (const k in portDef.map) {
           if (portDef.map.hasOwnProperty(k)) {
-            const p = new Port(this, [x, 0], [1, 1], 0, portDef.map[k]);
+            const p = new Port(this, portDef.map[k]);
+            p.translate([x, 0]);
             this.map.set(k, p);
             x += p.getWidth() + Port.style.map.px;
             height = Math.max(height, p.getHeight());
@@ -619,6 +616,12 @@ export class Port extends Composable {
     return this.map.get(entry);
   }
 
+  /**
+   * Connects ports and recursively descends to leaves in the process (with maps as well as with streams).
+   *
+   * @param {Port} dst destination port
+   * @returns {Set<Connection>} resulting connections
+   */
   public connectDeep(dst: Port): Set<Connection> {
     if (!dst) {
       return new Set<Connection>();
@@ -642,6 +645,19 @@ export class Port extends Composable {
 
   public justifyHorizontally() {
     const x = (this.getParent().getWidth() - this.getWidth()) / 2;
-    this.setPosX(x);
+    this.translate([x, 0]);
+  }
+
+  public getPortMat(): Mat3 {
+    const point = [this.getWidth() / 2, 0];
+    return new Mat3([1, 0, point[0], 0, 1, point[1], 0, 0, 1]);
+  }
+
+  public getPortPosX(): number {
+    return this.getPortMat().multiply(this.getAbsMat3()).at(2);
+  }
+
+  public getPortPosY(): number {
+    return this.getPortMat().multiply(this.getAbsMat3()).at(5);
   }
 }

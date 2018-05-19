@@ -46,26 +46,11 @@ export class OperatorComponent implements OnInit {
 
   ngOnInit() {
     this.route.params.subscribe(routeParams => {
-      this.operatorName = routeParams.operatorName;
-      this.operatorDef = this.operators.getLocal(routeParams.operatorName);
-      if (this.operatorDef) {
-        const def = this.operatorDef.getDef();
-        this.operator = new OperatorInstance(this.operators, this.operatorName, '', null, [0, 0], [1, 1], 0, def);
-        this.updateDef(this.operatorDef.getDef());
-      } else {
-        this.status = `Operator "${this.operatorName}" not found.`;
-      }
+      this.loadOperator(routeParams.operatorName);
     });
     this.operators.getLoadingObservable().subscribe((success) => {
       if (success) {
-        this.operatorDef = this.operators.getLocal(this.operatorName);
-        if (this.operatorDef) {
-          const def = this.operatorDef.getDef();
-          this.operator = new OperatorInstance(this.operators, this.operatorName, '', null, [0, 0], [1, 1], 0, def);
-          this.updateDef(def);
-        } else {
-          this.status = `Operator "${this.operatorName}" not found.`;
-        }
+        this.loadOperator(this.operatorName);
       }
     });
   }
@@ -74,6 +59,19 @@ export class OperatorComponent implements OnInit {
 
   public save() {
     this.api.post('visual/', {cwd: this.operators.getWorkingDir(), fqop: this.operatorName}, {test: 'test'});
+  }
+
+  public loadOperator(operatorName) {
+    this.operatorName = operatorName;
+    this.operatorDef = this.operators.getLocal(this.operatorName);
+    if (this.operatorDef) {
+      const def = this.operatorDef.getDef();
+      this.operator = new OperatorInstance(this.operators, this.operatorName, '', null, def, [800, 480]);
+      this.operator.translate([200, 200]);
+      this.updateDef(def);
+    } else {
+      this.status = `Operator "${this.operatorName}" not found.`;
+    }
   }
 
   // YAML
@@ -156,7 +154,7 @@ export class OperatorComponent implements OnInit {
 
   private updateDrag(event, update?: boolean) {
     if (this.visualSelectedInst && update) {
-      this.visualSelectedInst.move([(event.screenX - this.lastX) / this.scale, (event.screenY - this.lastY) / this.scale]);
+      this.visualSelectedInst.translate([(event.screenX - this.lastX) / this.scale, (event.screenY - this.lastY) / this.scale]);
     }
     this.lastX = event.screenX;
     this.lastY = event.screenY;
