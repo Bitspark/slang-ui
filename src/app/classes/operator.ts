@@ -171,11 +171,11 @@ export class Transformable {
   }
 
   public getPosX(): number {
-    return this.mat.at(3);
+    return this.mat.at(2);
   }
 
   public getPosY(): number {
-    return this.mat.at(6);
+    return this.mat.at(5);
   }
 
   /*
@@ -204,7 +204,7 @@ class Composable extends Transformable {
   }
 
   protected getAbsMat3() {
-    return (this.parent) ? this.parent.mat.copy().multiply(this.mat) : this.mat.copy();
+    return (this.parent) ? this.mat.copy().multiply(this.parent.mat) : this.mat.copy();
   }
 
   public getAbsX(): number {
