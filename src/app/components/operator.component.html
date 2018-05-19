@@ -24,7 +24,7 @@
            (mouseup)="stopDrag($event)"
            (mousemove)="drag($event)">
 
-        <svg:g [attr.transform]="transform(operator)">
+        <svg:g *ngIf="operator" [attr.transform]="transform(operator)">
           <svg:rect x="0" y="0" [attr.width]="operator.getWidth()" [attr.height]="operator.getHeight()"
                     fill="transparent"
                     [attr.stroke]="operator === visualSelectedInst ? 'red' : 'orange'" stroke-dasharray="3 3" stroke-width="3"
@@ -47,10 +47,10 @@
         <svg:line *ngFor="let c of visualConnections()"
                   stroke="green"
                   stroke-width="2px"
-                  [attr.x1]="c.getSource().getAbsX() + c.getSource().getWidth()/2"
-                  [attr.y1]="c.getSource().getAbsY()"
-                  [attr.x2]="c.getDestination().getAbsX() + c.getDestination().getWidth()/2"
-                  [attr.y2]="c.getDestination().getAbsY()"></svg:line>
+                  [attr.x1]="c.getSource().getPortPosX()"
+                  [attr.y1]="c.getSource().getPortPosY()"
+                  [attr.x2]="c.getDestination().getPortPosX()"
+                  [attr.y2]="c.getDestination().getPortPosY()"></svg:line>
       </svg>
     </div>
     <div style="border: 1px dotted black; display: inline-block; height: 600px; overflow: scroll; margin-left: 20px">
