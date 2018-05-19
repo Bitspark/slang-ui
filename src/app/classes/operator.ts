@@ -288,10 +288,7 @@ export class OperatorInstance extends Composable {
       for (const src in connections) {
         if (connections.hasOwnProperty(src)) {
           for (const dst of connections[src]) {
-            console.log(src, dst);
-            console.log(this.getPort(src), this.getPort(dst));
             const conns = this.getPort(src).connectDeep(this.getPort(dst));
-            console.log(conns);
             conns.forEach(conn => this.connections.add(conn));
           }
         }
