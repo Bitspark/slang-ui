@@ -150,7 +150,7 @@ export class Transformable {
   }
 
   public rotate(angle: number) {
-    const rot = Mat2.identity.rotate(angle).all();
+    const rot = Mat2.identity.copy().rotate(angle).all();
     this.mat.multiply(new Mat3([
       rot[0], rot[1], 0,
       rot[2], rot[3], 0,
@@ -177,20 +177,6 @@ export class Transformable {
   public getPosY(): number {
     return this.mat.at(5);
   }
-
-  /*
-  public getScaleX(): number {
-    return this.scale[0];
-  }
-
-  public getScaleY(): number {
-    return this.scale[1];
-  }
-
-  public getRotation(): number {
-    return this.rotation;
-  }
-  */
 }
 
 
