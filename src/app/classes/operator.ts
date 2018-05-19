@@ -204,11 +204,10 @@ class Composable extends Transformable {
   }
 
   protected getAbsMat3() {
-    return (this.parent) ? this.mat.copy().multiply(this.parent.mat) : this.mat.copy();
+    return !!this.parent ? this.mat.copy().multiply(this.parent.getAbsMat3()) : this.mat.copy();
   }
 
   public getAbsX(): number {
-    console.log(this.getAbsMat3().all());
     return this.getAbsMat3().at(2);
   }
 
@@ -301,7 +300,10 @@ export class OperatorInstance extends Composable {
       for (const src in connections) {
         if (connections.hasOwnProperty(src)) {
           for (const dst of connections[src]) {
+            console.log(src, dst);
+            console.log(this.getPort(src), this.getPort(dst));
             const conns = this.getPort(src).connectDeep(this.getPort(dst));
+            console.log(conns);
             conns.forEach(conn => this.connections.add(conn));
           }
         }
@@ -637,6 +639,12 @@ export class Port extends Composable {
     return this.map.get(entry);
   }
 
+  /**
+   * Connects ports and recursively descends to leaves in the process (with maps as well as with streams).
+   *
+   * @param {Port} dst destination port
+   * @returns {Set<Connection>} resulting connections
+   */
   public connectDeep(dst: Port): Set<Connection> {
     if (!dst) {
       return new Set<Connection>();
@@ -661,5 +669,18 @@ export class Port extends Composable {
   public justifyHorizontally() {
     const x = (this.getParent().getWidth() - this.getWidth()) / 2;
     this.translate([x, 0]);
+  }
+
+  public getPortMat(): Mat3 {
+    const point = [this.getWidth() / 2, 0];
+    return new Mat3([1, 0, point[0], 0, 1, point[1], 0, 0, 1]);
+  }
+
+  public getPortPosX(): number {
+    return this.getPortMat().multiply(this.getAbsMat3()).at(2);
+  }
+
+  public getPortPosY(): number {
+    return this.getPortMat().multiply(this.getAbsMat3()).at(5);
   }
 }
