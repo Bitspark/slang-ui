@@ -4,6 +4,7 @@ import {OperatorService} from '../services/operator.service';
 import {Connection, OperatorDef, OperatorInstance, Transformable} from '../classes/operator';
 import {safeDump, safeLoad} from 'js-yaml';
 import {generateSvgTransform} from '../utils';
+import {ApiService} from '../services/api.service';
 
 @Component({
   templateUrl: './operator.component.html',
@@ -40,7 +41,7 @@ export class OperatorComponent implements OnInit {
     }
   }
 
-  constructor(private route: ActivatedRoute, public operators: OperatorService) {
+  constructor(private route: ActivatedRoute, public operators: OperatorService, public api: ApiService) {
   }
 
   ngOnInit() {
@@ -67,6 +68,12 @@ export class OperatorComponent implements OnInit {
         }
       }
     });
+  }
+
+  // General
+
+  public save() {
+    this.api.post('visual/', {cwd: this.operators.getWorkingDir(), fqop: this.operatorName}, {test: 'test'});
   }
 
   // YAML

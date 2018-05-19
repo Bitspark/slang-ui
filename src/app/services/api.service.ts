@@ -9,9 +9,16 @@ export class ApiService {
   constructor(private http: HttpClient) {
   }
 
-  public async get(path: string, params: any): Promise<Object> {
+  public async get(path: string, getParams: any): Promise<Object> {
     return await this.http.get(this.baseUrl + path, {
-      params: params
+      params: getParams
+    }).toPromise();
+  }
+
+  public async post(path: string, getParams: any, postData: any): Promise<Object> {
+    return await this.http.post(this.baseUrl + path, postData, {
+      params: getParams,
+      responseType: 'json'
     }).toPromise();
   }
 
