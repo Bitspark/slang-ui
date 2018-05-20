@@ -552,6 +552,16 @@ export class PortGroup extends Composable {
   public getOut(): Port {
     return this.out;
   }
+
+  public getOperator(): OperatorInstance {
+    const parent = this.getParent();
+    if (parent.constructor.name === OperatorInstance.name) {
+      return parent as OperatorInstance;
+    } else if (parent.constructor.name === PortGroup.name) {
+      return (parent as PortGroup).getOperator();
+    }
+    return null;
+  }
 }
 
 export class Port extends Composable {
@@ -625,6 +635,19 @@ export class Port extends Composable {
 
   public getType(): string {
     return this.type;
+  }
+
+  public getOperator(): OperatorInstance {
+    const parent = this.getParent();
+    switch (parent.constructor.name) {
+      case OperatorInstance.name:
+        return parent as OperatorInstance;
+      case PortGroup.name:
+        return (parent as PortGroup).getOperator();
+      case Port.name:
+        return (parent as Port).getOperator();
+    }
+    return null;
   }
 
   public isPrimitive(): boolean {
