@@ -67,7 +67,6 @@ export class OperatorComponent implements OnInit {
   }
 
   public async loadOperator(operatorName) {
-    console.log(operatorName);
     this.operatorName = operatorName;
     this.operatorDef = this.operators.getLocal(this.operatorName);
     if (this.operatorDef) {
