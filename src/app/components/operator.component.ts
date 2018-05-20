@@ -24,6 +24,7 @@ export class OperatorComponent implements OnInit {
   // Visual
   public visualSelectedInst: OperatorInstance = null;
   public scale = 0.6;
+  public filterString = '';
 
   // Dragging
   private dragging = false;
@@ -153,6 +154,18 @@ export class OperatorComponent implements OnInit {
       operator: op.name
     };
     this.updateDef(def);
+  }
+
+  public getLocals(filterString: string): Array<OperatorDef> {
+    return this.operators.getLocals().filter(op => op.getName().toLowerCase().indexOf(filterString.toLowerCase()) !== -1);
+  }
+
+  public getElementaries(filterString: string): Array<OperatorDef> {
+    return this.operators.getElementaries().filter(op => op.getName().toLowerCase().indexOf(filterString.toLowerCase()) !== -1);
+  }
+
+  public getLibraries(filterString: string): Array<OperatorDef> {
+    return this.operators.getLibraries().filter(op => op.getName().toLowerCase().indexOf(filterString.toLowerCase()) !== -1);
   }
 
   // Dragging
