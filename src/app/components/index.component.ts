@@ -2,6 +2,7 @@ import {Component} from '@angular/core';
 import {OperatorService} from '../services/operator.service';
 import {OperatorDef} from '../classes/operator';
 import {Router} from '@angular/router';
+import * as initialDef from '../initial-def.json';
 
 @Component({
   templateUrl: './index.component.html',
@@ -22,7 +23,7 @@ export class IndexComponent {
   }
 
   public async newOperator() {
-    const newOperator = new OperatorDef({name: this.newOperatorName, def: {}, type: 'local', saved: false});
+    const newOperator = new OperatorDef({name: this.newOperatorName, def: JSON.parse(JSON.stringify(initialDef['default'])), type: 'local', saved: false});
     this.operators.addLocal(newOperator);
     await this.openOperator(newOperator);
 

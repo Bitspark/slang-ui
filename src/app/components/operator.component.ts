@@ -76,7 +76,9 @@ export class OperatorComponent implements OnInit {
       this.operator.translate([50, 50]);
       this.updateDef(def);
       const visual = await this.visuals.loadVisual(this.operators.getWorkingDir(), operatorName);
-      this.operator.updateVisual(visual);
+      if (visual) {
+        this.operator.updateVisual(visual);
+      }
     } else {
       this.status = `Operator "${this.operatorName}" not found.`;
     }
