@@ -5,7 +5,7 @@ import {Connection, OperatorDef, OperatorInstance, Transformable} from '../class
 import {safeDump, safeLoad} from 'js-yaml';
 import {generateSvgTransform} from '../utils';
 import {ApiService} from '../services/api.service';
-import {VisualService} from "../services/visual.service";
+import {VisualService} from '../services/visual.service';
 
 @Component({
   templateUrl: './operator.component.html',
@@ -87,6 +87,9 @@ export class OperatorComponent implements OnInit {
   }
 
   public removeInstance(ins: OperatorInstance) {
+    if (ins === this.operator) {
+      return;
+    }
     const def = this.operatorDef.getDef();
     for (const src in def['connections']) {
       if (def['connections'].hasOwnProperty(src)) {
