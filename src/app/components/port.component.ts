@@ -1,4 +1,4 @@
-import {Component, Input} from '@angular/core';
+import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {generateSvgTransform} from '../utils';
 import {Port, Transformable} from '../classes/operator';
 
@@ -11,6 +11,11 @@ export class PortComponent {
 
   @Input()
   public port: Port;
+
+  @Output()
+  public select: EventEmitter<any> = new EventEmitter();
+  @Input()
+  public selectedEntity: any;
 
   public getEntries(): Array<Port> {
     return Array.from(this.port.getMap().values());

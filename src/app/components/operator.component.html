@@ -35,34 +35,34 @@
         <svg:g *ngIf="operator" [attr.transform]="transform(operator)">
           <svg:rect x="0" y="0" [attr.width]="operator.getWidth()" [attr.height]="operator.getHeight()"
                     fill="transparent"
-                    [attr.stroke]="operator === selectedEntity ? 'red' : 'orange'" stroke-dasharray="3 3" stroke-width="3"
+                    [attr.stroke]="operator === selectedEntity.entity ? 'red' : 'orange'" stroke-dasharray="3 3" stroke-width="3"
                     (mousedown)="selectInstance(operator)"></svg:rect>
           <svg:g *ngFor="let dlg of operator.getDelegates()" [attr.transform]="transform(dlg)">
-            <svg:g [attr.transform]="transform(dlg.getIn())" app-port [port]="dlg.getIn()"></svg:g>
-            <svg:g [attr.transform]="transform(dlg.getOut())" app-port [port]="dlg.getOut()"></svg:g>
+            <svg:g [attr.transform]="transform(dlg.getIn())" app-port [port]="dlg.getIn()" (select)="selectPort($event)" [selectedEntity]="selectedEntity"></svg:g>
+            <svg:g [attr.transform]="transform(dlg.getOut())" app-port [port]="dlg.getOut()" (select)="selectPort($event)" [selectedEntity]="selectedEntity"></svg:g>
           </svg:g>
-          <svg:g [attr.transform]="transform(operator.getMainIn())" app-port [port]="operator.getMainIn()"></svg:g>
-          <svg:g [attr.transform]="transform(operator.getMainOut())" app-port [port]="operator.getMainOut()"></svg:g>
+          <svg:g [attr.transform]="transform(operator.getMainIn())" app-port [port]="operator.getMainIn()" (select)="selectPort($event)" [selectedEntity]="selectedEntity"></svg:g>
+          <svg:g [attr.transform]="transform(operator.getMainOut())" app-port [port]="operator.getMainOut()" (select)="selectPort($event)" [selectedEntity]="selectedEntity"></svg:g>
 
           <svg:g *ngFor="let ins of visualInstances()" [attr.transform]="transform(ins)">
             <svg:rect x="0" y="0" [attr.width]="ins.getWidth()" [attr.height]="ins.getHeight()" fill="orange"
-                      [attr.stroke]="ins === selectedEntity ? 'red' : ''" stroke-dasharray="3 3" stroke-width="2"
+                      [attr.stroke]="ins === selectedEntity.entity ? 'red' : ''" stroke-dasharray="3 3" stroke-width="2"
                       (mousedown)="selectInstance(ins)"></svg:rect>
             <svg:text text-anchor="middle" x="65" y="35" fill="white" font-family="Arial" font-size="16"
                       style="pointer-events: none">{{ins.getName()}}
             </svg:text>
             <svg:g *ngFor="let dlg of ins.getDelegates()" [attr.transform]="transform(dlg)">
-              <svg:g [attr.transform]="transform(dlg.getIn())" app-port [port]="dlg.getIn()"></svg:g>
-              <svg:g [attr.transform]="transform(dlg.getOut())" app-port [port]="dlg.getOut()"></svg:g>
+              <svg:g [attr.transform]="transform(dlg.getIn())" app-port [port]="dlg.getIn()" (select)="selectPort($event)" [selectedEntity]="selectedEntity"></svg:g>
+              <svg:g [attr.transform]="transform(dlg.getOut())" app-port [port]="dlg.getOut()" (select)="selectPort($event)" [selectedEntity]="selectedEntity"></svg:g>
             </svg:g>
-            <svg:g [attr.transform]="transform(ins.getMainIn())" app-port [port]="ins.getMainIn()"></svg:g>
-            <svg:g [attr.transform]="transform(ins.getMainOut())" app-port [port]="ins.getMainOut()"></svg:g>
+            <svg:g [attr.transform]="transform(ins.getMainIn())" app-port [port]="ins.getMainIn()" (select)="selectPort($event)" [selectedEntity]="selectedEntity"></svg:g>
+            <svg:g [attr.transform]="transform(ins.getMainOut())" app-port [port]="ins.getMainOut()" (select)="selectPort($event)" [selectedEntity]="selectedEntity"></svg:g>
           </svg:g>
         </svg:g>
         <svg:line *ngFor="let conn of visualConnections()"
-                  stroke-width="5px"
+                  stroke-width="2px"
                   (click)="selectConnection(conn)"
-                  [attr.stroke]="conn === selectedEntity ? 'red' : 'green'"
+                  [attr.stroke]="conn === selectedEntity.entity ? 'red' : 'black'"
                   [attr.x1]="conn.getSource().getPortPosX()"
                   [attr.y1]="conn.getSource().getPortPosY()"
                   [attr.x2]="conn.getDestination().getPortPosX()"

@@ -587,8 +587,8 @@ export class Port extends Composable {
     y: 10,
 
     str: {
-      px: 2,
-      py: 2,
+      px: 3,
+      py: 3,
     },
 
     map: {
@@ -768,6 +768,14 @@ export class Port extends Composable {
 
   public getColor(): string {
     return Port.style.portColors[this.type];
+  }
+
+  public isIn(): boolean {
+    return this.inDir;
+  }
+
+  public isOut(): boolean {
+    return !this.inDir;
   }
 
   public justifyHorizontally() {
