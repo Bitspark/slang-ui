@@ -5,7 +5,7 @@ import {Connection, OperatorDef, OperatorInstance, Transformable} from '../class
 import {safeDump, safeLoad} from 'js-yaml';
 import {generateSvgTransform} from '../utils';
 import {ApiService} from '../services/api.service';
-import {VisualService} from "../services/visual.service";
+import {VisualService} from '../services/visual.service';
 
 @Component({
   templateUrl: './operator.component.html',
@@ -39,6 +39,9 @@ export class OperatorComponent implements OnInit {
         break;
       case '-':
         this.scale /= 1.1;
+        break;
+      case 'Delete':
+        this.removeInstance(this.visualSelectedInst);
         break;
     }
   }
@@ -81,6 +84,27 @@ export class OperatorComponent implements OnInit {
     } else {
       this.status = `Operator "${this.operatorName}" not found.`;
     }
+  }
+
+  public removeInstance(ins: OperatorInstance) {
+    if (ins === this.operator) {
+      return;
+    }
+    const def = this.operatorDef.getDef();
+    for (const src in def['connections']) {
+      if (def['connections'].hasOwnProperty(src)) {
+        if (this.operator.getPort(src).getOperator() === ins) {
+          delete def['connections'][src];
+          continue;
+        }
+        def['connections'][src] = def['connections'][src].filter(dst => this.operator.getPort(dst).getOperator() !== ins);
+        if (def['connections'][src].length === 0) {
+          delete def['connections'][src];
+        }
+      }
+    }
+    delete def['operators'][ins.getName()];
+    this.updateDef(def);
   }
 
   // YAML
