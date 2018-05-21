@@ -24,12 +24,11 @@ export class TypeDefFormComponent implements OnInit {
   ngOnInit() {
   }
 
-
   public setType(portType: string) {
     this.port.type = portType;
     switch (portType) {
       case 'map':
-        this.port[portType] = new Map<string, any>();
+        this.port[portType] = {};
         break;
       case 'generic':
         this.port[portType] = 'itemType';
@@ -41,27 +40,26 @@ export class TypeDefFormComponent implements OnInit {
 
   public getMapPortNames(): Array<string> {
     if (this.isMap()) {
-      return Array.from(this.port.map.keys());
+      return Array.from(Object.keys(this.port.map)).filter(k => this.port.map.hasOwnProperty(k));
     }
     return [];
   }
 
   public addMapPort(portName: string) {
-    if (!portName || this.port.map.has(portName)) {
+    if (!portName || this.port.map[portName]) {
       return;
     }
-
-    this.port.map.set(portName, TypeDefFormComponent.newPrimitiveTypeDef());
+    this.port.map[portName] = TypeDefFormComponent.newPrimitiveTypeDef();
     this.resetNewMapPortName();
   }
 
   public renameMapPortName(oldPortName, newPortName: string) {
-    this.port.map.set(newPortName, this.port.map.get(oldPortName));
+    this.port.map[newPortName] = this.port.map[oldPortName];
     this.removeMapPort(oldPortName);
   }
 
   public removeMapPort(portName: string) {
-    this.port.map.delete(portName);
+    delete this.port.map[portName];
   }
 
   public resetNewMapPortName() {

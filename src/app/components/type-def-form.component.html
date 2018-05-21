@@ -11,7 +11,7 @@
     <p *ngFor="let portName of getMapPortNames()">
       <button (click)="removeMapPort(portName.trim())">REMOVE</button>
       <input [ngModel]="portName" (ngModelChange)="renameMapPortName(portName, $event)"/>
-      <app-type-def-form [port]="port.map.get(portName)"></app-type-def-form>
+      <app-type-def-form [port]="port.map[portName]"></app-type-def-form>
     </p>
   </div>
 
