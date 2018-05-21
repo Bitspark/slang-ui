@@ -10,16 +10,20 @@
   <div>
     YAML view
   </div>
-  <textarea cols="150" rows="15" title="YAML representation" [ngModel]="yamlRepr" (ngModelChange)="updateYaml($event)"
-            (blur)="storeYaml()">
-</textarea>
+  <div style="border: 1px dotted black; width: 800px">
+    <codemirror [ngModel]="yamlRepr"
+                [config]="editorConfig"
+                (ngModelChange)="updateYaml($event)"
+                (blur)="storeYaml()">
+</codemirror>
+</div>
 </div>
 
 <div>
   <div>
     Visual view
   </div>
-  <div style="height: 700px">
+  <div>
     <div style="width: 800px; height: 600px; overflow: scroll; display: inline-block">
       <svg [attr.width]="1600*scale" [attr.height]="1200*scale" style="border: 1px dotted black;"
            viewBox="0 0 1600 1200"

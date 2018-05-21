@@ -6,6 +6,7 @@ import {safeDump, safeLoad} from 'js-yaml';
 import {generateSvgTransform} from '../utils';
 import {ApiService} from '../services/api.service';
 import {VisualService} from '../services/visual.service';
+import 'codemirror/mode/yaml/yaml.js';
 
 @Component({
   templateUrl: './operator.component.html',
@@ -20,6 +21,11 @@ export class OperatorComponent implements OnInit {
 
   // YAML
   public yamlRepr = '';
+  public editorConfig = {
+    theme: 'default',
+    mode: 'text/x-yaml',
+    lineNumbers: true,
+  };
 
   // Visual
   public visualSelectedInst: OperatorInstance = null;

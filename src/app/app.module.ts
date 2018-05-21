@@ -3,6 +3,7 @@ import {RouterModule} from '@angular/router';
 import {BrowserModule} from '@angular/platform-browser';
 import {FormsModule} from '@angular/forms';
 import {HttpClientModule} from '@angular/common/http';
+import {CodemirrorModule} from 'ng2-codemirror';
 
 import {AppRoutes} from './app.routes';
 
@@ -26,7 +27,8 @@ import {VisualService} from './services/visual.service';
     ),
     BrowserModule,
     FormsModule,
-    HttpClientModule
+    HttpClientModule,
+    CodemirrorModule
   ],
   providers: [ApiService, OperatorService, VisualService],
   bootstrap: [AppComponent]
