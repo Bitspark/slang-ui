@@ -224,35 +224,40 @@ export class OperatorInstance extends Composable {
   }
 
   public updateOperator(def: any, dim?: [number, number]) {
+    let [width, height] = (this.dim) ? this.dim : (dim) ? dim : [0, 0];
+
     this.mainIn = new Port(this, 'service', 'main', true, null, '', this, def.services['main']['in']);
     const tmpMainOut = new Port(this, 'service', 'main', false, null, '', this, def.services['main']['out']);
-    let width = Math.max(Math.max(this.mainIn.getWidth(), tmpMainOut.getWidth()) + 10, 130);
-    let height = this.mainIn.getHeight() + 10;
+    width = Math.max(width, this.mainIn.getWidth(), tmpMainOut.getWidth() + 10, 130);
+    height = Math.max(height, this.mainIn.getHeight() + 10);
 
+    let dlgHeight = 10;
     this.delegates = new Map<string, PortGroup>();
     if (def.delegates) {
       for (const dlgName in def.delegates) {
         if (def.delegates.hasOwnProperty(dlgName)) {
-          height += 5;
+          dlgHeight += 5;
           const dlgDef = def.delegates[dlgName];
           const dlg = new Delegate(this, dlgName, this, dlgDef);
+          dlgHeight += dlg.getWidth();
           dlg.scale([-1, 1]);
           dlg.rotate(Math.PI / 2);
-          dlg.translate([width, dlg.getWidth() + height]);
+          dlg.translate([width, dlg.getWidth()]);
           this.delegates.set(dlgName, dlg);
-          height += dlg.getWidth() + 5;
+          dlgHeight += 5;
         }
       }
     }
-    height = Math.max(height + 10, 60);
+    height = Math.max(height, dlgHeight + 10, 60);
 
-    this.dim = [width, height] = (!this.dim) ? ((!dim) ? [width, height] : [dim[0], dim[1]]) : this.dim;
+    this.dim = [width, height];
     this.mainOut = new Port(this, 'service', 'main', false, null, '', this, def.services['main']['out']);
     this.mainOut.scale([1, -1]);
     this.mainOut.translate([0, height]);
 
     this.mainIn.justifyHorizontally();
     this.mainOut.justifyHorizontally();
+    this.distributeDelegatesVertically();
 
     this.updateInstances(def.operators, def.connections);
   }
@@ -511,6 +516,23 @@ export class OperatorInstance extends Composable {
 
     return p;
   }
+
+  private distributeDelegatesVertically() {
+    if (!this.delegates) {
+      return;
+    }
+    const dlgs = Array.from(this.delegates.values());
+    // -20: margin top and bottom
+    //  -5: padding between comps
+    const yDiff = (this.getHeight() - 20 - ((dlgs.length - 1) * 5)) / (dlgs.length + 1);
+    let yStart = yDiff + 10;
+
+    dlgs.forEach((dlg, i) => {
+      const y = (yStart - dlg.getWidth() / 2);
+      dlg.translate([0, y]);
+      yStart = yDiff * i + 5;
+    });
+  }
 }
 
 export class Connection {
@@ -576,7 +598,6 @@ export class Delegate extends PortGroup {
 }
 
 export class Port extends Composable {
-
   /**
    * x: width [px]
    * y: height [px]
