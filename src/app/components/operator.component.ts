@@ -3,7 +3,7 @@ import {ActivatedRoute} from '@angular/router';
 import {OperatorService} from '../services/operator.service';
 import {Connection, OperatorDef, OperatorInstance, Transformable} from '../classes/operator';
 import {safeDump, safeLoad} from 'js-yaml';
-import {generateSvgTransform} from '../utils';
+import {generateSvgTransform, normalizeConnections} from '../utils';
 import {ApiService} from '../services/api.service';
 import {VisualService} from '../services/visual.service';
 import 'codemirror/mode/yaml/yaml.js';
@@ -28,7 +28,7 @@ export class OperatorComponent implements OnInit {
   };
 
   // Visual
-  public visualSelectedInst: OperatorInstance = null;
+  public selectedEntity = null;
   public scale = 0.6;
   public filterString = '';
 
@@ -47,7 +47,15 @@ export class OperatorComponent implements OnInit {
         this.scale /= 1.1;
         break;
       case 'Delete':
-        this.removeInstance(this.visualSelectedInst);
+        if (!this.selectedEntity) { return; }
+        if (this.selectedEntity.constructor.name === OperatorInstance.name) {
+          this.removeInstance(this.selectedEntity);
+          break;
+        }
+        if (this.selectedEntity.constructor.name === Connection.name) {
+          this.removeConnection(this.selectedEntity);
+          break;
+        }
         break;
     }
   }
@@ -113,6 +121,14 @@ export class OperatorComponent implements OnInit {
     this.updateDef(def);
   }
 
+  public removeConnection(conn: Connection) {
+    const conns = this.operator.getConnections();
+    conns.delete(conn);
+    const def = this.operatorDef.getDef();
+    def['connections'] = normalizeConnections(conns);
+    this.updateDef(def);
+  }
+
   // YAML
 
   public updateYaml(newYaml) {
@@ -159,8 +175,12 @@ export class OperatorComponent implements OnInit {
     return Array.from(this.operator.getConnections().values());
   }
 
-  public selectVisualInstance(ins: OperatorInstance) {
-    this.visualSelectedInst = ins;
+  public selectInstance(ins: OperatorInstance) {
+    this.selectedEntity = ins;
+  }
+
+  public selectConnection(conn: Connection) {
+    this.selectedEntity = conn;
   }
 
   private displayVisual() {
@@ -202,8 +222,8 @@ export class OperatorComponent implements OnInit {
   // Dragging
 
   private updateDrag(event, update?: boolean) {
-    if (this.visualSelectedInst && update) {
-      this.visualSelectedInst.translate([(event.screenX - this.lastX) / this.scale, (event.screenY - this.lastY) / this.scale]);
+    if (this.selectedEntity && update) {
+      this.selectedEntity.translate([(event.screenX - this.lastX) / this.scale, (event.screenY - this.lastY) / this.scale]);
     }
     this.lastX = event.screenX;
     this.lastY = event.screenY;

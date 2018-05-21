@@ -1,4 +1,4 @@
-import {Transformable} from './classes/operator';
+import {Connection, Transformable} from './classes/operator';
 
 function expandExpressionPart(exprPart: string, props: any, propDefs: any): Array<string> {
   const vals = [];
@@ -51,4 +51,17 @@ export function expandProperties(str: string, props: any, propDefs: any): Array<
 export function generateSvgTransform(t: Transformable): string {
   const cols = t.col(0).slice(0, 2).concat(t.col(1).slice(0, 2).concat(t.col(2).slice(0, 2)));
   return `matrix(${cols.join(',')})`;
+}
+
+export function normalizeConnections(conns: Set<Connection>): any {
+  const connObj = {};
+  conns.forEach(conn => {
+    const srcRef = conn.getSource().getRefString();
+    const dstRef = conn.getDestination().getRefString();
+    if (!connObj[srcRef]) {
+      connObj[srcRef] = [];
+    }
+    connObj[srcRef].push(dstRef);
+  });
+  return connObj;
 }
