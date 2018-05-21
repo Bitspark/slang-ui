@@ -60,7 +60,7 @@
           </svg:g>
         </svg:g>
         <svg:line *ngFor="let conn of visualConnections()"
-                  stroke-width="3px"
+                  stroke-width="5px"
                   (click)="selectConnection(conn)"
                   [attr.stroke]="conn === selectedEntity ? 'red' : 'green'"
                   [attr.x1]="conn.getSource().getPortPosX()"
