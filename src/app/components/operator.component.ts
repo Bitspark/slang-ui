@@ -24,6 +24,7 @@ export class OperatorComponent implements OnInit {
   // Visual
   public visualSelectedInst: OperatorInstance = null;
   public scale = 0.6;
+  public filterString = '';
 
   // Dragging
   private dragging = false;
@@ -66,7 +67,6 @@ export class OperatorComponent implements OnInit {
   }
 
   public async loadOperator(operatorName) {
-    console.log(operatorName);
     this.operatorName = operatorName;
     this.operatorDef = this.operators.getLocal(this.operatorName);
     if (this.operatorDef) {
@@ -75,7 +75,9 @@ export class OperatorComponent implements OnInit {
       this.operator.translate([50, 50]);
       this.updateDef(def);
       const visual = await this.visuals.loadVisual(this.operators.getWorkingDir(), operatorName);
-      this.operator.updateVisual(visual);
+      if (visual) {
+        this.operator.updateVisual(visual);
+      }
     } else {
       this.status = `Operator "${this.operatorName}" not found.`;
     }
@@ -153,6 +155,18 @@ export class OperatorComponent implements OnInit {
       operator: op.name
     };
     this.updateDef(def);
+  }
+
+  public getLocals(filterString: string): Array<OperatorDef> {
+    return this.operators.getLocals().filter(op => op.getName().toLowerCase().indexOf(filterString.toLowerCase()) !== -1);
+  }
+
+  public getElementaries(filterString: string): Array<OperatorDef> {
+    return this.operators.getElementaries().filter(op => op.getName().toLowerCase().indexOf(filterString.toLowerCase()) !== -1);
+  }
+
+  public getLibraries(filterString: string): Array<OperatorDef> {
+    return this.operators.getLibraries().filter(op => op.getName().toLowerCase().indexOf(filterString.toLowerCase()) !== -1);
   }
 
   // Dragging

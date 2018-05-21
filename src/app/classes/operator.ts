@@ -219,6 +219,7 @@ export class OperatorInstance extends Composable {
               dim?: [number, number]) {
     super(parent);
     this.instances = new Map<string, OperatorInstance>();
+    this.connections = new Set<Connection>();
     this.updateOperator(def, dim);
   }
 
