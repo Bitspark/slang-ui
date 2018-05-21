@@ -30,6 +30,18 @@ export class OperatorDef {
       portDef['type'] === 'trigger';
   }
 
+  public static isStream(portDef: any) {
+    return portDef['type'] === 'stream';
+  }
+
+  public static isMap(portDef: any) {
+    return portDef['type'] === 'map';
+  }
+
+  public static isGeneric(portDef: any) {
+    return portDef['type'] === 'generic';
+  }
+
   public static specifyOperatorDef(def: any, gens: any, props: any, propDefs: any) {
     const newSrvs = {};
     for (const srvName in def['services']) {

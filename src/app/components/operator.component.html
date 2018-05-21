@@ -6,6 +6,10 @@
   <button (click)="save()">Save</button>
 </div>
 
+<div style="padding: 2px">
+  <app-type-def-form></app-type-def-form>
+</div>
+
 <div>
   <div>
     YAML view
@@ -15,8 +19,8 @@
                 [config]="editorConfig"
                 (ngModelChange)="updateYaml($event)"
                 (blur)="storeYaml()">
-</codemirror>
-</div>
+    </codemirror>
+  </div>
 </div>
 
 <div>
@@ -35,7 +39,8 @@
         <svg:g *ngIf="operator" [attr.transform]="transform(operator)">
           <svg:rect x="0" y="0" [attr.width]="operator.getWidth()" [attr.height]="operator.getHeight()"
                     fill="transparent"
-                    [attr.stroke]="operator === visualSelectedInst ? 'red' : 'orange'" stroke-dasharray="3 3" stroke-width="3"
+                    [attr.stroke]="operator === visualSelectedInst ? 'red' : 'orange'" stroke-dasharray="3 3"
+                    stroke-width="3"
                     (mousedown)="selectVisualInstance(operator)"></svg:rect>
           <svg:g *ngFor="let dlg of operator.getDelegates()" [attr.transform]="transform(dlg)">
             <svg:g [attr.transform]="transform(dlg.getIn())" app-port [port]="dlg.getIn()"></svg:g>
