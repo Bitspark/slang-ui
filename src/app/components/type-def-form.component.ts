@@ -26,12 +26,17 @@ export class TypeDefFormComponent implements OnInit {
 
 
   public setType(portType: string) {
-    if (portType === 'map') {
-      this.port[portType] = new Map<string, any>();
-    } else {
-      this.port[portType] = TypeDefFormComponent.newPrimitiveTypeDef();
-    }
     this.port.type = portType;
+    switch (portType) {
+      case 'map':
+        this.port[portType] = new Map<string, any>();
+        break;
+      case 'generic':
+        this.port[portType] = 'itemType';
+        break;
+      default:
+        this.port[portType] = TypeDefFormComponent.newPrimitiveTypeDef();
+    }
   }
 
   public getMapPortNames(): Array<string> {
