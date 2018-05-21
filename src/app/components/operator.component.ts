@@ -21,6 +21,7 @@ export class OperatorComponent implements OnInit {
 
   // YAML
   public yamlRepr = '';
+  public showYAML = false;
   public editorConfig = {
     theme: 'default',
     mode: 'text/x-yaml',

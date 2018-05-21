@@ -532,6 +532,10 @@ export class OperatorInstance extends Composable {
       y += dlg.getWidth();
       y += OperatorInstance.style.dlgM;
     });
+    const centerY = (this.getHeight() - y - OperatorInstance.style.dlgP) / 2;
+    this.delegates.forEach(dlg => {
+      dlg.translate([0, centerY]);
+    });
   }
 }
 
