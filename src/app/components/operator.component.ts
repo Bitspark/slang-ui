@@ -4,6 +4,8 @@ import {OperatorService} from '../services/operator.service';
 import {Connection, OperatorDef, OperatorInstance, Transformable} from '../classes/operator';
 import {safeDump, safeLoad} from 'js-yaml';
 import {generateSvgTransform} from '../utils';
+import {ApiService} from '../services/api.service';
+import {VisualService} from '../services/visual.service';
 import 'codemirror/mode/yaml/yaml.js';
 
 @Component({
@@ -28,6 +30,7 @@ export class OperatorComponent implements OnInit {
   // Visual
   public visualSelectedInst: OperatorInstance = null;
   public scale = 0.6;
+  public filterString = '';
 
   // Dragging
   private dragging = false;
@@ -43,10 +46,13 @@ export class OperatorComponent implements OnInit {
       case '-':
         this.scale /= 1.1;
         break;
+      case 'Delete':
+        this.removeInstance(this.visualSelectedInst);
+        break;
     }
   }
 
-  constructor(private route: ActivatedRoute, public operators: OperatorService) {
+  constructor(private route: ActivatedRoute, public operators: OperatorService, public visuals: VisualService, public api: ApiService) {
   }
 
   ngOnInit() {
@@ -60,17 +66,51 @@ export class OperatorComponent implements OnInit {
     });
   }
 
-  public loadOperator(operatorName) {
+  // General
+
+  public async save() {
+    await this.operators.storeDefinition(this.operatorName, this.operatorDef.getDef());
+    await this.visuals.storeVisual(this.operators.getWorkingDir(), this.operatorName, this.operator.getVisual());
+    await this.operators.refresh();
+    await this.loadOperator(this.operatorName);
+  }
+
+  public async loadOperator(operatorName) {
     this.operatorName = operatorName;
     this.operatorDef = this.operators.getLocal(this.operatorName);
     if (this.operatorDef) {
       const def = this.operatorDef.getDef();
-      this.operator = new OperatorInstance(this.operators, this.operatorName, '', null, def, [800, 480]);
-      this.operator.translate([200, 200]);
+      this.operator = new OperatorInstance(this.operators, this.operatorName, '', null, def, [1200, 1100]);
+      this.operator.translate([50, 50]);
       this.updateDef(def);
+      const visual = await this.visuals.loadVisual(this.operators.getWorkingDir(), operatorName);
+      if (visual) {
+        this.operator.updateVisual(visual);
+      }
     } else {
       this.status = `Operator "${this.operatorName}" not found.`;
     }
+  }
+
+  public removeInstance(ins: OperatorInstance) {
+    if (ins === this.operator) {
+      return;
+    }
+    const def = this.operatorDef.getDef();
+    for (const src in def['connections']) {
+      if (def['connections'].hasOwnProperty(src)) {
+        if (this.operator.getPort(src).getOperator() === ins) {
+          delete def['connections'][src];
+          continue;
+        }
+        def['connections'][src] = def['connections'][src].filter(dst => this.operator.getPort(dst).getOperator() !== ins);
+        if (def['connections'][src].length === 0) {
+          delete def['connections'][src];
+        }
+      }
+    }
+    delete def['operators'][ins.getName()];
+    this.updateDef(def);
   }
 
   // YAML
@@ -83,7 +123,6 @@ export class OperatorComponent implements OnInit {
     try {
       const newDef = safeLoad(this.yamlRepr);
       this.updateDef(newDef);
-      this.status = 'Parsed YAML successfully.';
     } catch (e) {
       this.status = e.toString();
     }
@@ -126,8 +165,7 @@ export class OperatorComponent implements OnInit {
 
   private displayVisual() {
     const def = this.operatorDef.getDef();
-    this.operator.getInstances().forEach(ins => ins.hide());
-    this.operator.updateInstances(def.operators, def.connections);
+    this.operator.updateOperator(def);
   }
 
   public addInstance(op: any) {
@@ -147,6 +185,18 @@ export class OperatorComponent implements OnInit {
       operator: op.name
     };
     this.updateDef(def);
+  }
+
+  public getLocals(filterString: string): Array<OperatorDef> {
+    return this.operators.getLocals().filter(op => op.getName().toLowerCase().indexOf(filterString.toLowerCase()) !== -1);
+  }
+
+  public getElementaries(filterString: string): Array<OperatorDef> {
+    return this.operators.getElementaries().filter(op => op.getName().toLowerCase().indexOf(filterString.toLowerCase()) !== -1);
+  }
+
+  public getLibraries(filterString: string): Array<OperatorDef> {
+    return this.operators.getLibraries().filter(op => op.getName().toLowerCase().indexOf(filterString.toLowerCase()) !== -1);
   }
 
   // Dragging

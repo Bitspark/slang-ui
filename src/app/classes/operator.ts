@@ -218,6 +218,12 @@ export class OperatorInstance extends Composable {
               def: any,
               dim?: [number, number]) {
     super(parent);
+    this.instances = new Map<string, OperatorInstance>();
+    this.connections = new Set<Connection>();
+    this.updateOperator(def, dim);
+  }
+
+  public updateOperator(def: any, dim?: [number, number]) {
     this.mainIn = new Port(this, def.services['main']['in']);
     const tmpMainOut = new Port(this, def.services['main']['out']);
     let width = Math.max(Math.max(this.mainIn.getWidth(), tmpMainOut.getWidth()) + 10, 130);
@@ -240,7 +246,7 @@ export class OperatorInstance extends Composable {
     }
     height = Math.max(height + 10, 60);
 
-    this.dim = [width, height] = (!dim) ? [width, height] : [dim[0], dim[1]];
+    this.dim = [width, height] = (!this.dim) ? ((!dim) ? [width, height] : [dim[0], dim[1]]) : this.dim;
     this.mainOut = new Port(this, def.services['main']['out']);
     this.mainOut.scale([1, -1]);
     this.mainOut.translate([0, height]);
@@ -248,11 +254,12 @@ export class OperatorInstance extends Composable {
     this.mainIn.justifyHorizontally();
     this.mainOut.justifyHorizontally();
 
-    this.instances = new Map<string, OperatorInstance>();
+    this.updateInstances(def.operators, def.connections);
   }
 
   public updateInstances(instances: any, connections: any) {
     if (instances) {
+      this.instances.forEach(ins => ins.hide());
       for (const insName in instances) {
         if (instances.hasOwnProperty(insName)) {
           const ins = instances[insName];
@@ -268,7 +275,7 @@ export class OperatorInstance extends Composable {
           if (typeof opIns !== 'undefined') {
             ipos = [opIns.getPosX(), opIns.getPosY()];
           } else {
-            ipos = [Math.random() * 600, Math.random() * 400];
+            ipos = [Math.random() * 1000, Math.random() * 1000];
           }
           if (!op) {
             continue;
@@ -294,6 +301,33 @@ export class OperatorInstance extends Composable {
         }
       }
     }
+  }
+
+  public updateVisual(visual: any) {
+    this.mat = new Mat3([1, 0, visual.pos.x, 0, 1, visual.pos.y, 0, 0, 1]);
+    for (const insName in visual.instances) {
+      if (visual.instances.hasOwnProperty(insName)) {
+        const ins = this.instances.get(insName);
+        if (!ins) {
+          continue;
+        }
+        ins.mat = new Mat3(visual.instances[insName]);
+      }
+    }
+  }
+
+  public getVisual(): any {
+    const visual = {
+      instances: {},
+      pos: {
+        x: this.getAbsX(),
+        y: this.getAbsY(),
+      }
+    };
+    this.instances.forEach((ins, insName) => {
+      visual.instances[insName] = ins.mat.all();
+    });
+    return visual;
   }
 
   public getMainIn(): Port {
@@ -518,6 +552,16 @@ export class PortGroup extends Composable {
   public getOut(): Port {
     return this.out;
   }
+
+  public getOperator(): OperatorInstance {
+    const parent = this.getParent();
+    if (parent.constructor.name === OperatorInstance.name) {
+      return parent as OperatorInstance;
+    } else if (parent.constructor.name === PortGroup.name) {
+      return (parent as PortGroup).getOperator();
+    }
+    return null;
+  }
 }
 
 export class Port extends Composable {
@@ -541,13 +585,13 @@ export class Port extends Composable {
     },
 
     portColors: {
-      primitive: 'violet',
-      number: 'green',
-      string: 'cyan',
-      boolean: 'red',
-      binary: 'yellow',
-      trigger: 'gray',
-      generic: 'purple',
+      primitive: '#C4739C',
+      number: '#0e7800',
+      string: '#0095B7',
+      boolean: '#BA1200',
+      binary: '#870001',
+      trigger: '#5d5d5d',
+      generic: '#9E008E',
     }
   };
 
@@ -591,6 +635,19 @@ export class Port extends Composable {
 
   public getType(): string {
     return this.type;
+  }
+
+  public getOperator(): OperatorInstance {
+    const parent = this.getParent();
+    switch (parent.constructor.name) {
+      case OperatorInstance.name:
+        return parent as OperatorInstance;
+      case PortGroup.name:
+        return (parent as PortGroup).getOperator();
+      case Port.name:
+        return (parent as Port).getOperator();
+    }
+    return null;
   }
 
   public isPrimitive(): boolean {
@@ -651,6 +708,7 @@ export class Port extends Composable {
     } else if (this.isGeneric()) {
       return new Set<Connection>([new Connection(this, dst)]);
     }
+    return new Set<Connection>();
   }
 
   public getColor(): string {

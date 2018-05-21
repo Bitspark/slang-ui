@@ -1,0 +1,12 @@
+{
+  "services": {
+    "main": {
+      "in": {
+        "type": "number"
+      },
+      "out": {
+        "type": "number"
+      }
+    }
+  }
+}

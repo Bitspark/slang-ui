@@ -14,6 +14,7 @@ import {PortComponent} from './components/port.component';
 
 import {ApiService} from './services/api.service';
 import {OperatorService} from './services/operator.service';
+import {VisualService} from './services/visual.service';
 
 @NgModule({
   declarations: [
@@ -29,7 +30,7 @@ import {OperatorService} from './services/operator.service';
     HttpClientModule,
     CodemirrorModule
   ],
-  providers: [ApiService, OperatorService],
+  providers: [ApiService, OperatorService, VisualService],
   bootstrap: [AppComponent]
 })
 export class AppModule {

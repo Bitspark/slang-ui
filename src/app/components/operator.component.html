@@ -3,6 +3,10 @@
 </div>
 
 <div>
+  <button (click)="save()">Save</button>
+</div>
+
+<div>
   <div>
     YAML view
   </div>
@@ -66,9 +70,22 @@
     </div>
     <div style="border: 1px dotted black; display: inline-block; height: 600px; overflow: scroll; margin-left: 20px">
       <div>
+        <input [(ngModel)]="filterString">
+        <h2>Local operators</h2>
+        <ul>
+          <li *ngFor="let op of getLocals(filterString)">{{ op.getName() }}
+            <button (click)="addInstance(op)">+</button>
+          </li>
+        </ul>
         <h2>Elementary operators</h2>
         <ul>
-          <li *ngFor="let op of operators.getElementaries()">{{ op.getName() }}
+          <li *ngFor="let op of getElementaries(filterString)">{{ op.getName() }}
+            <button (click)="addInstance(op)">+</button>
+          </li>
+        </ul>
+        <h2>Library operators</h2>
+        <ul>
+          <li *ngFor="let op of getLibraries(filterString)">{{ op.getName() }}
             <button (click)="addInstance(op)">+</button>
           </li>
         </ul>

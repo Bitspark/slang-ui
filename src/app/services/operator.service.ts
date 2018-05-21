@@ -63,6 +63,13 @@ export class OperatorService {
     }
   }
 
+  public async storeDefinition(opName: string, def: any): Promise<void> {
+    return new Promise<void>(async resolve => {
+      await this.api.post('operator/def/', {cwd: this.workingDir, fqop: opName}, def);
+      resolve();
+    });
+  }
+
   public getLocals(): Array<OperatorDef> {
     return this.localOperators;
   }
