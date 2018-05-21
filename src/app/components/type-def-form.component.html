@@ -1,14 +1,20 @@
-<div style="border: 2px solid; padding: 2px;">
-  <div style="display: inline-block">
-    <select [ngModel]="port.type" (ngModelChange)="setType($event)">
-      <option *ngFor="let portType of portTypes" [value]="portType">
-        {{portType}}
-      </option>
-    </select>
+<div style="display: inline-block">
+  <select [ngModel]="port.type" (ngModelChange)="setType($event)">
+    <option *ngFor="let portType of portTypes" [value]="portType">
+      {{portType}}
+    </option>
+  </select>
+
+  <div *ngIf="isMap()" style="display: inline-block">
+    <button (click)="addMapPort(newMapPortName.trim())">ADD</button>
+    <input [(ngModel)]="newMapPortName"/>
+    <p *ngFor="let portName of getMapPortNames()">
+      <button (click)="removeMapPort(portName.trim())">REMOVE</button>
+      <input [ngModel]="portName" (ngModelChange)="renameMapPortName(portName, $event)"/>
+      <app-type-def-form [port]="port.map.get(portName)"></app-type-def-form>
+    </p>
   </div>
-  <div style="display: inline-block">
-    <app-type-def-form [port]="port.map" *ngIf="isMap()"></app-type-def-form>
-    <app-type-def-form [port]="port.stream" *ngIf="isStream()"></app-type-def-form>
-    <input [(ngModel)]="port.generic" *ngIf="isGeneric()"/>
-  </div>
+
+  <app-type-def-form [port]="port.stream" *ngIf="isStream()"></app-type-def-form>
+  <input [(ngModel)]="port.generic" *ngIf="isGeneric()"/>
 </div>
