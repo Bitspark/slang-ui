@@ -6,8 +6,19 @@
   <button (click)="save()">Save</button>
 </div>
 
-<div style="padding: 2px">
-  <app-type-def-form></app-type-def-form>
+<div style="padding: 2px" *ngIf="mainSrvPort">
+  <h4>
+    IN
+  </h4>
+  <div style="display: inline-block">
+    <app-type-def-form [port]="mainSrvPort.in"></app-type-def-form>
+  </div>
+  <h4>
+    OUT
+  </h4>
+  <div style="display: inline-block">
+    <app-type-def-form [port]="mainSrvPort.out"></app-type-def-form>
+  </div>
 </div>
 
 <div>

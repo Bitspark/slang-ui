@@ -17,6 +17,7 @@ export class OperatorComponent implements OnInit {
   public operatorName = '';
   public operatorDef: OperatorDef = null;
   public operator: OperatorInstance = null;
+  public mainSrvPort: any = null;
   public status;
 
   // YAML
@@ -130,6 +131,7 @@ export class OperatorComponent implements OnInit {
 
   private updateDef(def: any) {
     this.operatorDef.setDef(def);
+    this.mainSrvPort = this.operatorDef.getDef().services.main;
     this.status = `Updated definition of operator "${this.operatorName}".`;
     this.displayYaml();
     this.displayVisual();
