@@ -11,7 +11,7 @@
     YAML view
   </div>
   <div style="border: 1px dotted black; width: 800px">
-    <codemirror [(ngModel)]="yamlRepr"
+    <codemirror [ngModel]="yamlRepr"
                 [config]="editorConfig"
                 (ngModelChange)="updateYaml($event)"
                 (blur)="storeYaml()">
