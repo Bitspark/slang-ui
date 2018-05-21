@@ -1,4 +1,4 @@
-import {expandProperties} from '../utils';
+import {expandProperties, generateSvgTransform} from '../utils';
 import {OperatorService} from '../services/operator.service';
 import {Mat2, Mat3} from './matrix';
 
@@ -203,6 +203,12 @@ class Composable extends Transformable {
 }
 
 export class OperatorInstance extends Composable {
+
+  private static style = {
+    dlgP: 10,
+    dlgM: 5
+  };
+
   private mainIn: Port;
   private mainOut: Port;
   private services: Map<string, PortGroup>;
@@ -231,12 +237,11 @@ export class OperatorInstance extends Composable {
     width = Math.max(width, this.mainIn.getWidth(), tmpMainOut.getWidth() + 10, 130);
     height = Math.max(height, this.mainIn.getHeight() + 10);
 
-    let dlgHeight = 10;
+    let dlgHeight = OperatorInstance.style.dlgP;
     this.delegates = new Map<string, PortGroup>();
     if (def.delegates) {
       for (const dlgName in def.delegates) {
         if (def.delegates.hasOwnProperty(dlgName)) {
-          dlgHeight += 5;
           const dlgDef = def.delegates[dlgName];
           const dlg = new Delegate(this, dlgName, this, dlgDef);
           dlgHeight += dlg.getWidth();
@@ -244,11 +249,11 @@ export class OperatorInstance extends Composable {
           dlg.rotate(Math.PI / 2);
           dlg.translate([width, dlg.getWidth()]);
           this.delegates.set(dlgName, dlg);
-          dlgHeight += 5;
+          dlgHeight += OperatorInstance.style.dlgM;
         }
       }
     }
-    height = Math.max(height, dlgHeight + 10, 60);
+    height = Math.max(height, dlgHeight + OperatorInstance.style.dlgP, 60);
 
     this.dim = [width, height];
     this.mainOut = new Port(this, 'service', 'main', false, null, '', this, def.services['main']['out']);
@@ -521,16 +526,11 @@ export class OperatorInstance extends Composable {
     if (!this.delegates) {
       return;
     }
-    const dlgs = Array.from(this.delegates.values());
-    // -20: margin top and bottom
-    //  -5: padding between comps
-    const yDiff = (this.getHeight() - 20 - ((dlgs.length - 1) * 5)) / (dlgs.length + 1);
-    let yStart = yDiff + 10;
-
-    dlgs.forEach((dlg, i) => {
-      const y = (yStart - dlg.getWidth() / 2);
+    let y = OperatorInstance.style.dlgP;
+    this.delegates.forEach(dlg => {
       dlg.translate([0, y]);
-      yStart = yDiff * i + 5;
+      y += dlg.getWidth();
+      y += OperatorInstance.style.dlgM;
     });
   }
 }
