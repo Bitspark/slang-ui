@@ -690,6 +690,23 @@ export class Port extends Composable {
     return this.type;
   }
 
+  public getTypeDef(): any {
+    const typeDef = {
+      type: this.getType()
+    };
+    if (this.isGeneric()) {
+      typeDef['generic'] = this.generic;
+    } else if (this.isStream()) {
+      typeDef['stream'] = this.stream.getTypeDef();
+    } else if (this.isMap()) {
+      typeDef['map'] = {};
+      this.map.forEach((entry, key) => {
+        typeDef['map'][key] = entry.getTypeDef();
+      });
+    }
+    return typeDef;
+  }
+
   public getOperator(): OperatorInstance {
     return this.operator;
   }
@@ -717,6 +734,10 @@ export class Port extends Composable {
 
   public getMap(): Map<string, Port> {
     return this.map;
+  }
+
+  public getGeneric(): string {
+    return this.generic;
   }
 
   public getStream(): Port {
