@@ -2,10 +2,6 @@
   <h2>Operator "{{operatorName}}"</h2>
 </div>
 
-<div>
-  <button (click)="save()">Save</button>
-</div>
-
 <div style="padding: 2px" *ngIf="mainSrvPort">
   <h4>
     IN
@@ -22,10 +18,17 @@
 </div>
 
 <div>
+  <button (click)="save()">Save</button>
+  <button (click)="showYAML = !showYAML">Toggle YAML</button>
+</div>
+
+<br>
+
+<div *ngIf="showYAML">
   <div>
-    YAML view
+    <h3>YAML view</h3>
   </div>
-  <div style="border: 1px dotted black; width: 800px">
+  <div style="border: 1px dotted black; width: 1000px">
     <codemirror [ngModel]="yamlRepr"
                 [config]="editorConfig"
                 (ngModelChange)="updateYaml($event)"
@@ -36,12 +39,12 @@
 
 <div>
   <div>
-    Visual view
+    <h3>Visual view</h3>
   </div>
   <div>
-    <div style="width: 800px; height: 600px; overflow: scroll; display: inline-block">
-      <svg [attr.width]="1600*scale" [attr.height]="1200*scale" style="border: 1px dotted black;"
-           viewBox="0 0 1600 1200"
+    <div style="width: 1000px; height: 800px; overflow: scroll; display: inline-block; border: 1px dotted black; background-color: grey">
+      <svg [attr.width]="2000*scale" [attr.height]="2000*scale" style="background-color: white"
+      viewBox="0 0 2000 2000"
            xmlns:svg="http://www.w3.org/2000/svg"
            (mousedown)="startDrag($event)"
            (mouseup)="stopDrag($event)"
@@ -50,56 +53,58 @@
         <svg:g *ngIf="operator" [attr.transform]="transform(operator)">
           <svg:rect x="0" y="0" [attr.width]="operator.getWidth()" [attr.height]="operator.getHeight()"
                     fill="transparent"
-                    [attr.stroke]="operator === visualSelectedInst ? 'red' : 'orange'" stroke-dasharray="3 3"
+                    [attr.stroke]="operator === selectedEntity.entity ? 'red' : 'orange'" stroke-dasharray="3 3"
                     stroke-width="3"
-                    (mousedown)="selectVisualInstance(operator)"></svg:rect>
+                    (mousedown)="selectInstance(operator)"></svg:rect>
           <svg:g *ngFor="let dlg of operator.getDelegates()" [attr.transform]="transform(dlg)">
-            <svg:g [attr.transform]="transform(dlg.getIn())" app-port [port]="dlg.getIn()"></svg:g>
-            <svg:g [attr.transform]="transform(dlg.getOut())" app-port [port]="dlg.getOut()"></svg:g>
+            <svg:g [attr.transform]="transform(dlg.getIn())" app-port [port]="dlg.getIn()" (select)="selectPort($event)" [selectedEntity]="selectedEntity"></svg:g>
+            <svg:g [attr.transform]="transform(dlg.getOut())" app-port [port]="dlg.getOut()" (select)="selectPort($event)" [selectedEntity]="selectedEntity"></svg:g>
           </svg:g>
-          <svg:g [attr.transform]="transform(operator.getMainIn())" app-port [port]="operator.getMainIn()"></svg:g>
-          <svg:g [attr.transform]="transform(operator.getMainOut())" app-port [port]="operator.getMainOut()"></svg:g>
+          <svg:g [attr.transform]="transform(operator.getMainIn())" app-port [port]="operator.getMainIn()" (select)="selectPort($event)" [selectedEntity]="selectedEntity"></svg:g>
+          <svg:g [attr.transform]="transform(operator.getMainOut())" app-port [port]="operator.getMainOut()" (select)="selectPort($event)" [selectedEntity]="selectedEntity"></svg:g>
 
           <svg:g *ngFor="let ins of visualInstances()" [attr.transform]="transform(ins)">
             <svg:rect x="0" y="0" [attr.width]="ins.getWidth()" [attr.height]="ins.getHeight()" fill="orange"
-                      [attr.stroke]="ins === visualSelectedInst ? 'red' : ''" stroke-dasharray="3 3" stroke-width="2"
-                      (mousedown)="selectVisualInstance(ins)"></svg:rect>
+                      [attr.stroke]="ins === selectedEntity.entity ? 'red' : ''" stroke-dasharray="3 3" stroke-width="2"
+                      (mousedown)="selectInstance(ins)"></svg:rect>
             <svg:text text-anchor="middle" x="65" y="35" fill="white" font-family="Arial" font-size="16"
                       style="pointer-events: none">{{ins.getName()}}
             </svg:text>
             <svg:g *ngFor="let dlg of ins.getDelegates()" [attr.transform]="transform(dlg)">
-              <svg:g [attr.transform]="transform(dlg.getIn())" app-port [port]="dlg.getIn()"></svg:g>
-              <svg:g [attr.transform]="transform(dlg.getOut())" app-port [port]="dlg.getOut()"></svg:g>
+              <svg:g [attr.transform]="transform(dlg.getIn())" app-port [port]="dlg.getIn()" (select)="selectPort($event)" [selectedEntity]="selectedEntity"></svg:g>
+              <svg:g [attr.transform]="transform(dlg.getOut())" app-port [port]="dlg.getOut()" (select)="selectPort($event)" [selectedEntity]="selectedEntity"></svg:g>
             </svg:g>
-            <svg:g [attr.transform]="transform(ins.getMainIn())" app-port [port]="ins.getMainIn()"></svg:g>
-            <svg:g [attr.transform]="transform(ins.getMainOut())" app-port [port]="ins.getMainOut()"></svg:g>
+            <svg:g [attr.transform]="transform(ins.getMainIn())" app-port [port]="ins.getMainIn()" (select)="selectPort($event)" [selectedEntity]="selectedEntity"></svg:g>
+            <svg:g [attr.transform]="transform(ins.getMainOut())" app-port [port]="ins.getMainOut()" (select)="selectPort($event)" [selectedEntity]="selectedEntity"></svg:g>
           </svg:g>
         </svg:g>
-        <svg:line *ngFor="let c of visualConnections()"
-                  stroke="green"
+        <svg:line *ngFor="let conn of visualConnections()"
                   stroke-width="2px"
-                  [attr.x1]="c.getSource().getPortPosX()"
-                  [attr.y1]="c.getSource().getPortPosY()"
-                  [attr.x2]="c.getDestination().getPortPosX()"
-                  [attr.y2]="c.getDestination().getPortPosY()"></svg:line>
+                  (click)="selectConnection(conn)"
+                  [attr.stroke]="conn === selectedEntity.entity ? 'red' : 'black'"
+                  [attr.x1]="conn.getSource().getPortPosX()"
+                  [attr.y1]="conn.getSource().getPortPosY()"
+                  [attr.x2]="conn.getDestination().getPortPosX()"
+                  [attr.y2]="conn.getDestination().getPortPosY()"></svg:line>
       </svg>
     </div>
-    <div style="border: 1px dotted black; display: inline-block; height: 600px; overflow: scroll; margin-left: 20px">
+    <div style="border: 1px dotted black; display: inline-block; height: 780px; overflow: scroll; margin-left: 20px; padding: 10px">
       <div>
-        <input [(ngModel)]="filterString">
-        <h2>Local operators</h2>
+        <label for="opSearch" style="font-size: 10px">Search operators</label><br>
+        <input id="opSearch" [(ngModel)]="filterString">
+        <h3>Local operators</h3>
         <ul>
           <li *ngFor="let op of getLocals(filterString)">{{ op.getName() }}
             <button (click)="addInstance(op)">+</button>
           </li>
         </ul>
-        <h2>Elementary operators</h2>
+        <h3>Elementary operators</h3>
         <ul>
           <li *ngFor="let op of getElementaries(filterString)">{{ op.getName() }}
             <button (click)="addInstance(op)">+</button>
           </li>
         </ul>
-        <h2>Library operators</h2>
+        <h3>Library operators</h3>
         <ul>
           <li *ngFor="let op of getLibraries(filterString)">{{ op.getName() }}
             <button (click)="addInstance(op)">+</button>

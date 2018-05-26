@@ -1,4 +1,4 @@
-import {expandProperties} from '../utils';
+import {connectDeep, expandProperties} from '../utils';
 import {OperatorService} from '../services/operator.service';
 import {Mat2, Mat3} from './matrix';
 
@@ -203,6 +203,7 @@ export class Transformable {
   }
 }
 
+
 class Composable extends Transformable {
   constructor(private parent: Composable) {
     super();
@@ -226,6 +227,12 @@ class Composable extends Transformable {
 }
 
 export class OperatorInstance extends Composable {
+
+  private static style = {
+    dlgP: 10,
+    dlgM: 5
+  };
+
   private mainIn: Port;
   private mainOut: Port;
   private services: Map<string, PortGroup>;
@@ -249,32 +256,31 @@ export class OperatorInstance extends Composable {
   public updateOperator(def: any, dim?: [number, number]) {
     let [width, height] = (this.dim) ? this.dim : (dim) ? dim : [0, 0];
 
-    this.mainIn = new Port(this, def.services['main']['in']);
-    const tmpMainOut = new Port(this, def.services['main']['out']);
+    this.mainIn = new Port(this, 'service', 'main', true, null, '', this, def.services['main']['in']);
+    const tmpMainOut = new Port(this, 'service', 'main', false, null, '', this, def.services['main']['out']);
     width = Math.max(width, this.mainIn.getWidth(), tmpMainOut.getWidth() + 10, 130);
     height = Math.max(height, this.mainIn.getHeight() + 10);
 
-    let dlgHeight = 10;
+    let dlgHeight = OperatorInstance.style.dlgP;
     this.delegates = new Map<string, PortGroup>();
     if (def.delegates) {
       for (const dlgName in def.delegates) {
         if (def.delegates.hasOwnProperty(dlgName)) {
-          dlgHeight += 5;
           const dlgDef = def.delegates[dlgName];
-          const dlg = new PortGroup(this, dlgDef);
+          const dlg = new Delegate(this, dlgName, this, dlgDef);
           dlgHeight += dlg.getWidth();
           dlg.scale([-1, 1]);
           dlg.rotate(Math.PI / 2);
           dlg.translate([width, dlg.getWidth()]);
           this.delegates.set(dlgName, dlg);
-          dlgHeight += 5;
+          dlgHeight += OperatorInstance.style.dlgM;
         }
       }
     }
-    height = Math.max(height, dlgHeight + 10, 60);
+    height = Math.max(height, dlgHeight + OperatorInstance.style.dlgP, 60);
 
     this.dim = [width, height];
-    this.mainOut = new Port(this, def.services['main']['out']);
+    this.mainOut = new Port(this, 'service', 'main', false, null, '', this, def.services['main']['out']);
     this.mainOut.scale([1, -1]);
     this.mainOut.translate([0, height]);
 
@@ -319,15 +325,7 @@ export class OperatorInstance extends Composable {
     }
 
     if (connections) {
-      this.connections = new Set<Connection>();
-      for (const src in connections) {
-        if (connections.hasOwnProperty(src)) {
-          for (const dst of connections[src]) {
-            const conns = this.getPort(src).connectDeep(this.getPort(dst));
-            conns.forEach(conn => this.connections.add(conn));
-          }
-        }
-      }
+      this.connections = connectDeep(this, connections);
     }
   }
 
@@ -544,16 +542,15 @@ export class OperatorInstance extends Composable {
     if (!this.delegates) {
       return;
     }
-    const dlgs = Array.from(this.delegates.values());
-    // -20: margin top and bottom
-    //  -5: padding between comps
-    const yDiff = (this.getHeight() - 20 - ((dlgs.length - 1) * 5)) / (dlgs.length + 1);
-    let yStart = yDiff + 10;
-
-    dlgs.forEach((dlg, i) => {
-      const y = (yStart - dlg.getWidth() / 2);
+    let y = OperatorInstance.style.dlgP;
+    this.delegates.forEach(dlg => {
       dlg.translate([0, y]);
-      yStart = yDiff * i + 5;
+      y += dlg.getWidth();
+      y += OperatorInstance.style.dlgM;
+    });
+    const centerY = (this.getHeight() - y - OperatorInstance.style.dlgP) / 2;
+    this.delegates.forEach(dlg => {
+      dlg.translate([0, centerY]);
     });
   }
 }
@@ -581,11 +578,14 @@ export class PortGroup extends Composable {
   private in: Port;
   private out: Port;
 
-  constructor(parent: Composable,
+  constructor(operator: OperatorInstance,
+              groupType: string,
+              groupName: string,
+              parent: Composable,
               portGrpDef: any) {
     super(parent);
-    this.in = new Port(this, portGrpDef.in);
-    this.out = new Port(this, portGrpDef.out);
+    this.in = new Port(operator, groupType, groupName, true, null, '', this, portGrpDef.in);
+    this.out = new Port(operator, groupType, groupName, false, null, '', this, portGrpDef.out);
     this.out.translate([this.in.getWidth() + 5, 0]);
     this.dim = [this.in.getWidth() + this.out.getWidth() + 10, Math.max(this.in.getHeight(), this.out.getHeight())];
   }
@@ -597,15 +597,23 @@ export class PortGroup extends Composable {
   public getOut(): Port {
     return this.out;
   }
+}
 
-  public getOperator(): OperatorInstance {
-    const parent = this.getParent();
-    if (parent.constructor.name === OperatorInstance.name) {
-      return parent as OperatorInstance;
-    } else if (parent.constructor.name === PortGroup.name) {
-      return (parent as PortGroup).getOperator();
-    }
-    return null;
+export class Service extends PortGroup {
+  constructor(operator: OperatorInstance,
+              private name: string,
+              parent: Composable,
+              portGrpDef: any) {
+    super(operator, 'service', name, parent, portGrpDef);
+  }
+}
+
+export class Delegate extends PortGroup {
+  constructor(operator: OperatorInstance,
+              private name: string,
+              parent: Composable,
+              portGrpDef: any) {
+    super(operator, 'delegate', name, parent, portGrpDef);
   }
 }
 
@@ -620,8 +628,8 @@ export class Port extends Composable {
     y: 10,
 
     str: {
-      px: 2,
-      py: 2,
+      px: 3,
+      py: 3,
     },
 
     map: {
@@ -644,7 +652,24 @@ export class Port extends Composable {
   private stream: Port;
   private map: Map<string, Port>;
 
-  constructor(parent: Composable, portDef: any) {
+  /**
+   * @param {OperatorInstance} operator operator this port belongs to
+   * @param {string} groupType type of the group (either 'service' or 'delegate')
+   * @param {string} groupName name of the service/delegate
+   * @param {boolean} inDir true means in, false means out
+   * @param {Port} parentPort parent port (either map or stream port)
+   * @param {string} name entry name (empty string for non-map-entries)
+   * @param {Composable} parent
+   * @param portDef
+   */
+  constructor(private operator: OperatorInstance,
+              private groupType: string,
+              private groupName: string,
+              private inDir: boolean,
+              private parentPort: Port,
+              private name: string,
+              parent: Composable,
+              portDef: any) {
     super(parent);
     this.type = PortType[portDef.type as string];
     this.dim = [Port.style.x, Port.style.y];
@@ -654,7 +679,7 @@ export class Port extends Composable {
         this.generic = portDef.generic;
         break;
       case PortType.stream:
-        this.stream = new Port(this, portDef.stream);
+        this.stream = new Port(this.operator, this.groupType, this.groupName, inDir, this, '', this, portDef.stream);
         this.stream.translate([Port.style.str.px, 0]);
         this.dim = [2 * Port.style.str.px + this.stream.getWidth(), Port.style.str.py + this.stream.getHeight()];
         break;
@@ -664,7 +689,7 @@ export class Port extends Composable {
         this.map = new Map<string, Port>();
         for (const k in portDef.map) {
           if (portDef.map.hasOwnProperty(k)) {
-            const p = new Port(this, portDef.map[k]);
+            const p = new Port(this.operator, this.groupType, this.groupName, inDir, this, k, this, portDef.map[k]);
             p.translate([x, 0]);
             this.map.set(k, p);
             x += p.getWidth() + Port.style.map.px;
@@ -681,17 +706,25 @@ export class Port extends Composable {
     return this.type;
   }
 
-  public getOperator(): OperatorInstance {
-    const parent = this.getParent();
-    switch (parent.constructor.name) {
-      case OperatorInstance.name:
-        return parent as OperatorInstance;
-      case PortGroup.name:
-        return (parent as PortGroup).getOperator();
-      case Port.name:
-        return (parent as Port).getOperator();
+  public getTypeDef(): any {
+    const typeDef = {
+      type: this.getType()
+    };
+    if (this.isGeneric()) {
+      typeDef['generic'] = this.generic;
+    } else if (this.isStream()) {
+      typeDef['stream'] = this.stream.getTypeDef();
+    } else if (this.isMap()) {
+      typeDef['map'] = {};
+      this.map.forEach((entry, key) => {
+        typeDef['map'][key] = entry.getTypeDef();
+      });
     }
-    return null;
+    return typeDef;
+  }
+
+  public getOperator(): OperatorInstance {
+    return this.operator;
   }
 
   public isPrimitive(): boolean {
@@ -717,6 +750,10 @@ export class Port extends Composable {
 
   public getMap(): Map<string, Port> {
     return this.map;
+  }
+
+  public getGeneric(): string {
+    return this.generic;
   }
 
   public getStream(): Port {
@@ -755,8 +792,52 @@ export class Port extends Composable {
     return new Set<Connection>();
   }
 
+  private getPortRefString(): string {
+    if (!this.parentPort) {
+      return '';
+    }
+    const parentRefString = this.parentPort.getPortRefString();
+    if (this.parentPort.isMap()) {
+      if (parentRefString === '') {
+        return this.name;
+      }
+      return parentRefString + '.' + this.name;
+    } else if (this.parentPort.isStream()) {
+      if (parentRefString === '') {
+        return '~';
+      }
+      return parentRefString + '.~';
+    }
+    return parentRefString;
+  }
+
+  public getRefString(): string {
+    const portRefString = this.getPortRefString();
+    let opName = this.operator.getName();
+    if (this.groupType === 'service') {
+      if (this.groupName !== 'main') {
+        opName = this.groupName + '@' + opName;
+      }
+    } else if (this.groupType === 'delegate') {
+      opName = opName + '.' + this.groupName;
+    }
+    if (this.inDir) {
+      return portRefString + '(' + opName;
+    } else {
+      return opName + ')' + portRefString;
+    }
+  }
+
   public getColor(): string {
     return Port.style.portColors[this.type];
+  }
+
+  public isIn(): boolean {
+    return this.inDir;
+  }
+
+  public isOut(): boolean {
+    return !this.inDir;
   }
 
   public justifyHorizontally() {
@@ -775,6 +856,10 @@ export class Port extends Composable {
 
   public getPortPosY(): number {
     return this.getPortMat().multiply(this.getAbsMat3()).at(5);
+  }
+
+  public getParentPort(): Port {
+    return this.parentPort;
   }
 }
 

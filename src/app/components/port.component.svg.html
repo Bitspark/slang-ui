@@ -1,11 +1,11 @@
 <svg:g xmlns:svg="http://www.w3.org/2000/svg">
   <!-- Primitive -->
-  <svg:path *ngIf="port.isPrimitive() || port.isGeneric()" d="M0,0 a1,1 0 0,0 20,0" [attr.fill]="port.getColor()"></svg:path>
+  <svg:path (click)="select.emit(port)" *ngIf="port.isPrimitive() || port.isGeneric()" d="M0,0 a1,1 0 0,0 20,0" [attr.fill]="port.getColor()" stroke-width="3px" [attr.stroke]="(selectedEntity.entity === port) ? 'red' : ''"></svg:path>
   <!-- Stream -->
-  <svg:rect *ngIf="port.isStream()" fill="white" stroke-width="1" stroke="black" [attr.height]="port.getHeight()" [attr.width]="port.getWidth()"></svg:rect>
-  <svg:g *ngIf="port.isStream()" [attr.transform]="transform(port.getStream())" app-port [port]="port.getStream()"></svg:g>
+  <svg:rect *ngIf="port.isStream()" fill="white" stroke-width="1" [attr.stroke]="(selectedEntity.entity === port) ? 'red' : 'black'" [attr.height]="port.getHeight()" [attr.width]="port.getWidth()"></svg:rect>
+  <svg:g *ngIf="port.isStream()" [attr.transform]="transform(port.getStream())" app-port [port]="port.getStream()" (select)="select.emit($event)" [selectedEntity]="selectedEntity"></svg:g>
   <!-- Map -->
   <svg:g *ngIf="port.isMap()">
-    <svg:g *ngFor="let entry of getEntries()" [attr.transform]="transform(entry)" app-port [port]="entry"></svg:g>
+    <svg:g *ngFor="let entry of getEntries()" [attr.transform]="transform(entry)" app-port [port]="entry" (select)="select.emit($event)" [selectedEntity]="selectedEntity"></svg:g>
   </svg:g>
 </svg:g>

@@ -1,4 +1,4 @@
-import {Transformable} from './classes/operator';
+import {Connection, OperatorInstance, Port, Transformable} from './classes/operator';
 
 function expandExpressionPart(exprPart: string, props: any, propDefs: any): Array<string> {
   const vals = [];
@@ -51,4 +51,144 @@ export function expandProperties(str: string, props: any, propDefs: any): Array<
 export function generateSvgTransform(t: Transformable): string {
   const cols = t.col(0).slice(0, 2).concat(t.col(1).slice(0, 2).concat(t.col(2).slice(0, 2)));
   return `matrix(${cols.join(',')})`;
+}
+
+function normalizeStreams(conns: Set<Connection>): boolean {
+  let modified = false;
+  conns.forEach(conn => {
+    if (conn.getSource().getParentPort() && conn.getDestination().getParentPort() &&
+      conn.getSource().getParentPort().isStream() && conn.getDestination().getParentPort().isStream()) {
+      conns.delete(conn);
+      conns.add(new Connection(conn.getSource().getParentPort(), conn.getDestination().getParentPort()));
+      modified = true;
+    }
+  });
+  return modified;
+}
+
+const FoundException = {};
+const NotFoundException = {};
+
+function containsConnection(conns: Set<Connection>, src: Port, dst: Port): boolean {
+  try {
+    conns.forEach(searchConn => {
+      if (searchConn.getSource() === src && searchConn.getDestination() === dst) {
+        throw FoundException;
+      }
+    });
+  } catch (e) {
+    if (e !== FoundException) {
+      throw e;
+    }
+    return true;
+  }
+  return false;
+}
+
+function normalizeMaps(conns: Set<Connection>): boolean {
+  let modified = false;
+  conns.forEach(conn => {
+    const srcMap = conn.getSource().getParentPort();
+    const dstMap = conn.getDestination().getParentPort();
+    if (srcMap && dstMap && srcMap.isMap() && dstMap.isMap()) {
+      // First, check if parent map is already connected
+      // In that case we don't need to do anything
+      if (containsConnection(conns, srcMap, dstMap)) {
+        return;
+      }
+
+      // Look if all siblings are connected as well
+
+      let connected = true;
+      // Look if source map is completely connected
+      try {
+        srcMap.getMap().forEach((entry, entryName) => {
+          const dstEntry = dstMap.getMap().get(entryName);
+          if (!dstEntry) {
+            throw NotFoundException;
+          }
+          if (!containsConnection(conns, entry, dstEntry)) {
+            connected = false;
+          }
+        });
+      } catch (e) {
+        if (e !== NotFoundException) {
+          throw e;
+        }
+        return;
+      }
+      if (!connected) {
+        return;
+      }
+
+      // Look if destination map is completely connected
+      try {
+        dstMap.getMap().forEach((entry, entryName) => {
+          const srcEntry = srcMap.getMap().get(entryName);
+          if (!srcEntry) {
+            throw NotFoundException;
+          }
+          if (!containsConnection(conns, srcEntry, entry)) {
+            connected = false;
+          }
+        });
+      } catch (e) {
+        if (e !== NotFoundException) {
+          throw e;
+        }
+        return;
+      }
+      if (!connected) {
+        return;
+      }
+
+      // Remove all the obsolete connections
+      srcMap.getMap().forEach((entry, entryName) => {
+        const dstEntry = dstMap.getMap().get(entryName);
+        conns.forEach(searchConn => {
+          if (searchConn.getSource() === entry && searchConn.getDestination() === dstEntry) {
+            conns.delete(searchConn);
+          }
+        });
+      });
+      conns.add(new Connection(srcMap, dstMap));
+      modified = true;
+    }
+  });
+  return modified;
+}
+
+export function normalizeConnections(conns: Set<Connection>) {
+  let modified = true;
+  while (modified) {
+    modified = false;
+    modified = normalizeStreams(conns) || modified;
+    modified = normalizeMaps(conns) || modified;
+  }
+}
+
+export function connectDeep(op: OperatorInstance, connections: any): Set<Connection> {
+  const connSet = new Set<Connection>();
+  for (const src in connections) {
+    if (connections.hasOwnProperty(src)) {
+      for (const dst of connections[src]) {
+        const conns = op.getPort(src).connectDeep(op.getPort(dst));
+        conns.forEach(conn => connSet.add(conn));
+      }
+    }
+  }
+  return connSet;
+}
+
+export function stringifyConnections(conns: Set<Connection>): any {
+  const connObj = {};
+  conns.forEach(conn => {
+    const srcRef = conn.getSource().getRefString();
+    const dstRef = conn.getDestination().getRefString();
+    if (!connObj[srcRef]) {
+      connObj[srcRef] = [];
+    }
+    connObj[srcRef].push(dstRef);
+  });
+  return connObj;
 }
