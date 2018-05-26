@@ -2,6 +2,18 @@ import {connectDeep, expandProperties} from '../utils';
 import {OperatorService} from '../services/operator.service';
 import {Mat2, Mat3} from './matrix';
 
+export enum PortType {
+  number,
+  binary,
+  boolean,
+  string,
+  trigger,
+  primitive,
+  generic,
+  stream,
+  map,
+}
+
 export class OperatorDef {
 
   private readonly name: string;
@@ -16,6 +28,18 @@ export class OperatorDef {
       portDef['type'] === 'boolean' ||
       portDef['type'] === 'primitive' ||
       portDef['type'] === 'trigger';
+  }
+
+  public static isStream(portDef: any) {
+    return portDef['type'] === 'stream';
+  }
+
+  public static isMap(portDef: any) {
+    return portDef['type'] === 'map';
+  }
+
+  public static isGeneric(portDef: any) {
+    return portDef['type'] === 'generic';
   }
 
   public static specifyOperatorDef(def: any, gens: any, props: any, propDefs: any) {
@@ -500,7 +524,7 @@ export class OperatorInstance extends Composable {
         continue;
       }
 
-      if (p.getType() !== 'map') {
+      if (!p.isMap()) {
         return null;
       }
 
@@ -623,7 +647,7 @@ export class Port extends Composable {
     }
   };
 
-  private type: string;
+  private type: PortType;
   private generic: string;
   private stream: Port;
   private map: Map<string, Port>;
@@ -647,19 +671,19 @@ export class Port extends Composable {
               parent: Composable,
               portDef: any) {
     super(parent);
-    this.type = portDef.type;
+    this.type = PortType[portDef.type as string];
     this.dim = [Port.style.x, Port.style.y];
 
     switch (this.type) {
-      case 'generic':
+      case PortType.generic:
         this.generic = portDef.generic;
         break;
-      case 'stream':
+      case PortType.stream:
         this.stream = new Port(this.operator, this.groupType, this.groupName, inDir, this, '', this, portDef.stream);
         this.stream.translate([Port.style.str.px, 0]);
         this.dim = [2 * Port.style.str.px + this.stream.getWidth(), Port.style.str.py + this.stream.getHeight()];
         break;
-      case 'map':
+      case PortType.map:
         let x = 0;
         let height = 0;
         this.map = new Map<string, Port>();
@@ -678,7 +702,7 @@ export class Port extends Composable {
     }
   }
 
-  public getType(): string {
+  public getType(): PortType {
     return this.type;
   }
 
@@ -704,24 +728,24 @@ export class Port extends Composable {
   }
 
   public isPrimitive(): boolean {
-    return this.type === 'number' ||
-      this.type === 'string' ||
-      this.type === 'binary' ||
-      this.type === 'boolean' ||
-      this.type === 'primitive' ||
-      this.type === 'trigger';
+    return this.type === PortType.number ||
+      this.type === PortType.string ||
+      this.type === PortType.binary ||
+      this.type === PortType.boolean ||
+      this.type === PortType.primitive ||
+      this.type === PortType.trigger;
   }
 
   public isGeneric(): boolean {
-    return this.type === 'generic';
+    return this.type === PortType.generic;
   }
 
   public isStream(): boolean {
-    return this.type === 'stream';
+    return this.type === PortType.stream;
   }
 
   public isMap(): boolean {
-    return this.type === 'map';
+    return this.type === PortType.map;
   }
 
   public getMap(): Map<string, Port> {
@@ -773,12 +797,12 @@ export class Port extends Composable {
       return '';
     }
     const parentRefString = this.parentPort.getPortRefString();
-    if (this.parentPort.type === 'map') {
+    if (this.parentPort.isMap()) {
       if (parentRefString === '') {
         return this.name;
       }
       return parentRefString + '.' + this.name;
-    } else if (this.parentPort.type === 'stream') {
+    } else if (this.parentPort.isStream()) {
       if (parentRefString === '') {
         return '~';
       }
@@ -838,3 +862,4 @@ export class Port extends Composable {
     return this.parentPort;
   }
 }
+

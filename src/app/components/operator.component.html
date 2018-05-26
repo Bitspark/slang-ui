@@ -2,6 +2,21 @@
   <h2>Operator "{{operatorName}}"</h2>
 </div>
 
+<div style="padding: 2px" *ngIf="mainSrvPort">
+  <h4>
+    IN
+  </h4>
+  <div style="display: inline-block">
+    <app-type-def-form [port]="mainSrvPort.in" (typeDefChanged)="refresh($event)"></app-type-def-form>
+  </div>
+  <h4>
+    OUT
+  </h4>
+  <div style="display: inline-block">
+    <app-type-def-form [port]="mainSrvPort.out" (typeDefChanged)="refresh($event)"></app-type-def-form>
+  </div>
+</div>
+
 <div>
   <button (click)="save()">Save</button>
   <button (click)="showYAML = !showYAML">Toggle YAML</button>
@@ -38,7 +53,8 @@
         <svg:g *ngIf="operator" [attr.transform]="transform(operator)">
           <svg:rect x="0" y="0" [attr.width]="operator.getWidth()" [attr.height]="operator.getHeight()"
                     fill="transparent"
-                    [attr.stroke]="operator === selectedEntity.entity ? 'red' : 'orange'" stroke-dasharray="3 3" stroke-width="3"
+                    [attr.stroke]="operator === selectedEntity.entity ? 'red' : 'orange'" stroke-dasharray="3 3"
+                    stroke-width="3"
                     (mousedown)="selectInstance(operator)"></svg:rect>
           <svg:g *ngFor="let dlg of operator.getDelegates()" [attr.transform]="transform(dlg)">
             <svg:g [attr.transform]="transform(dlg.getIn())" app-port [port]="dlg.getIn()" (select)="selectPort($event)" [selectedEntity]="selectedEntity"></svg:g>
