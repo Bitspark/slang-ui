@@ -1,9 +1,9 @@
 import {Component, HostListener, OnInit} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 import {OperatorService} from '../services/operator.service';
-import {Connection, OperatorDef, OperatorInstance, Transformable} from '../classes/operator';
+import {Connection, OperatorDef, OperatorInstance, Port, Transformable} from '../classes/operator';
 import {safeDump, safeLoad} from 'js-yaml';
-import {generateSvgTransform} from '../utils';
+import {generateSvgTransform, normalizeConnections, stringifyConnections} from '../utils';
 import {ApiService} from '../services/api.service';
 import {VisualService} from '../services/visual.service';
 import 'codemirror/mode/yaml/yaml.js';
@@ -21,14 +21,21 @@ export class OperatorComponent implements OnInit {
 
   // YAML
   public yamlRepr = '';
+  public showYAML = false;
   public editorConfig = {
     theme: 'default',
     mode: 'text/x-yaml',
     lineNumbers: true,
+    extraKeys: {
+      Tab: function (cm) {
+        const spaces = Array(cm.getOption('indentUnit') + 1).join(' ');
+        cm.replaceSelection(spaces);
+      }
+    }
   };
 
   // Visual
-  public visualSelectedInst: OperatorInstance = null;
+  public selectedEntity = {entity: null as any};
   public scale = 0.6;
   public filterString = '';
 
@@ -47,7 +54,17 @@ export class OperatorComponent implements OnInit {
         this.scale /= 1.1;
         break;
       case 'Delete':
-        this.removeInstance(this.visualSelectedInst);
+        if (!this.selectedEntity.entity) {
+          return;
+        }
+        if (this.selectedEntity.entity.constructor.name === OperatorInstance.name) {
+          this.removeInstance(this.selectedEntity.entity);
+          break;
+        }
+        if (this.selectedEntity.entity.constructor.name === Connection.name) {
+          this.removeConnection(this.selectedEntity.entity);
+          break;
+        }
         break;
     }
   }
@@ -113,6 +130,31 @@ export class OperatorComponent implements OnInit {
     this.updateDef(def);
   }
 
+  public removeConnection(conn: Connection) {
+    const conns = this.operator.getConnections();
+    conns.delete(conn);
+    const def = this.operatorDef.getDef();
+    const connsCpy = new Set<Connection>(conns);
+    normalizeConnections(connsCpy);
+    def['connections'] = stringifyConnections(connsCpy);
+    this.updateDef(def);
+  }
+
+  public addConnection(src: Port, dst: Port) {
+    const conns = this.operator.getConnections();
+    conns.forEach(conn => {
+      if (conn.getDestination() === dst) {
+        conns.delete(conn);
+      }
+    });
+    conns.add(new Connection(src, dst));
+    const def = this.operatorDef.getDef();
+    const connsCpy = new Set<Connection>(conns);
+    normalizeConnections(connsCpy);
+    def['connections'] = stringifyConnections(connsCpy);
+    this.updateDef(def);
+  }
+
   // YAML
 
   public updateYaml(newYaml) {
@@ -159,8 +201,56 @@ export class OperatorComponent implements OnInit {
     return Array.from(this.operator.getConnections().values());
   }
 
-  public selectVisualInstance(ins: OperatorInstance) {
-    this.visualSelectedInst = ins;
+  public selectInstance(ins: OperatorInstance) {
+    this.selectedEntity.entity = ins;
+  }
+
+  public selectConnection(conn: Connection) {
+    this.selectedEntity.entity = conn;
+  }
+
+  public selectPort(port1: Port) {
+    if (this.selectedEntity.entity && this.selectedEntity.entity.constructor.name === Port.name) {
+      const port2 = this.selectedEntity.entity as Port;
+      if (port1.getOperator() === this.operator) {
+        if (port2.getOperator() === this.operator) {
+          if (port1.isIn() && port2.isOut()) {
+            this.addConnection(port1, port2);
+            return;
+          } else if (port2.isIn() && port1.isOut()) {
+            this.addConnection(port2, port1);
+            return;
+          }
+        } else {
+          if (port1.isIn() && port2.isIn()) {
+            this.addConnection(port1, port2);
+            return;
+          } else if (port2.isOut() && port1.isOut()) {
+            this.addConnection(port2, port1);
+            return;
+          }
+        }
+      } else {
+        if (port2.getOperator() === this.operator) {
+          if (port2.isIn() && port1.isIn()) {
+            this.addConnection(port2, port1);
+            return;
+          } else if (port1.isOut() && port2.isOut()) {
+            this.addConnection(port1, port2);
+            return;
+          }
+        } else {
+          if (port1.isOut() && port2.isIn()) {
+            this.addConnection(port1, port2);
+            return;
+          } else if (port2.isOut() && port1.isIn()) {
+            this.addConnection(port2, port1);
+            return;
+          }
+        }
+      }
+    }
+    this.selectedEntity.entity = port1;
   }
 
   private displayVisual() {
@@ -202,8 +292,8 @@ export class OperatorComponent implements OnInit {
   // Dragging
 
   private updateDrag(event, update?: boolean) {
-    if (this.visualSelectedInst && update) {
-      this.visualSelectedInst.translate([(event.screenX - this.lastX) / this.scale, (event.screenY - this.lastY) / this.scale]);
+    if (this.selectedEntity.entity && typeof this.selectedEntity.entity.translate === 'function' && update) {
+      this.selectedEntity.entity.translate([(event.screenX - this.lastX) / this.scale, (event.screenY - this.lastY) / this.scale]);
     }
     this.lastX = event.screenX;
     this.lastY = event.screenY;
