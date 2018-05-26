@@ -1,4 +1,4 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {OperatorDef, PortType} from '../classes/operator';
 
 @Component({
@@ -9,6 +9,8 @@ import {OperatorDef, PortType} from '../classes/operator';
 export class TypeDefFormComponent implements OnInit {
   @Input()
   public port: any = TypeDefFormComponent.newPrimitiveTypeDef();
+  @Output() typeDefChanged: EventEmitter<any> = new EventEmitter();
+
   public portTypes = Object.keys(PortType).filter(t => typeof PortType[t] === 'number');
   public newMapPortName: string;
 
@@ -36,6 +38,7 @@ export class TypeDefFormComponent implements OnInit {
       default:
         this.port[portType] = TypeDefFormComponent.newPrimitiveTypeDef();
     }
+    this.typeDefChanged.emit(null);
   }
 
   public getMapPortNames(): Array<string> {
@@ -51,15 +54,18 @@ export class TypeDefFormComponent implements OnInit {
     }
     this.port.map[portName] = TypeDefFormComponent.newPrimitiveTypeDef();
     this.resetNewMapPortName();
+    this.typeDefChanged.emit(null);
   }
 
   public renameMapPortName(oldPortName, newPortName: string) {
     this.port.map[newPortName] = this.port.map[oldPortName];
     this.removeMapPort(oldPortName);
+    this.typeDefChanged.emit(null);
   }
 
   public removeMapPort(portName: string) {
     delete this.port.map[portName];
+    this.typeDefChanged.emit(null);
   }
 
   public resetNewMapPortName() {

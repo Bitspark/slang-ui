@@ -11,7 +11,7 @@
     IN
   </h4>
   <div style="display: inline-block">
-    <app-type-def-form [port]="mainSrvPort.in"></app-type-def-form>
+    <app-type-def-form [port]="mainSrvPort.in" (typeDefChanged)="refresh($event)"></app-type-def-form>
   </div>
   <h4>
     OUT

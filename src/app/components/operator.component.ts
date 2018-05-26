@@ -115,6 +115,10 @@ export class OperatorComponent implements OnInit {
   }
 
   // YAML
+  public refresh() {
+    this.displayYaml();
+    this.displayVisual();
+  }
 
   public updateYaml(newYaml) {
     this.yamlRepr = newYaml;
@@ -133,8 +137,6 @@ export class OperatorComponent implements OnInit {
     this.operatorDef.setDef(def);
     this.mainSrvPort = this.operatorDef.getDef().services.main;
     this.status = `Updated definition of operator "${this.operatorName}".`;
-    this.displayYaml();
-    this.displayVisual();
   }
 
   private displayYaml() {
