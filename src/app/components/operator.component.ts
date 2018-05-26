@@ -137,6 +137,7 @@ export class OperatorComponent implements OnInit {
     this.operatorDef.setDef(def);
     this.mainSrvPort = this.operatorDef.getDef().services.main;
     this.status = `Updated definition of operator "${this.operatorName}".`;
+    this.refresh();
   }
 
   private displayYaml() {
