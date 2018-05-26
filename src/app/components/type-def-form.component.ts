@@ -9,6 +9,7 @@ import {OperatorDef, PortType} from '../classes/operator';
 export class TypeDefFormComponent implements OnInit {
   @Input()
   public port: any = TypeDefFormComponent.newPrimitiveTypeDef();
+  public intTypeDef: any;
   @Output() typeDefChanged: EventEmitter<any> = new EventEmitter();
 
   public portTypes = Object.keys(PortType).filter(t => typeof PortType[t] === 'number');
@@ -24,47 +25,126 @@ export class TypeDefFormComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.intTypeDef = this.mapExt2IntTypeDef(this.port);
+  }
+
+  public mapExt2IntTypeDef(extTDef: any): Array<any> {
+    let intTDef;
+    if (OperatorDef.isMap(extTDef)) {
+      intTDef = {
+        type: 'map',
+        map: this.getMapPortNames2(extTDef).map(portName => {
+          return {name: portName, def: this.mapExt2IntTypeDef(extTDef.map[portName])};
+        })
+      };
+    } else {
+      intTDef = {
+        type: extTDef.type,
+      };
+      if (extTDef.hasOwnProperty(extTDef.type)) {
+        intTDef[extTDef.type] = this.mapExt2IntTypeDef(extTDef[extTDef.type]);
+      }
+    }
+    return intTDef;
+  }
+
+  public mapInt2ExtTypeDef(intTDef: any, extTDef?: any): Array<any> {
+    if (!extTDef) {
+      extTDef = {};
+    }
+    if (OperatorDef.isMap(intTDef)) {
+      const map = {};
+      intTDef.map.forEach(curr => {
+        map[curr.name] = this.mapInt2ExtTypeDef(curr.def);
+      });
+      extTDef.map = map;
+      extTDef.type = 'map';
+
+    } else {
+      extTDef.type = intTDef.type;
+      if (intTDef.hasOwnProperty(intTDef.type)) {
+        extTDef[intTDef.type] = this.mapInt2ExtTypeDef(intTDef[intTDef.type]);
+      }
+    }
+    return extTDef;
   }
 
   public setType(portType: string) {
-    this.port.type = portType;
+    this.intTypeDef.type = portType;
     switch (portType) {
       case 'map':
-        this.port[portType] = {};
+        this.intTypeDef[portType] = [{name: 'port', def: TypeDefFormComponent.newPrimitiveTypeDef()}];
         break;
       case 'generic':
-        this.port[portType] = 'itemType';
+        this.intTypeDef[portType] = 'itemType';
         break;
       default:
-        this.port[portType] = TypeDefFormComponent.newPrimitiveTypeDef();
+        this.intTypeDef[portType] = TypeDefFormComponent.newPrimitiveTypeDef();
     }
-    this.typeDefChanged.emit(null);
+    this.handleTypeDefChanged();
   }
 
-  public getMapPortNames(): Array<string> {
-    if (this.isMap()) {
-      return Array.from(Object.keys(this.port.map)).filter(k => this.port.map.hasOwnProperty(k));
+  public getMapPortNames2(tDef: any): Array<string> {
+    if (OperatorDef.isMap(tDef)) {
+      return Array.from(Object.keys(tDef.map)).filter(k => tDef.map.hasOwnProperty(k));
     }
     return [];
   }
 
+  public getMapPortNames(): Array<string> {
+    if (this.isMap()) {
+      return this.intTypeDef.map.map(curr => curr.name);
+    }
+    return [];
+  }
+
+  public getMapEntry(portName): any | null {
+    return this.intTypeDef.map.find(curr => curr.name === portName);
+  }
+
+  public getMapEntryIndex(portName): number {
+    return this.intTypeDef.map.findIndex(curr => curr.name === portName);
+  }
+
   public addMapPort(portName: string) {
-    if (!portName || this.port.map[portName]) {
+    const existingMapEntry = this.getMapEntry(portName);
+    if (!portName || existingMapEntry) {
       return;
     }
-    this.port.map[portName] = TypeDefFormComponent.newPrimitiveTypeDef();
+    this.intTypeDef.map.push({name: portName, def: TypeDefFormComponent.newPrimitiveTypeDef()});
     this.resetNewMapPortName();
-    this.typeDefChanged.emit(null);
+    this.handleTypeDefChanged();
   }
 
   public renameMapPortName(oldPortName, newPortName: string) {
-    this.port.map[newPortName] = this.port.map[oldPortName];
-    this.removeMapPort(oldPortName);
-    this.typeDefChanged.emit(null);
+    const collidingMapEntry = this.getMapEntry(newPortName);
+    if (collidingMapEntry) {
+      return;
+    }
+
+    const existingMapEntry = this.getMapEntry(oldPortName);
+    if (!existingMapEntry) {
+      return;
+    }
+    existingMapEntry.name = newPortName;
+    this.handleTypeDefChanged();
   }
 
   public removeMapPort(portName: string) {
-    delete this.port.map[portName];
+    const existingMapEntry = this.getMapEntryIndex(portName);
+    if (!existingMapEntry) {
+      return;
+    }
+
+    const idx = this.getMapEntryIndex(portName);
+    if (idx > -1) {
+      delete this.intTypeDef.map[idx];
+    }
+    this.handleTypeDefChanged();
+  }
+
+  public handleTypeDefChanged() {
+    this.mapInt2ExtTypeDef(this.intTypeDef, this.port);
     this.typeDefChanged.emit(null);
   }
 

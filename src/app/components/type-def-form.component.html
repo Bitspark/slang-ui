@@ -1,5 +1,5 @@
 <div style="display: inline-block">
-  <select [ngModel]="port.type" (ngModelChange)="setType($event)">
+  <select [ngModel]="intTypeDef.type" (ngModelChange)="setType($event)">
     <option *ngFor="let portType of portTypes" [value]="portType">
       {{portType}}
     </option>
@@ -11,7 +11,7 @@
     <p *ngFor="let portName of getMapPortNames()">
       <button (click)="removeMapPort(portName.trim())">REMOVE</button>
       <input [ngModel]="portName" (ngModelChange)="renameMapPortName(portName, $event)"/>
-      <app-type-def-form [port]="port.map[portName]"></app-type-def-form>
+      <app-type-def-form [port]="getMapEntry(portName).def"></app-type-def-form>
     </p>
   </div>
 
