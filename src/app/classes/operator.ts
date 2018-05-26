@@ -1,4 +1,4 @@
-import {expandProperties, generateSvgTransform} from '../utils';
+import {connectDeep, expandProperties} from '../utils';
 import {OperatorService} from '../services/operator.service';
 import {Mat2, Mat3} from './matrix';
 
@@ -301,15 +301,7 @@ export class OperatorInstance extends Composable {
     }
 
     if (connections) {
-      this.connections = new Set<Connection>();
-      for (const src in connections) {
-        if (connections.hasOwnProperty(src)) {
-          for (const dst of connections[src]) {
-            const conns = this.getPort(src).connectDeep(this.getPort(dst));
-            conns.forEach(conn => this.connections.add(conn));
-          }
-        }
-      }
+      this.connections = connectDeep(this, connections);
     }
   }
 
@@ -840,5 +832,9 @@ export class Port extends Composable {
 
   public getPortPosY(): number {
     return this.getPortMat().multiply(this.getAbsMat3()).at(5);
+  }
+
+  public getParentPort(): Port {
+    return this.parentPort;
   }
 }

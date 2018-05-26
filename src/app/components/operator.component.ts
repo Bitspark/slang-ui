@@ -3,7 +3,7 @@ import {ActivatedRoute} from '@angular/router';
 import {OperatorService} from '../services/operator.service';
 import {Connection, OperatorDef, OperatorInstance, Port, Transformable} from '../classes/operator';
 import {safeDump, safeLoad} from 'js-yaml';
-import {generateSvgTransform, normalizeConnections} from '../utils';
+import {generateSvgTransform, normalizeConnections, stringifyConnections} from '../utils';
 import {ApiService} from '../services/api.service';
 import {VisualService} from '../services/visual.service';
 import 'codemirror/mode/yaml/yaml.js';
@@ -134,7 +134,9 @@ export class OperatorComponent implements OnInit {
     const conns = this.operator.getConnections();
     conns.delete(conn);
     const def = this.operatorDef.getDef();
-    def['connections'] = normalizeConnections(conns);
+    const connsCpy = new Set<Connection>(conns);
+    normalizeConnections(connsCpy);
+    def['connections'] = stringifyConnections(connsCpy);
     this.updateDef(def);
   }
 
@@ -147,7 +149,9 @@ export class OperatorComponent implements OnInit {
     });
     conns.add(new Connection(src, dst));
     const def = this.operatorDef.getDef();
-    def['connections'] = normalizeConnections(conns);
+    const connsCpy = new Set<Connection>(conns);
+    normalizeConnections(connsCpy);
+    def['connections'] = stringifyConnections(connsCpy);
     this.updateDef(def);
   }
 
@@ -208,7 +212,6 @@ export class OperatorComponent implements OnInit {
   public selectPort(port1: Port) {
     if (this.selectedEntity.entity && this.selectedEntity.entity.constructor.name === Port.name) {
       const port2 = this.selectedEntity.entity as Port;
-      console.log(port1.getOperator() === this.operator, port2.getOperator() === this.operator);
       if (port1.getOperator() === this.operator) {
         if (port2.getOperator() === this.operator) {
           if (port1.isIn() && port2.isOut()) {
