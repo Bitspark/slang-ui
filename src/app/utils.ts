@@ -1,4 +1,4 @@
-import {Connection, OperatorInstance, Transformable} from './classes/operator';
+import {Connection, OperatorInstance, Port, Transformable} from './classes/operator';
 
 function expandExpressionPart(exprPart: string, props: any, propDefs: any): Array<string> {
   const vals = [];
@@ -69,6 +69,22 @@ function normalizeStreams(conns: Set<Connection>): boolean {
 const FoundException = {};
 const NotFoundException = {};
 
+function containsConnection(conns: Set<Connection>, src: Port, dst: Port): boolean {
+  try {
+    conns.forEach(searchConn => {
+      if (searchConn.getSource() === src && searchConn.getDestination() === dst) {
+        throw FoundException;
+      }
+    });
+  } catch (e) {
+    if (e !== FoundException) {
+      throw e;
+    }
+    return true;
+  }
+  return false;
+}
+
 function normalizeMaps(conns: Set<Connection>): boolean {
   let modified = false;
   conns.forEach(conn => {
@@ -77,16 +93,7 @@ function normalizeMaps(conns: Set<Connection>): boolean {
     if (srcMap && dstMap && srcMap.isMap() && dstMap.isMap()) {
       // First, check if parent map is already connected
       // In that case we don't need to do anything
-      try {
-        conns.forEach(searchConn => {
-          if (searchConn.getSource() === srcMap && searchConn.getDestination() === dstMap) {
-            throw FoundException;
-          }
-        });
-      } catch (e) {
-        if (e !== FoundException) {
-          throw e;
-        }
+      if (containsConnection(conns, srcMap, dstMap)) {
         return;
       }
 
@@ -100,18 +107,8 @@ function normalizeMaps(conns: Set<Connection>): boolean {
           if (!dstEntry) {
             throw NotFoundException;
           }
-          try {
-            conns.forEach(searchConn => {
-              if (searchConn.getSource() === entry && searchConn.getDestination() === dstEntry) {
-                throw FoundException;
-              }
-            });
+          if (!containsConnection(conns, entry, dstEntry)) {
             connected = false;
-          } catch (e) {
-            if (e !== FoundException) {
-              throw e;
-            }
-            return;
           }
         });
       } catch (e) {
@@ -131,18 +128,8 @@ function normalizeMaps(conns: Set<Connection>): boolean {
           if (!srcEntry) {
             throw NotFoundException;
           }
-          try {
-            conns.forEach(searchConn => {
-              if (searchConn.getSource() === srcEntry && searchConn.getDestination() === entry) {
-                throw FoundException;
-              }
-            });
+          if (!containsConnection(conns, srcEntry, entry)) {
             connected = false;
-          } catch (e) {
-            if (e !== FoundException) {
-              throw e;
-            }
-            return;
           }
         });
       } catch (e) {
