@@ -829,7 +829,7 @@ export class Port extends Composable {
   }
 
   public getColor(): string {
-    return Port.style.portColors[this.type];
+    return Port.style.portColors[PortType[this.type] as string];
   }
 
   public isIn(): boolean {

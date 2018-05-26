@@ -2,6 +2,24 @@
   <h2>Operator "{{operatorName}}"</h2>
 </div>
 
+<div>
+  <button (click)="save()">Save</button>
+  <button (click)="showYAML = !showYAML">Toggle YAML</button>
+</div>
+
+<div *ngIf="showYAML">
+  <div>
+    <h3>YAML view</h3>
+  </div>
+  <div style="border: 1px dotted black; width: 1000px">
+    <codemirror [ngModel]="yamlRepr"
+                [config]="editorConfig"
+                (ngModelChange)="updateYaml($event)"
+                (blur)="storeYaml()">
+    </codemirror>
+  </div>
+</div>
+
 <div style="padding: 2px" *ngIf="mainSrvPort">
   <h4>
     IN
@@ -14,26 +32,6 @@
   </h4>
   <div style="display: inline-block">
     <app-type-def-form [port]="mainSrvPort.out" (typeDefChanged)="refresh($event)"></app-type-def-form>
-  </div>
-</div>
-
-<div>
-  <button (click)="save()">Save</button>
-  <button (click)="showYAML = !showYAML">Toggle YAML</button>
-</div>
-
-<br>
-
-<div *ngIf="showYAML">
-  <div>
-    <h3>YAML view</h3>
-  </div>
-  <div style="border: 1px dotted black; width: 1000px">
-    <codemirror [ngModel]="yamlRepr"
-                [config]="editorConfig"
-                (ngModelChange)="updateYaml($event)"
-                (blur)="storeYaml()">
-    </codemirror>
   </div>
 </div>
 
