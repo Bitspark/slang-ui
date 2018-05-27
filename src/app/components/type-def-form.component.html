@@ -8,13 +8,13 @@
   <div *ngIf="isMap()" style="display: inline-block; vertical-align: top; border-left: 3px solid gray; padding-left: 5px; margin-left: 5px">
     <p *ngFor="let p of subs">
       <button (click)="removeMapPort(p.name.trim())"><i class="fa fa-trash-o"></i></button>
-      <input [ngModel]="p.name" (ngModelChange)="renameMapPortName(p.name, $event)"/>
-      <app-type-def-form [port]="p.def"></app-type-def-form>
+      <input [ngModel]="p.name" (ngModelChange)="renameMapPortName(p.name, $event)" title="entry name" style="width: 60px" />
+      <app-type-def-form (typeDefChanged)="handleTypeDefChanged($event)" [port]="p.def"></app-type-def-form>
     </p>
     <button (click)="addMapPort(newMapPortName.trim())"><i class="fa fa-plus"></i></button>
-    <input [(ngModel)]="newMapPortName"/>
+    <input [(ngModel)]="newMapPortName" title="new entry name" style="width: 60px" />
   </div>
 
   <app-type-def-form [port]="port.stream" *ngIf="isStream()" (typeDefChanged)="handleTypeDefChanged($event)"></app-type-def-form>
-  <input [(ngModel)]="port.generic" *ngIf="isGeneric()"/>
+  <input [(ngModel)]="port.generic" *ngIf="isGeneric()" title="generic name" style="width: 60px" />
 </div>
