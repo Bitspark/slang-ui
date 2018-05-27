@@ -102,7 +102,7 @@ export class TypeDefFormComponent implements OnInit {
   public removeMapPort(portName: string) {
     const idx = this.getMapEntryIndex(portName);
     if (idx > -1) {
-      delete this.subs[idx];
+      this.subs.splice(idx, 1);
     }
     this.handleTypeDefChanged();
   }
