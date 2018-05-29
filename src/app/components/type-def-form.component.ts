@@ -1,5 +1,5 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {OperatorDef, PortType} from '../classes/operator';
+import {OperatorDef, Type} from '../classes/operator';
 
 @Component({
   selector: 'app-type-def-form',
@@ -7,11 +7,23 @@ import {OperatorDef, PortType} from '../classes/operator';
   styleUrls: ['./type-def-form.component.css']
 })
 export class TypeDefFormComponent implements OnInit {
+  public typeDef_: any = TypeDefFormComponent.newPrimitiveTypeDef();
+
   @Input()
-  public port: any = TypeDefFormComponent.newPrimitiveTypeDef();
+  get typeDef() {
+    return this.typeDef_;
+  }
+
+  @Output() typeDefChange: EventEmitter<any> = new EventEmitter();
+
+  set typeDef(val) {
+    console.log('set...', val);
+    this.typeDef_ = val;
+    this.typeDefChange.emit(this.typeDef_);
+  }
+
   public subs: Array<{ name: string, def: any }> = [];
-  @Output() typeDefChanged: EventEmitter<any> = new EventEmitter();
-  public portTypes = Object.keys(PortType).filter(t => typeof PortType[t] === 'number');
+  public types = Object.keys(Type).filter(t => typeof Type[t] === 'number');
   public newMapPortName: string;
 
   constructor() {
@@ -29,78 +41,79 @@ export class TypeDefFormComponent implements OnInit {
 
   public mapToSubs(): any {
     this.subs = [];
-    if (OperatorDef.isMap(this.port)) {
-      this.subs = Object.keys(this.port.map).map(portName => {
-        return {name: portName, def: this.port.map[portName]};
+    if (OperatorDef.isMap(this.typeDef)) {
+      this.subs = Object.keys(this.typeDef.map).map(portName => {
+        return {name: portName, def: this.typeDef.map[portName]};
       });
     }
   }
 
   public subsToMap(): any {
-    if (OperatorDef.isMap(this.port)) {
-      this.port.map = {};
+    if (OperatorDef.isMap(this.typeDef)) {
+      this.typeDef.map = {};
       this.subs.forEach(curr => {
-        this.port.map[curr.name] = curr.def;
+        this.typeDef.map[curr.name] = curr.def;
       });
     }
   }
 
-  public setType(portType: string) {
-    for (const k in this.port) {
-      if (k !== 'type' && this.port.hasOwnProperty(k)) {
-        delete this.port[k];
+  public setType(tp: string) {
+    console.log('setType', tp);
+    for (const k in this.typeDef) {
+      if (k !== 'type' && this.typeDef.hasOwnProperty(k)) {
+        delete this.typeDef[k];
       }
     }
-    switch (portType) {
+    switch (tp) {
       case 'map':
-        this.subs = [{name: 'port', def: TypeDefFormComponent.newPrimitiveTypeDef()}];
+        this.subs = [{name: 'entryName', def: TypeDefFormComponent.newPrimitiveTypeDef()}];
         break;
       case 'stream':
-        this.port[portType] = TypeDefFormComponent.newPrimitiveTypeDef();
+        this.typeDef[tp] = TypeDefFormComponent.newPrimitiveTypeDef();
         break;
       case 'generic':
-        this.port[portType] = 'itemType';
+        this.typeDef[tp] = 'itemType';
         break;
     }
     this.handleTypeDefChanged();
   }
 
-  private getSubPort(portName): any | null {
-    return this.subs.find(curr => curr.name === portName);
+  private getSub(name: string): any | null {
+    return this.subs.find(curr => curr.name === name);
   }
 
-  private getMapEntryIndex(portName): number {
-    return this.subs.findIndex(curr => curr.name === portName);
+  private getMapEntryIndex(name: string): number {
+    return this.subs.findIndex(curr => curr.name === name);
   }
 
-  public addMapPort(portName: string) {
-    const existingMapEntry = this.getSubPort(portName);
-    if (!portName || existingMapEntry) {
+  public addSub(name: string) {
+    const existingMapEntry = this.getSub(name);
+    if (!name || existingMapEntry) {
       return;
     }
-    this.subs.push({name: portName, def: TypeDefFormComponent.newPrimitiveTypeDef()});
+    this.subs.push({name: name, def: TypeDefFormComponent.newPrimitiveTypeDef()});
     this.resetNewMapPortName();
     this.handleTypeDefChanged();
   }
 
-  public renameMapPortName(oldPortName, newPortName: string) {
-    if (!newPortName) {
+  public renameSubName(oldName, newName: string) {
+    if (!newName) {
       return;
     }
-    const collidingMapEntry = this.getSubPort(newPortName);
+    const collidingMapEntry = this.getSub(newName);
     if (collidingMapEntry) {
       return;
     }
-    const existingMapEntry = this.getSubPort(oldPortName);
+    const existingMapEntry = this.getSub(oldName);
     if (!existingMapEntry) {
       return;
     }
-    existingMapEntry.name = newPortName;
+    existingMapEntry.name = newName;
     this.handleTypeDefChanged();
   }
 
-  public removeMapPort(portName: string) {
-    const idx = this.getMapEntryIndex(portName);
+  public removeMapPort(name: string) {
+    const idx = this.getMapEntryIndex(name);
     if (idx > -1) {
       this.subs.splice(idx, 1);
     }
@@ -109,7 +122,7 @@ export class TypeDefFormComponent implements OnInit {
 
   public handleTypeDefChanged() {
     this.subsToMap();
-    this.typeDefChanged.emit(null);
+    this.typeDefChange.emit(this.typeDef_);
   }
 
   public resetNewMapPortName() {
@@ -117,15 +130,15 @@ export class TypeDefFormComponent implements OnInit {
   }
 
   public isMap(): boolean {
-    return OperatorDef.isMap(this.port);
+    return OperatorDef.isMap(this.typeDef);
   }
 
   public isStream(): boolean {
-    return OperatorDef.isStream(this.port);
+    return OperatorDef.isStream(this.typeDef);
   }
 
   public isGeneric(): boolean {
-    return OperatorDef.isGeneric(this.port);
+    return OperatorDef.isGeneric(this.typeDef);
   }
 
 }

@@ -2,7 +2,7 @@ import {connectDeep, expandProperties} from '../utils';
 import {OperatorService} from '../services/operator.service';
 import {Mat2, Mat3} from './matrix';
 
-export enum PortType {
+export enum Type {
   number,
   binary,
   boolean,
@@ -647,7 +647,7 @@ export class Port extends Composable {
     }
   };
 
-  private type: PortType;
+  private type: Type;
   private generic: string;
   private stream: Port;
   private map: Map<string, Port>;
@@ -671,19 +671,19 @@ export class Port extends Composable {
               parent: Composable,
               portDef: any) {
     super(parent);
-    this.type = PortType[portDef.type as string];
+    this.type = Type[portDef.type as string];
     this.dim = [Port.style.x, Port.style.y];
 
     switch (this.type) {
-      case PortType.generic:
+      case Type.generic:
         this.generic = portDef.generic;
         break;
-      case PortType.stream:
+      case Type.stream:
         this.stream = new Port(this.operator, this.groupType, this.groupName, inDir, this, '', this, portDef.stream);
         this.stream.translate([Port.style.str.px, 0]);
         this.dim = [2 * Port.style.str.px + this.stream.getWidth(), Port.style.str.py + this.stream.getHeight()];
         break;
-      case PortType.map:
+      case Type.map:
         let x = 0;
         let height = 0;
         this.map = new Map<string, Port>();
@@ -702,7 +702,7 @@ export class Port extends Composable {
     }
   }
 
-  public getType(): PortType {
+  public getType(): Type {
     return this.type;
   }
 
@@ -728,24 +728,24 @@ export class Port extends Composable {
   }
 
   public isPrimitive(): boolean {
-    return this.type === PortType.number ||
-      this.type === PortType.string ||
-      this.type === PortType.binary ||
-      this.type === PortType.boolean ||
-      this.type === PortType.primitive ||
-      this.type === PortType.trigger;
+    return this.type === Type.number ||
+      this.type === Type.string ||
+      this.type === Type.binary ||
+      this.type === Type.boolean ||
+      this.type === Type.primitive ||
+      this.type === Type.trigger;
   }
 
   public isGeneric(): boolean {
-    return this.type === PortType.generic;
+    return this.type === Type.generic;
   }
 
   public isStream(): boolean {
-    return this.type === PortType.stream;
+    return this.type === Type.stream;
   }
 
   public isMap(): boolean {
-    return this.type === PortType.map;
+    return this.type === Type.map;
   }
 
   public getMap(): Map<string, Port> {
@@ -829,7 +829,7 @@ export class Port extends Composable {
   }
 
   public getColor(): string {
-    return Port.style.portColors[PortType[this.type] as string];
+    return Port.style.portColors[Type[this.type] as string];
   }
 
   public isIn(): boolean {
