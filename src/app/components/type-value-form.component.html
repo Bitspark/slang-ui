@@ -1,4 +1,4 @@
-<div style="display: inline-block; vertical-align: top">
+<div style="display: inline-block; vertical-align: top; margin-bottom: 5px">
   <div *ngIf="typeDef.type === 'primitive'">
     <input [(ngModel)]="typeValue" title="value" />
   </div>
@@ -15,7 +15,7 @@
     &bull; Trigger
   </div>
 
-  <div *ngIf="typeDef.type === 'map'">
+  <div *ngIf="typeDef.type === 'map'" style="border-left: 3px solid gray; padding-left: 5px; margin-left: 5px">
     <div *ngFor="let key of getEntries()">
       {{key}}
       <app-type-value-form [(typeValue)]="typeValue[key]" [typeDef]="typeDef.map[key]"></app-type-value-form>
