@@ -17,8 +17,8 @@ export class TypeDefFormComponent implements OnInit {
   @Output() typeDefChange: EventEmitter<any> = new EventEmitter();
 
   set typeDef(val) {
-    console.log('set...', val);
     this.typeDef_ = val;
+    this.mapToSubs();
     this.typeDefChange.emit(this.typeDef_);
   }
 
@@ -58,7 +58,6 @@ export class TypeDefFormComponent implements OnInit {
   }
 
   public setType(tp: string) {
-    console.log('setType', tp);
     for (const k in this.typeDef) {
       if (k !== 'type' && this.typeDef.hasOwnProperty(k)) {
         delete this.typeDef[k];

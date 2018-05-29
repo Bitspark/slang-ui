@@ -4,17 +4,18 @@
       {{t}}
     </option>
   </select>
+  Type:{{typeDef.type}}
 
   <div *ngIf="isMap()" style="display: inline-block; vertical-align: top; border-left: 3px solid gray; padding-left: 5px; margin-left: 5px">
     <p *ngFor="let p of subs">
       <button (click)="removeMapPort(p.name.trim())"><i class="fa fa-trash-o"></i></button>
       <input [ngModel]="p.name" (ngModelChange)="renameSubName(p.name, $event)" title="entry name" style="width: 60px" />
-      <app-type-def-form (typeDefChange)="handleTypeDefChanged()" [(typeDef)]="p.def"></app-type-def-form>
+      <app-type-def-form [(typeDef)]="p.def" (typeDefChange)="handleTypeDefChanged()"></app-type-def-form>
     </p>
     <button (click)="addSub(newMapPortName.trim())"><i class="fa fa-plus"></i></button>
     <input [(ngModel)]="newMapPortName" title="new entry name" style="width: 60px" />
   </div>
 
-  <app-type-def-form [(typeDef)]="typeDef.stream" *ngIf="isStream()" (typeDefChange)="handleTypeDefChanged()"></app-type-def-form>
+  <app-type-def-form *ngIf="isStream()" [(typeDef)]="typeDef.stream" (typeDefChange)="handleTypeDefChanged()"></app-type-def-form>
   <input [(ngModel)]="typeDef.generic" *ngIf="isGeneric()" title="generic name" style="width: 60px" />
 </div>
