@@ -113,6 +113,11 @@
   </div>
 </div>
 
+<div *ngIf="mainSrvPort">
+  <app-type-value-form [typeDef]="mainSrvPort.in" [(typeValue)]="inVal"></app-type-value-form>
+  <pre>{{ stringify(inVal) }}</pre>
+</div>
+
 <div>
   Status: {{status}}
 </div>

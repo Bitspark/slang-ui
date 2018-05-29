@@ -3,7 +3,7 @@ import {ActivatedRoute} from '@angular/router';
 import {OperatorService} from '../services/operator.service';
 import {Connection, OperatorDef, OperatorInstance, Port, Transformable} from '../classes/operator';
 import {safeDump, safeLoad} from 'js-yaml';
-import {generateSvgTransform, normalizeConnections, stringifyConnections} from '../utils';
+import {createDefaultValue, generateSvgTransform, normalizeConnections, stringifyConnections} from '../utils';
 import {ApiService} from '../services/api.service';
 import {VisualService} from '../services/visual.service';
 import 'codemirror/mode/yaml/yaml.js';
@@ -19,6 +19,8 @@ export class OperatorComponent implements OnInit {
   public operator: OperatorInstance = null;
   public mainSrvPort: any = null;
   public status;
+
+  public inVal: any;
 
   // YAML
   public yamlRepr = '';
@@ -156,8 +158,13 @@ export class OperatorComponent implements OnInit {
     this.updateDef(def);
   }
 
+  public stringify(val: any): string {
+    return JSON.stringify(val);
+  }
+
   // YAML
   public refresh() {
+    this.inVal = createDefaultValue(this.operatorDef.getDef().services.main.in);
     this.displayYaml();
     this.displayVisual();
   }

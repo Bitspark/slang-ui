@@ -12,6 +12,7 @@ import {IndexComponent} from './components/index.component';
 import {OperatorComponent} from './components/operator.component';
 import {PortComponent} from './components/port.component';
 import {TypeDefFormComponent} from './components/type-def-form.component';
+import {TypeValueFormComponent} from './components/type-value-form.component';
 
 import {ApiService} from './services/api.service';
 import {OperatorService} from './services/operator.service';
@@ -19,7 +20,7 @@ import {VisualService} from './services/visual.service';
 
 @NgModule({
   declarations: [
-    AppComponent, IndexComponent, OperatorComponent, PortComponent, TypeDefFormComponent
+    AppComponent, IndexComponent, OperatorComponent, PortComponent, TypeDefFormComponent, TypeValueFormComponent
   ],
   imports: [
     RouterModule.forRoot(

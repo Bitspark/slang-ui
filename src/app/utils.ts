@@ -192,3 +192,28 @@ export function stringifyConnections(conns: Set<Connection>): any {
   });
   return connObj;
 }
+
+export function createDefaultValue(typeDef: any): any {
+  switch (typeDef.type) {
+    case 'string':
+      return '';
+    case 'number':
+      return 0;
+    case 'boolean':
+      return false;
+    case 'trigger':
+      return null;
+    case 'primitive':
+      return '';
+    case 'map':
+      const typeValue = {};
+      for (const key in typeDef.map) {
+        if (typeDef.map.hasOwnProperty(key)) {
+          typeValue[key] = createDefaultValue(typeDef.map[key]);
+        }
+      }
+      return typeValue;
+    case 'stream':
+      return [];
+  }
+}
