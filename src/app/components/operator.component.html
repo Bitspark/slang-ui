@@ -5,6 +5,7 @@
 <div>
   <button (click)="save()">Save</button>
   <button (click)="showYAML = !showYAML">Toggle YAML</button>
+  <button (click)="showInOutPorts = !showInOutPorts">Toggle In & Out ports</button>
 </div>
 
 <div *ngIf="showYAML">
@@ -20,7 +21,7 @@
   </div>
 </div>
 
-<div style="padding: 2px" *ngIf="mainSrvPort">
+<div style="padding: 2px" *ngIf="showInOutPorts && mainSrvPort">
   <h4>
     IN
   </h4>
@@ -111,11 +112,6 @@
       </div>
     </div>
   </div>
-</div>
-
-<div *ngIf="mainSrvPort">
-  <app-type-value-form [typeDef]="mainSrvPort.in" [(typeValue)]="inVal"></app-type-value-form>
-  <pre>{{ stringify(inVal) }}</pre>
 </div>
 
 <div>

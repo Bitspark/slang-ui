@@ -19,8 +19,7 @@ export class OperatorComponent implements OnInit {
   public operator: OperatorInstance = null;
   public mainSrvPort: any = null;
   public status;
-
-  public inVal: any;
+  public showInOutPorts = false;
 
   // YAML
   public yamlRepr = '';
