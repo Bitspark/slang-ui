@@ -5,6 +5,7 @@
 <div>
   <button (click)="save()">Save</button>
   <button (click)="showYAML = !showYAML">Toggle YAML</button>
+  <button (click)="showInOutPorts = !showInOutPorts">Toggle In & Out ports</button>
 </div>
 
 <div *ngIf="showYAML">
@@ -20,18 +21,18 @@
   </div>
 </div>
 
-<div style="padding: 2px" *ngIf="mainSrvPort">
+<div style="padding: 2px" *ngIf="showInOutPorts && mainSrvPort">
   <h4>
     IN
   </h4>
   <div style="display: inline-block">
-    <app-type-def-form [port]="mainSrvPort.in" (typeDefChanged)="refresh($event)"></app-type-def-form>
+    <app-type-def-form [(typeDef)]="mainSrvPort.in" (typeDefChange)="refresh()"></app-type-def-form>
   </div>
   <h4>
     OUT
   </h4>
   <div style="display: inline-block">
-    <app-type-def-form [port]="mainSrvPort.out" (typeDefChanged)="refresh($event)"></app-type-def-form>
+    <app-type-def-form [(typeDef)]="mainSrvPort.out" (typeDefChange)="refresh()"></app-type-def-form>
   </div>
 </div>
 
