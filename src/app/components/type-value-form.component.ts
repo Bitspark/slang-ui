@@ -40,6 +40,8 @@ export class TypeValueFormComponent implements OnInit, OnChanges {
   }
 
   ngOnInit() {
+    console.log('>>> typeDef', this.typeDef_);
+    console.log('>>> typeValue', this.typeVal_);
   }
 
   ngOnChanges(changes: SimpleChanges): void {

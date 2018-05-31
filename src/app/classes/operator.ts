@@ -19,6 +19,7 @@ export class OperatorDef {
   private readonly name: string;
   private def: any;
   private genericNames = new Set<string>();
+  private propertyDefs = new Map<string, any>();
   private readonly type: string;
   private saved: boolean;
 
@@ -158,6 +159,13 @@ export class OperatorDef {
         this.genericNames.add(pDef.generic);
       }
     });
+    if (def.properties) {
+      for (const propName in def.properties) {
+        if (def.properties.hasOwnProperty(propName)) {
+          this.propertyDefs.set(propName, def.properties[propName]);
+        }
+      }
+    }
   }
 
   public getName(): string {
@@ -166,6 +174,10 @@ export class OperatorDef {
 
   public getGenericNames(): Set<string> {
     return this.genericNames;
+  }
+
+  public getPropertyDefs(): Map<string, any> {
+    return this.propertyDefs;
   }
 
   public getDef(): any {
@@ -576,8 +588,12 @@ export class OperatorInstance extends Composable {
     return p;
   }
 
-  public getGenericNaemes(): Set<string> {
+  public getGenericNames(): Set<string> {
     return this.opDef.getGenericNames();
+  }
+
+  public getPropertyDefs(): Map<string, any> {
+    return this.opDef.getPropertyDefs();
   }
 
   private distributeDelegatesVertically() {

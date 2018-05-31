@@ -3,7 +3,7 @@ import {ActivatedRoute} from '@angular/router';
 import {OperatorService} from '../services/operator.service';
 import {Connection, OperatorDef, OperatorInstance, Port, Transformable} from '../classes/operator';
 import {safeDump, safeLoad} from 'js-yaml';
-import {generateSvgTransform, normalizeConnections, stringifyConnections} from '../utils';
+import {createDefaultValue, generateSvgTransform, normalizeConnections, stringifyConnections} from '../utils';
 import {ApiService} from '../services/api.service';
 import {VisualService} from '../services/visual.service';
 import 'codemirror/mode/yaml/yaml.js';
@@ -231,12 +231,8 @@ export class OperatorComponent implements OnInit {
     return '';
   }
 
-  public genericNames(): Array<string> {
-    console.log((this.selectedEntity.entity as OperatorInstance).getGenericNaemes());
-    if (this.isInstanceSelected()) {
-      return Array.from((this.selectedEntity.entity as OperatorInstance).getGenericNaemes());
-    }
-    return [];
+  public genericNames(ins: OperatorInstance): Array<string> {
+    return Array.from(ins.getGenericNames());
   }
 
   public selectPort(port1: Port) {
@@ -336,6 +332,37 @@ export class OperatorComponent implements OnInit {
       insOpDef.generics = {};
     }
     insOpDef.generics[genName] = TypeDefFormComponent.newPrimitiveTypeDef();
+  }
+
+  public isPropertySpecified(ins: OperatorInstance, prop: { name: string, def: any }): boolean {
+    const props = this.getProperties(ins);
+    return props && props[prop.name];
+  }
+
+  public getPropertyDefs(ins: OperatorInstance): Array<{ name: string, def: any }> {
+    const generics = this.getGenerics(ins);
+    const arr = Array.from(ins.getPropertyDefs().entries()).map(each => {
+      const defCopy = JSON.parse(JSON.stringify(each[1]));
+      OperatorDef.specifyTypeDef(defCopy, generics, {}, {});
+      return {name: each[0], def: defCopy};
+    });
+    return arr;
+  }
+
+  public getProperties(ins: OperatorInstance): any {
+    const oDef = this.operatorDef.getDef();
+    return oDef.operators[ins.getName()].properties;
+  }
+
+  public addProperty(ins: OperatorInstance, prop: { name: string, def: any }): any {
+    const oDef = this.operatorDef.getDef();
+    const insOpDef = oDef.operators[ins.getName()];
+    if (!insOpDef.properties) {
+      insOpDef.properties = {};
+    }
+    insOpDef.properties[prop.name] = createDefaultValue(prop.def);
+    console.log('>>>', insOpDef.properties[prop.name]);
+
   }
 
   // Dragging
