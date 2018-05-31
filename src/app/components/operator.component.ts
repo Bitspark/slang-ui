@@ -7,6 +7,7 @@ import {generateSvgTransform, normalizeConnections, stringifyConnections} from '
 import {ApiService} from '../services/api.service';
 import {VisualService} from '../services/visual.service';
 import 'codemirror/mode/yaml/yaml.js';
+import {TypeDefFormComponent} from './type-def-form.component';
 
 @Component({
   templateUrl: './operator.component.html',
@@ -223,6 +224,13 @@ export class OperatorComponent implements OnInit {
     return this.selectedEntity.entity && this.selectedEntity.entity.constructor.name === OperatorInstance.name;
   }
 
+  public getSelectedEntityName(): string {
+    if (this.isInstanceSelected()) {
+      return (this.selectedEntity.entity as OperatorInstance).getName();
+    }
+    return '';
+  }
+
   public genericNames(): Array<string> {
     console.log((this.selectedEntity.entity as OperatorInstance).getGenericNaemes());
     if (this.isInstanceSelected()) {
@@ -309,6 +317,25 @@ export class OperatorComponent implements OnInit {
 
   public getLibraries(filterString: string): Array<OperatorDef> {
     return this.operators.getLibraries().filter(op => op.getName().toLowerCase().indexOf(filterString.toLowerCase()) !== -1);
+  }
+
+  public isGenericSpecified(ins: OperatorInstance, genName: string): boolean {
+    const generics = this.getGenerics(ins);
+    return generics && generics[genName];
+  }
+
+  public getGenerics(ins: OperatorInstance): any {
+    const oDef = this.operatorDef.getDef();
+    return oDef.operators[ins.getName()].generics;
+  }
+
+  public addGeneric(ins: OperatorInstance, genName: string) {
+    const oDef = this.operatorDef.getDef();
+    const insOpDef = oDef.operators[ins.getName()];
+    if (!insOpDef.generics) {
+      insOpDef.generics = {};
+    }
+    insOpDef.generics[genName] = TypeDefFormComponent.newPrimitiveTypeDef();
   }
 
   // Dragging

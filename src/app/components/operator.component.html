@@ -125,11 +125,12 @@
 </div>
 
 <div *ngIf="isInstanceSelected()">
-  <h3>Instance: {{ selectedEntity.entity.getName() }}</h3>
+  <h3>Instance: {{ getSelectedEntityName() }}</h3>
   <h4>Generics ({{ genericNames().length }})</h4>
-  <ul>
-    <li *ngFor="let genName of genericNames()">{{ genName }}</li>
-  </ul>
+    <div *ngFor="let genName of genericNames()">{{ genName }}
+      <app-type-def-form *ngIf="isGenericSpecified(selectedEntity.entity, genName)" [(typeDef)]="getGenerics(selectedEntity.entity)[genName]" (typeDefChange)="refresh()"></app-type-def-form>
+      <button *ngIf="!isGenericSpecified(selectedEntity.entity, genName)" (click)="addGeneric(selectedEntity.entity, genName)">Specify</button>
+    </div>
 </div>
 
 <div>
