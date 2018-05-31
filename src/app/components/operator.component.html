@@ -51,21 +51,29 @@
            (mousemove)="drag($event)">
 
         <svg:g *ngIf="operator" [attr.transform]="transform(operator)">
+          <!-- Surrounding operator -->
           <svg:rect x="0" y="0" [attr.width]="operator.getWidth()" [attr.height]="operator.getHeight()"
                     fill="transparent" stroke-width="3" stroke-dasharray="3 3"
                     [attr.stroke]="operator === selectedEntity.entity ? '#f0f' : 'orange'"
                     (mousedown)="selectInstance(operator)"></svg:rect>
+
+          <!-- Delegates -->
           <svg:g *ngFor="let dlg of operator.getDelegates()" [attr.transform]="transform(dlg)">
             <svg:g [attr.transform]="transform(dlg.getIn())" app-port [port]="dlg.getIn()" (select)="selectPort($event)"
                    [selectedEntity]="selectedEntity"></svg:g>
             <svg:g [attr.transform]="transform(dlg.getOut())" app-port [port]="dlg.getOut()"
                    (select)="selectPort($event)" [selectedEntity]="selectedEntity"></svg:g>
           </svg:g>
-          <svg:g [attr.transform]="transform(operator.getMainIn())" app-port [port]="operator.getMainIn()"
-                 (select)="selectPort($event)" [selectedEntity]="selectedEntity"></svg:g>
-          <svg:g [attr.transform]="transform(operator.getMainOut())" app-port [port]="operator.getMainOut()"
-                 (select)="selectPort($event)" [selectedEntity]="selectedEntity"></svg:g>
 
+          <!-- Services -->
+          <svg:g>
+            <svg:g [attr.transform]="transform(operator.getMainIn())" app-port [port]="operator.getMainIn()"
+                   (select)="selectPort($event)" [selectedEntity]="selectedEntity"></svg:g>
+            <svg:g [attr.transform]="transform(operator.getMainOut())" app-port [port]="operator.getMainOut()"
+                   (select)="selectPort($event)" [selectedEntity]="selectedEntity"></svg:g>
+          </svg:g>
+
+          <!-- Instances -->
           <svg:g *ngFor="let ins of visualInstances()" [attr.transform]="transform(ins)">
             <svg:rect x="0" y="0" [attr.width]="ins.getWidth()" [attr.height]="ins.getHeight()" fill="orange"
                       [attr.stroke]="ins === selectedEntity.entity ? '#f0f' : ''" stroke-width="3"
@@ -85,6 +93,8 @@
                    (select)="selectPort($event)" [selectedEntity]="selectedEntity"></svg:g>
           </svg:g>
         </svg:g>
+
+        <!-- Connections -->
         <svg:line *ngFor="let conn of visualConnections()"
                   stroke-width="2px"
                   (click)="selectConnection(conn)"
@@ -93,6 +103,7 @@
                   [attr.y1]="conn.getSource().getPortPosY()"
                   [attr.x2]="conn.getDestination().getPortPosX()"
                   [attr.y2]="conn.getDestination().getPortPosY()"></svg:line>
+
       </svg>
     </div>
     <div
