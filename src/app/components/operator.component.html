@@ -52,9 +52,8 @@
 
         <svg:g *ngIf="operator" [attr.transform]="transform(operator)">
           <svg:rect x="0" y="0" [attr.width]="operator.getWidth()" [attr.height]="operator.getHeight()"
-                    fill="transparent"
-                    [attr.stroke]="operator === selectedEntity.entity ? 'red' : 'orange'" stroke-dasharray="3 3"
-                    stroke-width="3"
+                    fill="transparent" stroke-width="3" stroke-dasharray="3 3"
+                    [attr.stroke]="operator === selectedEntity.entity ? '#f0f' : 'orange'"
                     (mousedown)="selectInstance(operator)"></svg:rect>
           <svg:g *ngFor="let dlg of operator.getDelegates()" [attr.transform]="transform(dlg)">
             <svg:g [attr.transform]="transform(dlg.getIn())" app-port [port]="dlg.getIn()" (select)="selectPort($event)"
@@ -69,7 +68,7 @@
 
           <svg:g *ngFor="let ins of visualInstances()" [attr.transform]="transform(ins)">
             <svg:rect x="0" y="0" [attr.width]="ins.getWidth()" [attr.height]="ins.getHeight()" fill="orange"
-                      [attr.stroke]="ins === selectedEntity.entity ? 'red' : ''" stroke-dasharray="3 3" stroke-width="2"
+                      [attr.stroke]="ins === selectedEntity.entity ? '#f0f' : ''" stroke-width="3"
                       (mousedown)="selectInstance(ins)"></svg:rect>
             <svg:text text-anchor="middle" x="65" y="35" fill="white" font-family="Arial" font-size="16"
                       style="pointer-events: none">{{ins.getName()}}
@@ -89,7 +88,7 @@
         <svg:line *ngFor="let conn of visualConnections()"
                   stroke-width="2px"
                   (click)="selectConnection(conn)"
-                  [attr.stroke]="conn === selectedEntity.entity ? 'red' : 'black'"
+                  [attr.stroke]="conn === selectedEntity.entity ? '#f0f' : 'black'"
                   [attr.x1]="conn.getSource().getPortPosX()"
                   [attr.y1]="conn.getSource().getPortPosY()"
                   [attr.x2]="conn.getDestination().getPortPosX()"

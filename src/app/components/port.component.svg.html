@@ -2,16 +2,16 @@
   <!-- Primitive -->
   <svg:g *ngIf="(port.isPrimitive() || port.isGeneric())">
     <path (click)="select.emit(port)" *ngIf="port.isIn()" [attr.fill]="port.getColor()" stroke-width="3px"
-          stroke-width="3" [attr.stroke]="(selectedEntity.entity === port) ? 'red' : ''"
+          stroke-width="3" [attr.stroke]="(selectedEntity.entity === port) ? '#f0f' : ''"
           d="M -3 -5 L 23 -5 L 10 15 z"/>
     <!-- d="M left-x left-y L right-x right-y L bottom-x bottom-y z" -->
     <circle (click)="select.emit(port)" *ngIf="port.isOut()" [attr.fill]="port.getColor()" stroke-width="3px"
-            stroke-width="3" [attr.stroke]="(selectedEntity.entity === port) ? 'red' : ''"
+            stroke-width="3" [attr.stroke]="(selectedEntity.entity === port) ? '#f0f' : ''"
             cx="10" cy="0" r="10"/>
   </svg:g>
   <!-- Stream -->
   <svg:rect *ngIf="port.isStream()" fill="white" stroke-width="2" fill="transparent"
-            [attr.stroke]="(selectedEntity.entity === port) ? 'red' : 'white'"
+            [attr.stroke]="(selectedEntity.entity === port) ? '#f0f' : 'white'"
             [attr.width]="port.getWidth()" [attr.height]="port.getHeight()"/>
   <svg:g *ngIf="port.isStream()" [attr.transform]="transform(port.getStream())" app-port [port]="port.getStream()"
          (select)="select.emit($event)" [selectedEntity]="selectedEntity"></svg:g>
