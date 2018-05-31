@@ -163,7 +163,10 @@ export class OperatorComponent implements OnInit {
   }
 
   // YAML
-  public refresh() {
+  public refresh(noPropDefs?: boolean) {
+    if (!noPropDefs) {
+      this.insPropDefs = new Map<string, Array<{ name: string, def: any }>>();
+    }
     this.displayYaml();
     this.displayVisual();
   }
@@ -221,7 +224,7 @@ export class OperatorComponent implements OnInit {
   }
 
   public isInstanceSelected() {
-    return this.selectedEntity.entity && this.selectedEntity.entity.constructor.name === OperatorInstance.name;
+    return this.selectedEntity.entity && this.selectedEntity.entity !== this.operator && this.selectedEntity.entity.constructor.name === OperatorInstance.name;
   }
 
   public getSelectedEntityName(): string {
@@ -336,16 +339,24 @@ export class OperatorComponent implements OnInit {
 
   public isPropertySpecified(ins: OperatorInstance, prop: { name: string, def: any }): boolean {
     const props = this.getProperties(ins);
-    return props && props[prop.name];
+    return props && typeof props[prop.name] !== 'undefined';
   }
 
+  private insPropDefs = new Map<string, Array<{ name: string, def: any }>>();
+
   public getPropertyDefs(ins: OperatorInstance): Array<{ name: string, def: any }> {
+    const def = this.insPropDefs.get(ins.getName());
+    if (def) {
+      return def;
+    }
+
     const generics = this.getGenerics(ins);
     const arr = Array.from(ins.getPropertyDefs().entries()).map(each => {
       const defCopy = JSON.parse(JSON.stringify(each[1]));
       OperatorDef.specifyTypeDef(defCopy, generics, {}, {});
       return {name: each[0], def: defCopy};
     });
+    this.insPropDefs.set(ins.getName(), arr);
     return arr;
   }
 
@@ -361,8 +372,6 @@ export class OperatorComponent implements OnInit {
       insOpDef.properties = {};
     }
     insOpDef.properties[prop.name] = createDefaultValue(prop.def);
-    console.log('>>>', insOpDef.properties[prop.name]);
-
   }
 
   // Dragging

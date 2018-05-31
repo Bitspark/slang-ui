@@ -194,9 +194,6 @@ export function stringifyConnections(conns: Set<Connection>): any {
 }
 
 export function createDefaultValue(typeDef: any): any {
-
-  console.log('===', typeDef);
-
   switch (typeDef.type) {
     case 'string':
       return '';
@@ -218,5 +215,7 @@ export function createDefaultValue(typeDef: any): any {
       return typeValue;
     case 'stream':
       return [];
+    case 'generic':
+      return '$value';
   }
 }

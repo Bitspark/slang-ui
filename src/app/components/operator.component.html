@@ -140,7 +140,7 @@
     <app-type-value-form *ngIf="isPropertySpecified(selectedEntity.entity, prop)"
                          [typeDef]="prop.def"
                          [(typeValue)]="getProperties(selectedEntity.entity)[prop.name]"
-                         (typeValueChange)="refresh()"></app-type-value-form>
+                         (typeValueChange)="refresh(true)"></app-type-value-form>
     <button *ngIf="!isPropertySpecified(selectedEntity.entity, prop)"
             (click)="addProperty(selectedEntity.entity, prop)">Specify
     </button>
