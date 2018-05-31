@@ -1,5 +1,5 @@
 import {EventEmitter, Injectable} from '@angular/core';
-import {Observable, Observer} from 'rxjs';
+import {Observable} from 'rxjs';
 import {ApiService} from './api.service';
 import {OperatorDef} from '../classes/operator';
 
@@ -117,5 +117,4 @@ export class OperatorService {
   public getLoadingObservable(): Observable<boolean> {
     return this.loadedEmitter;
   }
-
 }

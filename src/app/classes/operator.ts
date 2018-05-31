@@ -18,6 +18,7 @@ export class OperatorDef {
 
   private readonly name: string;
   private def: any;
+  private genericNames = new Set<string>();
   private readonly type: string;
   private saved: boolean;
 
@@ -120,15 +121,51 @@ export class OperatorDef {
     console.error('Unknown type', def['type']);
   }
 
+  public static walkAllPorts(opDef: any, fn: (p: any) => void) {
+    ['services', 'delegates'].forEach(n => {
+      const portGroup = opDef[n];
+      if (portGroup) {
+        for (const name in portGroup) {
+          if (portGroup.hasOwnProperty(name)) {
+            this.walkPort(portGroup[name].in, fn);
+            this.walkPort(portGroup[name].out, fn);
+          }
+        }
+      }
+    });
+  }
+
+  public static walkPort(p: any, fn: (p: any) => void): void {
+    fn(p);
+    if (OperatorDef.isMap(p)) {
+      for (const subname in p.map) {
+        if (p.map.hasOwnProperty(subname)) {
+          this.walkPort(p.map[subname], fn);
+        }
+      }
+    } else if (OperatorDef.isStream(p)) {
+      this.walkPort(p.stream, fn);
+    }
+  }
+
   constructor({name, def, type, saved}: { name: string, def: any, type: string, saved: boolean }) {
     this.name = name;
     this.def = def;
     this.type = type;
     this.saved = saved;
+    OperatorDef.walkAllPorts(this.def, pDef => {
+      if (OperatorDef.isGeneric(pDef)) {
+        this.genericNames.add(pDef.generic);
+      }
+    });
   }
 
   public getName(): string {
     return this.name;
+  }
+
+  public getGenericNames(): Set<string> {
+    return this.genericNames;
   }
 
   public getDef(): any {
@@ -244,6 +281,7 @@ export class OperatorInstance extends Composable {
   constructor(private operatorSrv: OperatorService,
               private fqOperator: string,
               private name: string,
+              private opDef: OperatorDef,
               parent: Composable,
               def: any,
               dim?: [number, number]) {
@@ -316,7 +354,7 @@ export class OperatorInstance extends Composable {
           }
           const opDef = JSON.parse(JSON.stringify(op.getDef()));
           OperatorDef.specifyOperatorDef(opDef, ins['generics'], ins['properties'], opDef['properties']);
-          opIns = new OperatorInstance(this.operatorSrv, opName, insName, this, opDef);
+          opIns = new OperatorInstance(this.operatorSrv, opName, insName, op, this, opDef);
           opIns.translate(ipos);
           this.instances.set(insName, opIns);
           opIns.show();
@@ -536,6 +574,10 @@ export class OperatorInstance extends Composable {
     }
 
     return p;
+  }
+
+  public getGenericNaemes(): Set<string> {
+    return this.opDef.getGenericNames();
   }
 
   private distributeDelegatesVertically() {

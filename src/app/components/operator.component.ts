@@ -3,7 +3,7 @@ import {ActivatedRoute} from '@angular/router';
 import {OperatorService} from '../services/operator.service';
 import {Connection, OperatorDef, OperatorInstance, Port, Transformable} from '../classes/operator';
 import {safeDump, safeLoad} from 'js-yaml';
-import {createDefaultValue, generateSvgTransform, normalizeConnections, stringifyConnections} from '../utils';
+import {generateSvgTransform, normalizeConnections, stringifyConnections} from '../utils';
 import {ApiService} from '../services/api.service';
 import {VisualService} from '../services/visual.service';
 import 'codemirror/mode/yaml/yaml.js';
@@ -99,7 +99,7 @@ export class OperatorComponent implements OnInit {
     this.operatorDef = this.operators.getLocal(this.operatorName);
     if (this.operatorDef) {
       const def = this.operatorDef.getDef();
-      this.operator = new OperatorInstance(this.operators, this.operatorName, '', null, def, [1200, 1100]);
+      this.operator = new OperatorInstance(this.operators, this.operatorName, '', this.operatorDef, null, def, [1200, 1100]);
       this.operator.translate([50, 50]);
       this.updateDef(def);
       const visual = await this.visuals.loadVisual(this.operators.getWorkingDir(), operatorName);
@@ -163,7 +163,6 @@ export class OperatorComponent implements OnInit {
 
   // YAML
   public refresh() {
-    this.inVal = createDefaultValue(this.operatorDef.getDef().services.main.in);
     this.displayYaml();
     this.displayVisual();
   }
@@ -218,6 +217,18 @@ export class OperatorComponent implements OnInit {
 
   public selectConnection(conn: Connection) {
     this.selectedEntity.entity = conn;
+  }
+
+  public isInstanceSelected() {
+    return this.selectedEntity.entity && this.selectedEntity.entity.constructor.name === OperatorInstance.name;
+  }
+
+  public genericNames(): Array<string> {
+    console.log((this.selectedEntity.entity as OperatorInstance).getGenericNaemes());
+    if (this.isInstanceSelected()) {
+      return Array.from((this.selectedEntity.entity as OperatorInstance).getGenericNaemes());
+    }
+    return [];
   }
 
   public selectPort(port1: Port) {
