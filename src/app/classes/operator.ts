@@ -336,6 +336,8 @@ export class OperatorInstance extends Composable {
     this.mainOut.scale([1, 1]);
     this.mainOut.translate([0, height]);
 
+    this.mainIn.translate([0, -6]);
+    this.mainOut.translate([0, -6]);
     this.mainIn.justifyHorizontally();
     this.mainOut.justifyHorizontally();
     this.distributeDelegatesVertically();

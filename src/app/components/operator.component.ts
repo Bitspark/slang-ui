@@ -225,7 +225,8 @@ export class OperatorComponent implements OnInit {
   }
 
   public isInstanceSelected() {
-    return this.selectedEntity.entity && this.selectedEntity.entity !== this.operator && this.selectedEntity.entity.constructor.name === OperatorInstance.name;
+    return this.selectedEntity.entity && this.selectedEntity.entity !== this.operator &&
+      this.selectedEntity.entity.constructor.name === OperatorInstance.name;
   }
 
   public getSelectedEntityName(): string {
