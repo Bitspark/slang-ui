@@ -80,7 +80,8 @@
             <svg:rect x="0" y="0" [attr.width]="ins.getWidth()" [attr.height]="ins.getHeight()" fill="orange"
                       [attr.stroke]="ins === selectedEntity.entity ? '#f0f' : ''" stroke-width="3"
                       (mousedown)="selectInstance(ins)"></svg:rect>
-            <svg:text text-anchor="middle" x="65" y="75" fill="white" font-family="Arial" font-size="16"
+            <svg:text text-anchor="middle" x="65" y="75" font-family="Arial" font-size="16"
+                      [attr.fill]="(selectedEntity.entity === ins) ? '#f0f' : 'white'"
                       style="pointer-events: none">{{ins.getName()}}
             </svg:text>
             <svg:g *ngFor="let dlg of ins.getDelegates()" [attr.transform]="transform(dlg)">
@@ -109,7 +110,8 @@
 
         <!-- Text/Labels -->
         <svg:g *ngFor="let port of getPorts()" (click)="selectPort(port)" [attr.transform]="translate(port)">
-          <svg:text text-anchor="end" alignment-baseline="middle"
+          <!--<circle [attr.cx]="getPortLabelX(port)-1" [attr.cy]="getPortLabelY(port)-1" r="2"/>-->
+          <svg:text [attr.text-anchor]="getPortLabelAnchor(port)" alignment-baseline="middle"
                     font-family="Arial" stroke-width="10" font-size="16"
                     [attr.transform]="transformLabel(port)"
                     [attr.x]="getPortLabelX(port)" [attr.y]="getPortLabelY(port)"

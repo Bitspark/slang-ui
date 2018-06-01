@@ -277,9 +277,26 @@ export class Composable extends Transformable {
     return this.getAbsMat3().at(5);
   }
 
-  public getRotation(): number {
+  public getOrientation(): number {
     const mat = this.getAbsMat3();
-    return Math.atan2(mat.at(3), mat.at(0));
+    const vec = new Mat3([
+      0, 0, 0,
+      0, 0, 1,
+      0, 0, 0]);
+    const orientation = vec.multiply(mat);
+    if (orientation.at(5) > 0.1) {
+      return 0; // north
+    }
+    if (orientation.at(2) > 0.1) {
+      return 1; // east
+    }
+    if (orientation.at(5) < -0.1) {
+      return 2; // south
+    }
+    if (orientation.at(2) < -0.1) {
+      return 3; // west
+    }
+    return -1;
   }
 
 }
@@ -485,7 +502,9 @@ export class OperatorInstance extends Composable {
       });
     }
     this.instances.forEach(ins => {
-      ports = ports.concat(ins.getPrimitivePorts());
+      if (ins.visible) {
+        ports = ports.concat(ins.getPrimitivePorts());
+      }
     });
     return ports;
   }
@@ -679,9 +698,9 @@ export class PortGroup extends Composable {
               portGrpDef: any) {
     super(parent);
     this.in = new Port(operator, groupType, groupName, true, null, '', this, portGrpDef.in);
-    this.in.translate([0, -6]).scale([1, 1]);
+    this.in.translate([0, -6]);
     this.out = new Port(operator, groupType, groupName, false, null, '', this, portGrpDef.out);
-    this.out.translate([0, -6]).scale([1, -1]).translate([this.in.getWidth() + 5, 0]);
+    this.out.translate([0, -6]).translate([this.in.getWidth() + 5, 0]);
     this.dim = [this.in.getWidth() + this.out.getWidth() + 10, Math.max(this.in.getHeight(), this.out.getHeight())];
   }
 

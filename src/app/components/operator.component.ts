@@ -63,10 +63,12 @@ export class OperatorComponent implements OnInit {
         }
         if (this.selectedEntity.entity.constructor.name === OperatorInstance.name) {
           this.removeInstance(this.selectedEntity.entity);
+          this.selectedEntity.entity = null;
           break;
         }
         if (this.selectedEntity.entity.constructor.name === Connection.name) {
           this.removeConnection(this.selectedEntity.entity);
+          this.selectedEntity.entity = null;
           break;
         }
         break;
@@ -325,37 +327,53 @@ export class OperatorComponent implements OnInit {
   }
 
   public getPortLabelX(port: Port): number {
-    const rot = port.getRotation();
-    console.log(rot);
-    if (rot === 0) {
+    const ori = port.getOrientation();
+    if (ori === 0) {
       // to north
       return 10;
-    } else if (rot < 0) {
+    } else if (ori === 1) {
       // to west
-      return 20;
-    } else if (rot > 0 && rot < Math.PI) {
+      return 25;
+    } else if (ori === 3) {
       // to east
-      return -20;
+      return -25;
     } else {
       // to south
-      return -10;
+      return 10;
     }
   }
 
   public getPortLabelY(port: Port): number {
-    const rot = port.getRotation();
-    if (rot === 0) {
+    const ori = port.getOrientation();
+    if (ori === 0) {
       // to north
       return 20;
-    } else if (rot < 0) {
+    } else if (ori === 1) {
       // to west
-      return 10;
-    } else if (rot > 0 && rot < Math.PI) {
+      return -10;
+    } else if (ori === 3) {
       // to east
       return -10;
     } else {
       // to south
       return -20;
+    }
+  }
+
+  public getPortLabelAnchor(port: Port): string {
+    const ori = port.getOrientation();
+    if (ori === 0) {
+      // to north
+      return 'end';
+    } else if (ori === 3) {
+      // to west
+      return 'end';
+    } else if (ori === 1) {
+      // to east
+      return 'begin';
+    } else {
+      // to south
+      return 'begin';
     }
   }
 
