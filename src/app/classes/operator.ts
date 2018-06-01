@@ -278,6 +278,8 @@ class Composable extends Transformable {
 export class OperatorInstance extends Composable {
 
   private static style = {
+    opMinWidth: 130,
+    opMinHeight: 200,
     dlgP: 10,
     dlgM: 5
   };
@@ -308,7 +310,7 @@ export class OperatorInstance extends Composable {
 
     this.mainIn = new Port(this, 'service', 'main', true, null, '', this, def.services['main']['in']);
     const tmpMainOut = new Port(this, 'service', 'main', false, null, '', this, def.services['main']['out']);
-    width = Math.max(width, this.mainIn.getWidth(), tmpMainOut.getWidth() + 10, 130);
+    width = Math.max(width, this.mainIn.getWidth(), tmpMainOut.getWidth() + 10, OperatorInstance.style.opMinWidth);
     height = Math.max(height, this.mainIn.getHeight() + 10);
 
     let dlgHeight = OperatorInstance.style.dlgP;
@@ -327,11 +329,11 @@ export class OperatorInstance extends Composable {
         }
       }
     }
-    height = Math.max(height, dlgHeight + OperatorInstance.style.dlgP, 60);
+    height = Math.max(height, dlgHeight + OperatorInstance.style.dlgP, OperatorInstance.style.opMinHeight);
 
     this.dim = [width, height];
     this.mainOut = new Port(this, 'service', 'main', false, null, '', this, def.services['main']['out']);
-    this.mainOut.scale([1, -1]);
+    this.mainOut.scale([1, 1]);
     this.mainOut.translate([0, height]);
 
     this.mainIn.justifyHorizontally();
@@ -924,6 +926,18 @@ export class Port extends Composable {
 
   public getParentPort(): Port {
     return this.parentPort;
+  }
+
+  public getName(): string {
+    const parentName = (this.parentPort) ? this.parentPort.getName() : '';
+    if (!this.isStream()) {
+      if (parentName) {
+        return `${parentName}.${this.name}`;
+      } else {
+        return this.name;
+      }
+    }
+    return parentName;
   }
 }
 

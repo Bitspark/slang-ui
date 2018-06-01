@@ -41,6 +41,7 @@
     <h3>Visual view</h3>
   </div>
   <div>
+
     <div
       style="width: 1000px; height: 800px; overflow: scroll; display: inline-block; border: 1px dotted black; background-color: grey">
       <svg [attr.width]="2000*scale" [attr.height]="2000*scale" style="background-color: white"
@@ -51,6 +52,7 @@
            (mousemove)="drag($event)">
 
         <svg:g *ngIf="operator" [attr.transform]="transform(operator)">
+
           <!-- Surrounding operator -->
           <svg:rect x="0" y="0" [attr.width]="operator.getWidth()" [attr.height]="operator.getHeight()"
                     fill="transparent" stroke-width="3" stroke-dasharray="3 3"
@@ -78,7 +80,7 @@
             <svg:rect x="0" y="0" [attr.width]="ins.getWidth()" [attr.height]="ins.getHeight()" fill="orange"
                       [attr.stroke]="ins === selectedEntity.entity ? '#f0f' : ''" stroke-width="3"
                       (mousedown)="selectInstance(ins)"></svg:rect>
-            <svg:text text-anchor="middle" x="65" y="35" fill="white" font-family="Arial" font-size="16"
+            <svg:text text-anchor="middle" x="65" y="75" fill="white" font-family="Arial" font-size="16"
                       style="pointer-events: none">{{ins.getName()}}
             </svg:text>
             <svg:g *ngFor="let dlg of ins.getDelegates()" [attr.transform]="transform(dlg)">
@@ -92,6 +94,7 @@
             <svg:g [attr.transform]="transform(ins.getMainOut())" app-port [port]="ins.getMainOut()"
                    (select)="selectPort($event)" [selectedEntity]="selectedEntity"></svg:g>
           </svg:g>
+
         </svg:g>
 
         <!-- Connections -->
@@ -106,6 +109,7 @@
 
       </svg>
     </div>
+
     <div
       style="border: 1px dotted black; display: inline-block; height: 780px; overflow: scroll; margin-left: 20px; padding: 10px">
       <div>
@@ -131,6 +135,7 @@
         </ul>
       </div>
     </div>
+
   </div>
 </div>
 

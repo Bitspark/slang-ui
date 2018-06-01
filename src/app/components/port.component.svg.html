@@ -1,6 +1,12 @@
 <svg:g xmlns:svg="http://www.w3.org/2000/svg">
   <!-- Primitive -->
   <svg:g *ngIf="(port.isPrimitive() || port.isGeneric())">
+    <svg:text text-anchor="end" alignment-baseline="middle" x="10" y="15" font-family="Arial"
+              stroke-width="10"
+              font-size="16" transform="rotate(-45 10,15)" style="pointer-events: none"
+              (click)="select.emit(port)" [attr.fill]="(selectedEntity.entity === port) ? '#f0f' : 'blue'">
+      {{port.getName()}}
+    </svg:text>
     <path (click)="select.emit(port)" *ngIf="port.isIn()" [attr.fill]="port.getColor()" stroke-width="3px"
           stroke-width="3" [attr.stroke]="(selectedEntity.entity === port) ? '#f0f' : ''"
           d="M -3 -5 L 23 -5 L 10 15 z"/>
