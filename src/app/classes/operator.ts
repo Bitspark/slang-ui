@@ -651,7 +651,11 @@ export class PortGroup extends Composable {
               portGrpDef: any) {
     super(parent);
     this.in = new Port(operator, groupType, groupName, true, null, '', this, portGrpDef.in);
+    this.in.translate([0, -6]);
+    this.in.scale([1, 1]);
     this.out = new Port(operator, groupType, groupName, false, null, '', this, portGrpDef.out);
+    this.out.translate([0, -6]);
+    this.out.scale([1, -1]);
     this.out.translate([this.in.getWidth() + 5, 0]);
     this.dim = [this.in.getWidth() + this.out.getWidth() + 10, Math.max(this.in.getHeight(), this.out.getHeight())];
   }
