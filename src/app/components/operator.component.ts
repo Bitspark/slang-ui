@@ -1,7 +1,7 @@
 import {Component, HostListener, OnInit} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 import {OperatorService} from '../services/operator.service';
-import {Connection, OperatorDef, OperatorInstance, Port, Transformable} from '../classes/operator';
+import {Composable, Connection, OperatorDef, OperatorInstance, Port, Transformable} from '../classes/operator';
 import {safeDump, safeLoad} from 'js-yaml';
 import {createDefaultValue, generateSvgTransform, normalizeConnections, stringifyConnections} from '../utils';
 import {ApiService} from '../services/api.service';
@@ -202,6 +202,10 @@ export class OperatorComponent implements OnInit {
     return generateSvgTransform(trans);
   }
 
+  public translate(comp: Composable): string {
+    return `translate(${comp.getAbsX()},${comp.getAbsY()})`;
+  }
+
   public visualInstances(): Array<OperatorInstance> {
     if (!this.operator) {
       return [];
@@ -306,6 +310,15 @@ export class OperatorComponent implements OnInit {
       operator: op.name
     };
     this.updateDef(def);
+  }
+
+  public getPorts(): Array<Port> {
+    if (this.operator) {
+      console.log(this.operator.getPrimitivePorts());
+      return this.operator.getPrimitivePorts();
+    } else {
+      return [];
+    }
   }
 
   public getLocals(filterString: string): Array<OperatorDef> {
