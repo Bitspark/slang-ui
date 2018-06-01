@@ -334,10 +334,10 @@ export class OperatorInstance extends Composable {
 
     this.dim = [width, height];
     this.mainOut = new Port(this, 'service', 'main', false, null, '', this, def.services['main']['out']);
-    this.mainOut.scale([1, 1]).translate([0, height]);
+    this.mainOut.scale([1, -1]).translate([0, height]);
 
     this.mainIn.translate([0, -6]);
-    this.mainOut.translate([0, -6]);
+    this.mainOut.translate([0, 6]);
     this.mainIn.justifyHorizontally();
     this.mainOut.justifyHorizontally();
     this.distributeDelegatesVertically();

@@ -7,7 +7,7 @@
     <!-- d="M left-x left-y L right-x right-y L bottom-x bottom-y z" -->
     <path (click)="select.emit(port)" *ngIf="port.isOut()" [attr.fill]="port.getColor()" stroke-width="3px"
           stroke-width="3" [attr.stroke]="(selectedEntity.entity === port) ? '#f0f' : ''"
-          d="M 0 0 L 20 0 L 10 15 z"/>
+          d="M 0 15 L 20 15 L 10 0 z"/>
   </svg:g>
   <!-- Stream -->
   <svg:rect *ngIf="port.isStream()" fill="white" stroke-width="2" fill="transparent"
