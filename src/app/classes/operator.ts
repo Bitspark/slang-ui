@@ -282,7 +282,7 @@ export class OperatorInstance extends Composable {
 
   private static style = {
     opMinWidth: 130,
-    opMinHeight: 200,
+    opMinHeight: 150,
     dlgP: 10,
     dlgM: 5
   };
