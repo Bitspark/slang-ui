@@ -46,6 +46,7 @@ export class OperatorComponent implements OnInit {
   private dragging = false;
   private lastX: number;
   private lastY: number;
+  private insPropDefs = new Map<string, Array<{ name: string, def: any }>>();
 
   @HostListener('window:keyup', ['$event'])
   keyEvent(event: KeyboardEvent) {
@@ -341,8 +342,6 @@ export class OperatorComponent implements OnInit {
     const props = this.getProperties(ins);
     return props && typeof props[prop.name] !== 'undefined';
   }
-
-  private insPropDefs = new Map<string, Array<{ name: string, def: any }>>();
 
   public getPropertyDefs(ins: OperatorInstance): Array<{ name: string, def: any }> {
     const def = this.insPropDefs.get(ins.getName());
