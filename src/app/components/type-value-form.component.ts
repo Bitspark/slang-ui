@@ -36,13 +36,17 @@ export class TypeValueFormComponent implements OnInit, OnChanges {
 
   set typeValue(val) {
     this.typeVal_ = val;
-    this.typeValueChange.emit(this.typeVal_);
+    this.emitChange();
   }
 
   ngOnInit() {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
+  }
+
+  public emitChange() {
+    this.typeValueChange.emit(this.typeVal_);
   }
 
   public getEntries(): Array<string> {

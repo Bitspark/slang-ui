@@ -18,6 +18,8 @@ export class OperatorDef {
 
   private readonly name: string;
   private def: any;
+  private genericNames = new Set<string>();
+  private propertyDefs = new Map<string, any>();
   private readonly type: string;
   private saved: boolean;
 
@@ -120,15 +122,62 @@ export class OperatorDef {
     console.error('Unknown type', def['type']);
   }
 
+  public static walkAllPorts(opDef: any, fn: (p: any) => void) {
+    ['services', 'delegates'].forEach(n => {
+      const portGroup = opDef[n];
+      if (portGroup) {
+        for (const name in portGroup) {
+          if (portGroup.hasOwnProperty(name)) {
+            this.walkPort(portGroup[name].in, fn);
+            this.walkPort(portGroup[name].out, fn);
+          }
+        }
+      }
+    });
+  }
+
+  public static walkPort(p: any, fn: (p: any) => void): void {
+    fn(p);
+    if (OperatorDef.isMap(p)) {
+      for (const subname in p.map) {
+        if (p.map.hasOwnProperty(subname)) {
+          this.walkPort(p.map[subname], fn);
+        }
+      }
+    } else if (OperatorDef.isStream(p)) {
+      this.walkPort(p.stream, fn);
+    }
+  }
+
   constructor({name, def, type, saved}: { name: string, def: any, type: string, saved: boolean }) {
     this.name = name;
     this.def = def;
     this.type = type;
     this.saved = saved;
+    OperatorDef.walkAllPorts(this.def, pDef => {
+      if (OperatorDef.isGeneric(pDef)) {
+        this.genericNames.add(pDef.generic);
+      }
+    });
+    if (def.properties) {
+      for (const propName in def.properties) {
+        if (def.properties.hasOwnProperty(propName)) {
+          this.propertyDefs.set(propName, def.properties[propName]);
+        }
+      }
+    }
   }
 
   public getName(): string {
     return this.name;
+  }
+
+  public getGenericNames(): Set<string> {
+    return this.genericNames;
+  }
+
+  public getPropertyDefs(): Map<string, any> {
+    return this.propertyDefs;
   }
 
   public getDef(): any {
@@ -244,6 +293,7 @@ export class OperatorInstance extends Composable {
   constructor(private operatorSrv: OperatorService,
               private fqOperator: string,
               private name: string,
+              private opDef: OperatorDef,
               parent: Composable,
               def: any,
               dim?: [number, number]) {
@@ -316,8 +366,14 @@ export class OperatorInstance extends Composable {
           }
           const opDef = JSON.parse(JSON.stringify(op.getDef()));
           OperatorDef.specifyOperatorDef(opDef, ins['generics'], ins['properties'], opDef['properties']);
-          opIns = new OperatorInstance(this.operatorSrv, opName, insName, this, opDef);
-          opIns.translate(ipos);
+          if (typeof opIns === 'undefined') {
+            opIns = new OperatorInstance(this.operatorSrv, opName, insName, op, this, {
+            services: opDef['services'],
+            delegates: opDef['delegates']
+          });
+          } else {
+            opIns.updateOperator(opDef, ipos);
+          }
           this.instances.set(insName, opIns);
           opIns.show();
         }
@@ -536,6 +592,14 @@ export class OperatorInstance extends Composable {
     }
 
     return p;
+  }
+
+  public getGenericNames(): Set<string> {
+    return this.opDef.getGenericNames();
+  }
+
+  public getPropertyDefs(): Map<string, any> {
+    return this.opDef.getPropertyDefs();
   }
 
   private distributeDelegatesVertically() {

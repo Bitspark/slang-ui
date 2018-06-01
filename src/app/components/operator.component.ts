@@ -7,6 +7,7 @@ import {createDefaultValue, generateSvgTransform, normalizeConnections, stringif
 import {ApiService} from '../services/api.service';
 import {VisualService} from '../services/visual.service';
 import 'codemirror/mode/yaml/yaml.js';
+import {TypeDefFormComponent} from './type-def-form.component';
 
 @Component({
   templateUrl: './operator.component.html',
@@ -45,6 +46,7 @@ export class OperatorComponent implements OnInit {
   private dragging = false;
   private lastX: number;
   private lastY: number;
+  private insPropDefs = new Map<string, Array<{ name: string, def: any }>>();
 
   @HostListener('window:keyup', ['$event'])
   keyEvent(event: KeyboardEvent) {
@@ -99,7 +101,7 @@ export class OperatorComponent implements OnInit {
     this.operatorDef = this.operators.getLocal(this.operatorName);
     if (this.operatorDef) {
       const def = this.operatorDef.getDef();
-      this.operator = new OperatorInstance(this.operators, this.operatorName, '', null, def, [1200, 1100]);
+      this.operator = new OperatorInstance(this.operators, this.operatorName, '', this.operatorDef, null, def, [1200, 1100]);
       this.operator.translate([50, 50]);
       this.updateDef(def);
       const visual = await this.visuals.loadVisual(this.operators.getWorkingDir(), operatorName);
@@ -162,8 +164,10 @@ export class OperatorComponent implements OnInit {
   }
 
   // YAML
-  public refresh() {
-    this.inVal = createDefaultValue(this.operatorDef.getDef().services.main.in);
+  public refresh(noPropDefs?: boolean) {
+    if (!noPropDefs) {
+      this.insPropDefs = new Map<string, Array<{ name: string, def: any }>>();
+    }
     this.displayYaml();
     this.displayVisual();
   }
@@ -218,6 +222,21 @@ export class OperatorComponent implements OnInit {
 
   public selectConnection(conn: Connection) {
     this.selectedEntity.entity = conn;
+  }
+
+  public isInstanceSelected() {
+    return this.selectedEntity.entity && this.selectedEntity.entity !== this.operator && this.selectedEntity.entity.constructor.name === OperatorInstance.name;
+  }
+
+  public getSelectedEntityName(): string {
+    if (this.isInstanceSelected()) {
+      return (this.selectedEntity.entity as OperatorInstance).getName();
+    }
+    return '';
+  }
+
+  public genericNames(ins: OperatorInstance): Array<string> {
+    return Array.from(ins.getGenericNames());
   }
 
   public selectPort(port1: Port) {
@@ -298,6 +317,60 @@ export class OperatorComponent implements OnInit {
 
   public getLibraries(filterString: string): Array<OperatorDef> {
     return this.operators.getLibraries().filter(op => op.getName().toLowerCase().indexOf(filterString.toLowerCase()) !== -1);
+  }
+
+  public isGenericSpecified(ins: OperatorInstance, genName: string): boolean {
+    const generics = this.getGenerics(ins);
+    return generics && generics[genName];
+  }
+
+  public getGenerics(ins: OperatorInstance): any {
+    const oDef = this.operatorDef.getDef();
+    return oDef.operators[ins.getName()].generics;
+  }
+
+  public addGeneric(ins: OperatorInstance, genName: string) {
+    const oDef = this.operatorDef.getDef();
+    const insOpDef = oDef.operators[ins.getName()];
+    if (!insOpDef.generics) {
+      insOpDef.generics = {};
+    }
+    insOpDef.generics[genName] = TypeDefFormComponent.newPrimitiveTypeDef();
+  }
+
+  public isPropertySpecified(ins: OperatorInstance, prop: { name: string, def: any }): boolean {
+    const props = this.getProperties(ins);
+    return props && typeof props[prop.name] !== 'undefined';
+  }
+
+  public getPropertyDefs(ins: OperatorInstance): Array<{ name: string, def: any }> {
+    const def = this.insPropDefs.get(ins.getName());
+    if (def) {
+      return def;
+    }
+
+    const generics = this.getGenerics(ins);
+    const arr = Array.from(ins.getPropertyDefs().entries()).map(each => {
+      const defCopy = JSON.parse(JSON.stringify(each[1]));
+      OperatorDef.specifyTypeDef(defCopy, generics, {}, {});
+      return {name: each[0], def: defCopy};
+    });
+    this.insPropDefs.set(ins.getName(), arr);
+    return arr;
+  }
+
+  public getProperties(ins: OperatorInstance): any {
+    const oDef = this.operatorDef.getDef();
+    return oDef.operators[ins.getName()].properties;
+  }
+
+  public addProperty(ins: OperatorInstance, prop: { name: string, def: any }): any {
+    const oDef = this.operatorDef.getDef();
+    const insOpDef = oDef.operators[ins.getName()];
+    if (!insOpDef.properties) {
+      insOpDef.properties = {};
+    }
+    insOpDef.properties[prop.name] = createDefaultValue(prop.def);
   }
 
   // Dragging

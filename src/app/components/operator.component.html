@@ -41,9 +41,10 @@
     <h3>Visual view</h3>
   </div>
   <div>
-    <div style="width: 1000px; height: 800px; overflow: scroll; display: inline-block; border: 1px dotted black; background-color: grey">
+    <div
+      style="width: 1000px; height: 800px; overflow: scroll; display: inline-block; border: 1px dotted black; background-color: grey">
       <svg [attr.width]="2000*scale" [attr.height]="2000*scale" style="background-color: white"
-      viewBox="0 0 2000 2000"
+           viewBox="0 0 2000 2000"
            xmlns:svg="http://www.w3.org/2000/svg"
            (mousedown)="startDrag($event)"
            (mouseup)="stopDrag($event)"
@@ -56,11 +57,15 @@
                     stroke-width="3"
                     (mousedown)="selectInstance(operator)"></svg:rect>
           <svg:g *ngFor="let dlg of operator.getDelegates()" [attr.transform]="transform(dlg)">
-            <svg:g [attr.transform]="transform(dlg.getIn())" app-port [port]="dlg.getIn()" (select)="selectPort($event)" [selectedEntity]="selectedEntity"></svg:g>
-            <svg:g [attr.transform]="transform(dlg.getOut())" app-port [port]="dlg.getOut()" (select)="selectPort($event)" [selectedEntity]="selectedEntity"></svg:g>
+            <svg:g [attr.transform]="transform(dlg.getIn())" app-port [port]="dlg.getIn()" (select)="selectPort($event)"
+                   [selectedEntity]="selectedEntity"></svg:g>
+            <svg:g [attr.transform]="transform(dlg.getOut())" app-port [port]="dlg.getOut()"
+                   (select)="selectPort($event)" [selectedEntity]="selectedEntity"></svg:g>
           </svg:g>
-          <svg:g [attr.transform]="transform(operator.getMainIn())" app-port [port]="operator.getMainIn()" (select)="selectPort($event)" [selectedEntity]="selectedEntity"></svg:g>
-          <svg:g [attr.transform]="transform(operator.getMainOut())" app-port [port]="operator.getMainOut()" (select)="selectPort($event)" [selectedEntity]="selectedEntity"></svg:g>
+          <svg:g [attr.transform]="transform(operator.getMainIn())" app-port [port]="operator.getMainIn()"
+                 (select)="selectPort($event)" [selectedEntity]="selectedEntity"></svg:g>
+          <svg:g [attr.transform]="transform(operator.getMainOut())" app-port [port]="operator.getMainOut()"
+                 (select)="selectPort($event)" [selectedEntity]="selectedEntity"></svg:g>
 
           <svg:g *ngFor="let ins of visualInstances()" [attr.transform]="transform(ins)">
             <svg:rect x="0" y="0" [attr.width]="ins.getWidth()" [attr.height]="ins.getHeight()" fill="orange"
@@ -70,11 +75,15 @@
                       style="pointer-events: none">{{ins.getName()}}
             </svg:text>
             <svg:g *ngFor="let dlg of ins.getDelegates()" [attr.transform]="transform(dlg)">
-              <svg:g [attr.transform]="transform(dlg.getIn())" app-port [port]="dlg.getIn()" (select)="selectPort($event)" [selectedEntity]="selectedEntity"></svg:g>
-              <svg:g [attr.transform]="transform(dlg.getOut())" app-port [port]="dlg.getOut()" (select)="selectPort($event)" [selectedEntity]="selectedEntity"></svg:g>
+              <svg:g [attr.transform]="transform(dlg.getIn())" app-port [port]="dlg.getIn()"
+                     (select)="selectPort($event)" [selectedEntity]="selectedEntity"></svg:g>
+              <svg:g [attr.transform]="transform(dlg.getOut())" app-port [port]="dlg.getOut()"
+                     (select)="selectPort($event)" [selectedEntity]="selectedEntity"></svg:g>
             </svg:g>
-            <svg:g [attr.transform]="transform(ins.getMainIn())" app-port [port]="ins.getMainIn()" (select)="selectPort($event)" [selectedEntity]="selectedEntity"></svg:g>
-            <svg:g [attr.transform]="transform(ins.getMainOut())" app-port [port]="ins.getMainOut()" (select)="selectPort($event)" [selectedEntity]="selectedEntity"></svg:g>
+            <svg:g [attr.transform]="transform(ins.getMainIn())" app-port [port]="ins.getMainIn()"
+                   (select)="selectPort($event)" [selectedEntity]="selectedEntity"></svg:g>
+            <svg:g [attr.transform]="transform(ins.getMainOut())" app-port [port]="ins.getMainOut()"
+                   (select)="selectPort($event)" [selectedEntity]="selectedEntity"></svg:g>
           </svg:g>
         </svg:g>
         <svg:line *ngFor="let conn of visualConnections()"
@@ -87,7 +96,8 @@
                   [attr.y2]="conn.getDestination().getPortPosY()"></svg:line>
       </svg>
     </div>
-    <div style="border: 1px dotted black; display: inline-block; height: 780px; overflow: scroll; margin-left: 20px; padding: 10px">
+    <div
+      style="border: 1px dotted black; display: inline-block; height: 780px; overflow: scroll; margin-left: 20px; padding: 10px">
       <div>
         <label for="opSearch" style="font-size: 10px">Search operators</label><br>
         <input id="opSearch" [(ngModel)]="filterString">
@@ -111,6 +121,29 @@
         </ul>
       </div>
     </div>
+  </div>
+</div>
+
+<div *ngIf="isInstanceSelected()">
+  <h3>Instance: {{ getSelectedEntityName() }}</h3>
+  <h4>Generics ({{ genericNames(selectedEntity.entity).length }})</h4>
+  <div *ngFor="let genName of genericNames(selectedEntity.entity)">{{ genName }}
+    <app-type-def-form *ngIf="isGenericSpecified(selectedEntity.entity, genName)"
+                       [(typeDef)]="getGenerics(selectedEntity.entity)[genName]"
+                       (typeDefChange)="refresh()"></app-type-def-form>
+    <button *ngIf="!isGenericSpecified(selectedEntity.entity, genName)"
+            (click)="addGeneric(selectedEntity.entity, genName)">Specify
+    </button>
+  </div>
+  <h4>Properties ({{ getPropertyDefs(selectedEntity.entity).length }})</h4>
+  <div *ngFor="let prop of getPropertyDefs(selectedEntity.entity)">{{ prop.name }}
+    <app-type-value-form *ngIf="isPropertySpecified(selectedEntity.entity, prop)"
+                         [typeDef]="prop.def"
+                         [(typeValue)]="getProperties(selectedEntity.entity)[prop.name]"
+                         (typeValueChange)="refresh(true)"></app-type-value-form>
+    <button *ngIf="!isPropertySpecified(selectedEntity.entity, prop)"
+            (click)="addProperty(selectedEntity.entity, prop)">Specify
+    </button>
   </div>
 </div>
 
