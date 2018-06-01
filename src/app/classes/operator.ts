@@ -971,15 +971,15 @@ export class Port extends Composable {
   }
 
   public getName(): string {
-    const parentName = (this.parentPort) ? this.parentPort.getName() : '';
-    if (!this.isStream()) {
-      if (parentName) {
-        return `${parentName}.${this.name}`;
-      } else {
-        return this.name;
+    let portName = (this.parentPort) ? this.parentPort.getName() : '';
+    if (portName) {
+      if (this.name) {
+        portName += '.' + this.name;
       }
+    } else {
+      portName = this.name;
     }
-    return parentName;
+    return portName;
   }
 }
 
