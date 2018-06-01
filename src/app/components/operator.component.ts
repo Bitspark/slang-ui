@@ -314,7 +314,6 @@ export class OperatorComponent implements OnInit {
 
   public getPorts(): Array<Port> {
     if (this.operator) {
-      console.log(this.operator.getPrimitivePorts());
       return this.operator.getPrimitivePorts();
     } else {
       return [];
