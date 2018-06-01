@@ -367,7 +367,10 @@ export class OperatorInstance extends Composable {
           const opDef = JSON.parse(JSON.stringify(op.getDef()));
           OperatorDef.specifyOperatorDef(opDef, ins['generics'], ins['properties'], opDef['properties']);
           if (typeof opIns === 'undefined') {
-            opIns = new OperatorInstance(this.operatorSrv, opName, insName, op, this, opDef);
+            opIns = new OperatorInstance(this.operatorSrv, opName, insName, op, this, {
+            services: opDef['services'],
+            delegates: opDef['delegates']
+          });
           } else {
             opIns.updateOperator(opDef, ipos);
           }
