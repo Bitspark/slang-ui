@@ -256,7 +256,7 @@ export class Transformable {
 }
 
 
-class Composable extends Transformable {
+export class Composable extends Transformable {
   constructor(private parent: Composable) {
     super();
   }
@@ -372,9 +372,9 @@ export class OperatorInstance extends Composable {
           OperatorDef.specifyOperatorDef(opDef, ins['generics'], ins['properties'], opDef['properties']);
           if (typeof opIns === 'undefined') {
             opIns = new OperatorInstance(this.operatorSrv, opName, insName, op, this, {
-            services: opDef['services'],
-            delegates: opDef['delegates']
-          });
+              services: opDef['services'],
+              delegates: opDef['delegates']
+            });
           } else {
             opIns.updateOperator(opDef, ipos);
           }
@@ -462,6 +462,25 @@ export class OperatorInstance extends Composable {
 
   public getConnections(): Set<Connection> {
     return this.connections;
+  }
+
+  public getPrimitivePorts(): Array<Port> {
+    let ports: Array<Port> = [];
+    ports = ports.concat(this.mainOut.getPrimitivePorts()).concat(this.mainIn.getPrimitivePorts());
+    if (this.services) {
+      Array.from(this.services.values()).forEach(srv => {
+        ports = ports.concat(srv.getPrimitivePorts());
+      });
+    }
+    if (this.delegates) {
+      Array.from(this.delegates.values()).forEach(dlg => {
+        ports = ports.concat(dlg.getPrimitivePorts());
+      });
+    }
+    this.instances.forEach(ins => {
+      ports = ports.concat(ins.getPrimitivePorts());
+    });
+    return ports;
   }
 
   public getPort(ref: string): Port {
@@ -665,6 +684,10 @@ export class PortGroup extends Composable {
 
   public getOut(): Port {
     return this.out;
+  }
+
+  public getPrimitivePorts(): Array<Port> {
+    return this.in.getPrimitivePorts().concat(this.out.getPrimitivePorts());
   }
 }
 
@@ -929,6 +952,21 @@ export class Port extends Composable {
 
   public getParentPort(): Port {
     return this.parentPort;
+  }
+
+  public getPrimitivePorts(): Array<Port> {
+    switch (this.type) {
+      case Type.stream:
+        return this.stream.getPrimitivePorts();
+      case Type.map:
+        let ports: Array<Port> = [];
+        Array.from(this.map.values()).forEach(p => {
+          ports = ports.concat(p.getPrimitivePorts());
+        });
+        return ports;
+      default:
+        return [this];
+    }
   }
 
   public getName(): string {
