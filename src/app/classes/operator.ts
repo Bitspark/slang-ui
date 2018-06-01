@@ -206,29 +206,32 @@ export class Transformable {
     this.mat = Mat3.identity.copy();
   }
 
-  public translate(vec: [number, number]) {
+  public translate(vec: [number, number]): Transformable {
     this.mat.multiply(new Mat3([
       1, 0, vec[0],
       0, 1, vec[1],
       0, 0, 1
     ]));
+    return this;
   }
 
-  public scale(vec: [number, number]) {
+  public scale(vec: [number, number]): Transformable {
     this.mat.multiply(new Mat3([
       vec[0], 0, 0,
       0, vec[1], 0,
       0, 0, 1
     ]));
+    return this;
   }
 
-  public rotate(angle: number) {
+  public rotate(angle: number): Transformable {
     const rot = Mat2.identity.copy().rotate(angle).all();
     this.mat.multiply(new Mat3([
       rot[0], rot[1], 0,
       rot[2], rot[3], 0,
       0, 0, 1
     ]));
+    return this;
   }
 
   public getWidth(): number {
@@ -321,9 +324,7 @@ export class OperatorInstance extends Composable {
           const dlgDef = def.delegates[dlgName];
           const dlg = new Delegate(this, dlgName, this, dlgDef);
           dlgHeight += dlg.getWidth();
-          dlg.scale([-1, 1]);
-          dlg.rotate(Math.PI / 2);
-          dlg.translate([width, dlg.getWidth()]);
+          dlg.scale([-1, 1]).rotate(Math.PI / 2).translate([width, dlg.getWidth()]);
           this.delegates.set(dlgName, dlg);
           dlgHeight += OperatorInstance.style.dlgM;
         }
@@ -333,8 +334,7 @@ export class OperatorInstance extends Composable {
 
     this.dim = [width, height];
     this.mainOut = new Port(this, 'service', 'main', false, null, '', this, def.services['main']['out']);
-    this.mainOut.scale([1, 1]);
-    this.mainOut.translate([0, height]);
+    this.mainOut.scale([1, 1]).translate([0, height]);
 
     this.mainIn.translate([0, -6]);
     this.mainOut.translate([0, -6]);
@@ -653,12 +653,9 @@ export class PortGroup extends Composable {
               portGrpDef: any) {
     super(parent);
     this.in = new Port(operator, groupType, groupName, true, null, '', this, portGrpDef.in);
-    this.in.translate([0, -6]);
-    this.in.scale([1, 1]);
+    this.in.translate([0, -6]).scale([1, 1]);
     this.out = new Port(operator, groupType, groupName, false, null, '', this, portGrpDef.out);
-    this.out.translate([0, -6]);
-    this.out.scale([1, -1]);
-    this.out.translate([this.in.getWidth() + 5, 0]);
+    this.out.translate([0, -6]).scale([1, -1]).translate([this.in.getWidth() + 5, 0]);
     this.dim = [this.in.getWidth() + this.out.getWidth() + 10, Math.max(this.in.getHeight(), this.out.getHeight())];
   }
 
