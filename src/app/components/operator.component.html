@@ -37,12 +37,6 @@
 </div>
 
 <div>
-  <ul>
-    <li *ngFor="let port of getPorts()">{{port.getName()}} ({{ port.getAbsX() }},{{port.getAbsY()}})</li>
-  </ul>
-</div>
-
-<div>
   <div>
     <h3>Visual view</h3>
   </div>
@@ -117,7 +111,8 @@
         <svg:g *ngFor="let port of getPorts()" (click)="selectPort(port)" [attr.transform]="translate(port)">
           <svg:text text-anchor="end" alignment-baseline="middle"
                     font-family="Arial" stroke-width="10" font-size="16"
-                    transform="rotate(-55 10,20)" x="10" y="20"
+                    [attr.transform]="transformLabel(port)"
+                    [attr.x]="getPortLabelX(port)" [attr.y]="getPortLabelY(port)"
                     [attr.fill]="(selectedEntity.entity === port) ? '#f0f' : 'blue'">
             {{port.getName()}}
           </svg:text>

@@ -225,7 +225,7 @@ export class Transformable {
   }
 
   public rotate(angle: number): Transformable {
-    const rot = Mat2.identity.copy().rotate(angle).all();
+    const rot = Mat2.identity.copy().rotate(-angle).all();
     this.mat.multiply(new Mat3([
       rot[0], rot[1], 0,
       rot[2], rot[3], 0,
@@ -242,16 +242,16 @@ export class Transformable {
     return this.dim[1];
   }
 
-  public col(idx): number[] {
-    return this.mat.col(idx);
-  }
-
   public getPosX(): number {
     return this.mat.at(2);
   }
 
   public getPosY(): number {
     return this.mat.at(5);
+  }
+
+  public col(idx): number[] {
+    return this.mat.col(idx);
   }
 }
 
@@ -276,6 +276,12 @@ export class Composable extends Transformable {
   public getAbsY(): number {
     return this.getAbsMat3().at(5);
   }
+
+  public getRotation(): number {
+    const mat = this.getAbsMat3();
+    return Math.atan2(mat.at(3), mat.at(0));
+  }
+
 }
 
 export class OperatorInstance extends Composable {
@@ -324,7 +330,7 @@ export class OperatorInstance extends Composable {
           const dlgDef = def.delegates[dlgName];
           const dlg = new Delegate(this, dlgName, this, dlgDef);
           dlgHeight += dlg.getWidth();
-          dlg.scale([-1, 1]).rotate(Math.PI / 2).translate([width, dlg.getWidth()]);
+          dlg.scale([-1, 1]).rotate(-Math.PI / 2).translate([width, dlg.getWidth()]);
           this.delegates.set(dlgName, dlg);
           dlgHeight += OperatorInstance.style.dlgM;
         }

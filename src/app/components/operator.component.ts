@@ -198,6 +198,10 @@ export class OperatorComponent implements OnInit {
 
   // Visual
 
+  public transformLabel(port: Port): string {
+    return `rotate(-55 ${this.getPortLabelX(port)},${this.getPortLabelY(port)})`;
+  }
+
   public transform(trans: Transformable): string {
     return generateSvgTransform(trans);
   }
@@ -317,6 +321,41 @@ export class OperatorComponent implements OnInit {
       return this.operator.getPrimitivePorts();
     } else {
       return [];
+    }
+  }
+
+  public getPortLabelX(port: Port): number {
+    const rot = port.getRotation();
+    console.log(rot);
+    if (rot === 0) {
+      // to north
+      return 10;
+    } else if (rot < 0) {
+      // to west
+      return 20;
+    } else if (rot > 0 && rot < Math.PI) {
+      // to east
+      return -20;
+    } else {
+      // to south
+      return -10;
+    }
+  }
+
+  public getPortLabelY(port: Port): number {
+    const rot = port.getRotation();
+    if (rot === 0) {
+      // to north
+      return 20;
+    } else if (rot < 0) {
+      // to west
+      return 10;
+    } else if (rot > 0 && rot < Math.PI) {
+      // to east
+      return -10;
+    } else {
+      // to south
+      return -20;
     }
   }
 
