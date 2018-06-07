@@ -1,7 +1,7 @@
 import {Component, HostListener, OnInit} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 import {OperatorService} from '../services/operator.service';
-import {Connection, OperatorDef, OperatorInstance, Port, Transformable} from '../classes/operator';
+import {Composable, Connection, OperatorDef, OperatorInstance, Port, Transformable} from '../classes/operator';
 import {safeDump, safeLoad} from 'js-yaml';
 import {createDefaultValue, generateSvgTransform, normalizeConnections, stringifyConnections} from '../utils';
 import {ApiService} from '../services/api.service';
@@ -63,10 +63,12 @@ export class OperatorComponent implements OnInit {
         }
         if (this.selectedEntity.entity.constructor.name === OperatorInstance.name) {
           this.removeInstance(this.selectedEntity.entity);
+          this.selectedEntity.entity = null;
           break;
         }
         if (this.selectedEntity.entity.constructor.name === Connection.name) {
           this.removeConnection(this.selectedEntity.entity);
+          this.selectedEntity.entity = null;
           break;
         }
         break;
@@ -198,8 +200,16 @@ export class OperatorComponent implements OnInit {
 
   // Visual
 
+  public transformLabel(port: Port): string {
+    return `rotate(-55 ${this.getPortLabelX(port)},${this.getPortLabelY(port)})`;
+  }
+
   public transform(trans: Transformable): string {
     return generateSvgTransform(trans);
+  }
+
+  public translate(comp: Composable): string {
+    return `translate(${comp.getAbsX()},${comp.getAbsY()})`;
   }
 
   public visualInstances(): Array<OperatorInstance> {
@@ -225,7 +235,8 @@ export class OperatorComponent implements OnInit {
   }
 
   public isInstanceSelected() {
-    return this.selectedEntity.entity && this.selectedEntity.entity !== this.operator && this.selectedEntity.entity.constructor.name === OperatorInstance.name;
+    return this.selectedEntity.entity && this.selectedEntity.entity !== this.operator &&
+      this.selectedEntity.entity.constructor.name === OperatorInstance.name;
   }
 
   public getSelectedEntityName(): string {
@@ -305,6 +316,65 @@ export class OperatorComponent implements OnInit {
       operator: op.name
     };
     this.updateDef(def);
+  }
+
+  public getPorts(): Array<Port> {
+    if (this.operator) {
+      return this.operator.getPrimitivePorts();
+    } else {
+      return [];
+    }
+  }
+
+  public getPortLabelX(port: Port): number {
+    const ori = port.getOrientation();
+    if (ori === 0) {
+      // to north
+      return 10;
+    } else if (ori === 1) {
+      // to west
+      return 25;
+    } else if (ori === 3) {
+      // to east
+      return -25;
+    } else {
+      // to south
+      return 10;
+    }
+  }
+
+  public getPortLabelY(port: Port): number {
+    const ori = port.getOrientation();
+    if (ori === 0) {
+      // to north
+      return 20;
+    } else if (ori === 1) {
+      // to west
+      return -10;
+    } else if (ori === 3) {
+      // to east
+      return -10;
+    } else {
+      // to south
+      return -20;
+    }
+  }
+
+  public getPortLabelAnchor(port: Port): string {
+    const ori = port.getOrientation();
+    if (ori === 0) {
+      // to north
+      return 'end';
+    } else if (ori === 3) {
+      // to west
+      return 'end';
+    } else if (ori === 1) {
+      // to east
+      return 'begin';
+    } else {
+      // to south
+      return 'begin';
+    }
   }
 
   public getLocals(filterString: string): Array<OperatorDef> {

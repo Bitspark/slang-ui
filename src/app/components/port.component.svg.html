@@ -1,11 +1,23 @@
 <svg:g xmlns:svg="http://www.w3.org/2000/svg">
   <!-- Primitive -->
-  <svg:path (click)="select.emit(port)" *ngIf="port.isPrimitive() || port.isGeneric()" d="M0,0 a1,1 0 0,0 20,0" [attr.fill]="port.getColor()" stroke-width="3px" [attr.stroke]="(selectedEntity.entity === port) ? 'red' : ''"></svg:path>
+  <svg:g *ngIf="(port.isPrimitive() || port.isGeneric())">
+    <path (click)="select.emit(port)" *ngIf="port.isIn()" [attr.fill]="port.getColor()" stroke-width="3px"
+          stroke-width="3" [attr.stroke]="(selectedEntity.entity === port) ? '#f0f' : ''"
+          d="M 0 0 L 20 0 L 10 15 z"/>
+    <!-- d="M left-x left-y L right-x right-y L bottom-x bottom-y z" -->
+    <path (click)="select.emit(port)" *ngIf="port.isOut()" [attr.fill]="port.getColor()" stroke-width="3px"
+          stroke-width="3" [attr.stroke]="(selectedEntity.entity === port) ? '#f0f' : ''"
+          d="M 0 15 L 20 15 L 10 0 z"/>
+  </svg:g>
   <!-- Stream -->
-  <svg:rect *ngIf="port.isStream()" fill="white" stroke-width="1" [attr.stroke]="(selectedEntity.entity === port) ? 'red' : 'black'" [attr.height]="port.getHeight()" [attr.width]="port.getWidth()"></svg:rect>
-  <svg:g *ngIf="port.isStream()" [attr.transform]="transform(port.getStream())" app-port [port]="port.getStream()" (select)="select.emit($event)" [selectedEntity]="selectedEntity"></svg:g>
+  <svg:rect *ngIf="port.isStream()" fill="white" stroke-width="2" fill="transparent"
+            [attr.stroke]="(selectedEntity.entity === port) ? '#f0f' : 'white'"
+            [attr.width]="port.getWidth()" [attr.height]="port.getHeight()"/>
+  <svg:g *ngIf="port.isStream()" [attr.transform]="transform(port.getStream())" app-port [port]="port.getStream()"
+         (select)="select.emit($event)" [selectedEntity]="selectedEntity"></svg:g>
   <!-- Map -->
   <svg:g *ngIf="port.isMap()">
-    <svg:g *ngFor="let entry of getEntries()" [attr.transform]="transform(entry)" app-port [port]="entry" (select)="select.emit($event)" [selectedEntity]="selectedEntity"></svg:g>
+    <svg:g *ngFor="let entry of getEntries()" [attr.transform]="transform(entry)" app-port [port]="entry"
+           (select)="select.emit($event)" [selectedEntity]="selectedEntity"></svg:g>
   </svg:g>
 </svg:g>
