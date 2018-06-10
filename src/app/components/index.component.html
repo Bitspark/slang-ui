@@ -12,7 +12,7 @@
   <div>
     <h2>Local operators</h2>
     <ul>
-      <li *ngFor="let op of operators.getLocals()"><span [ngClass]="{'sl-saved': op.isSaved(), 'sl-unsaved': !op.isSaved()}">{{ op.getName() }}</span> <button (click)="openOperator(op)">Open</button></li>
+      <li *ngFor="let op of getLocals()"><span [ngClass]="{'sl-saved': op.isSaved(), 'sl-unsaved': !op.isSaved()}">{{ op.getName() }}</span> <button (click)="openOperator(op)">Open</button></li>
       <li><input title="Operator name" [(ngModel)]="newOperatorName" /> <button (click)="newOperator()">New</button></li>
     </ul>
   </div>
@@ -20,14 +20,14 @@
   <div>
     <h2>Library operators</h2>
     <ul>
-      <li *ngFor="let op of operators.getLibraries()">{{ op.getName() }}</li>
+      <li *ngFor="let op of getLibraries()">{{ op.getName() }}</li>
     </ul>
   </div>
 
   <div>
     <h2>Elementary operators</h2>
     <ul>
-      <li *ngFor="let op of operators.getElementaries()">{{ op.getName() }}</li>
+      <li *ngFor="let op of getElementaries()">{{ op.getName() }}</li>
     </ul>
   </div>
 </div>
