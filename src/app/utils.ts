@@ -1,4 +1,4 @@
-import {Connection, OperatorInstance, Port, Transformable} from './classes/operator';
+import {Connection, OperatorDef, OperatorInstance, Port, Transformable} from './classes/operator';
 
 function expandExpressionPart(exprPart: string, props: any, propDefs: any): Array<string> {
   const vals = [];
@@ -218,4 +218,8 @@ export function createDefaultValue(typeDef: any): any {
     case 'generic':
       return '$value';
   }
+}
+
+export function compareOperatorDefs(lhs, rhs: OperatorDef): number {
+  return (lhs.getName() < rhs.getName()) ? -1 : 1;
 }

@@ -3,7 +3,7 @@ import {ActivatedRoute} from '@angular/router';
 import {OperatorService} from '../services/operator.service';
 import {Composable, Connection, OperatorDef, OperatorInstance, Port, Transformable} from '../classes/operator';
 import {safeDump, safeLoad} from 'js-yaml';
-import {createDefaultValue, generateSvgTransform, normalizeConnections, stringifyConnections} from '../utils';
+import {compareOperatorDefs, createDefaultValue, generateSvgTransform, normalizeConnections, stringifyConnections} from '../utils';
 import {ApiService} from '../services/api.service';
 import {VisualService} from '../services/visual.service';
 import 'codemirror/mode/yaml/yaml.js';
@@ -378,15 +378,24 @@ export class OperatorComponent implements OnInit {
   }
 
   public getLocals(filterString: string): Array<OperatorDef> {
-    return this.operators.getLocals().filter(op => op.getName().toLowerCase().indexOf(filterString.toLowerCase()) !== -1);
+    return Array
+      .from(this.operators.getLocals().values())
+      .filter(op => op.getName().toLowerCase().indexOf(filterString.toLowerCase()) !== -1)
+      .sort(compareOperatorDefs);
   }
 
   public getElementaries(filterString: string): Array<OperatorDef> {
-    return this.operators.getElementaries().filter(op => op.getName().toLowerCase().indexOf(filterString.toLowerCase()) !== -1);
+    return Array
+      .from(this.operators.getElementaries().values())
+      .filter(op => op.getName().toLowerCase().indexOf(filterString.toLowerCase()) !== -1)
+      .sort(compareOperatorDefs);
   }
 
   public getLibraries(filterString: string): Array<OperatorDef> {
-    return this.operators.getLibraries().filter(op => op.getName().toLowerCase().indexOf(filterString.toLowerCase()) !== -1);
+    return Array
+      .from(this.operators.getLibraries().values())
+      .filter(op => op.getName().toLowerCase().indexOf(filterString.toLowerCase()) !== -1)
+      .sort(compareOperatorDefs);
   }
 
   public isGenericSpecified(ins: OperatorInstance, genName: string): boolean {
