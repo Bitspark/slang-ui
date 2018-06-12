@@ -4,7 +4,7 @@ import {createDefaultValue} from '../utils';
 @Component({
   selector: 'app-type-value-form',
   templateUrl: './type-value-form.component.html',
-  styleUrls: ['./type-value-form.component.css']
+  styleUrls: ['./type-value-form.component.scss']
 })
 export class TypeValueFormComponent implements OnInit, OnChanges {
 

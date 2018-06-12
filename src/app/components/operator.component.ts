@@ -11,7 +11,7 @@ import {TypeDefFormComponent} from './type-def-form.component';
 
 @Component({
   templateUrl: './operator.component.html',
-  styleUrls: ['./operator.component.css']
+  styleUrls: ['./operator.component.scss']
 })
 export class OperatorComponent implements OnInit {
   // General
