@@ -19,11 +19,15 @@ import {ApiService} from './services/api.service';
 import {OperatorService} from './services/operator.service';
 import {VisualService} from './services/visual.service';
 
+import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
+
+
 @NgModule({
   declarations: [
     AppComponent, IndexComponent, OperatorComponent, InstanceComponent, PortComponent, TypeDefFormComponent, TypeValueFormComponent
   ],
   imports: [
+    NgbModule.forRoot(),
     RouterModule.forRoot(
       AppRoutes,
       {enableTracing: true}
