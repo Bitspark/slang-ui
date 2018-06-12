@@ -1,1 +1,15 @@
+$body-bg: #24313B;
+$body-color: #EFEEFE;
+
+$theme-colors: (
+  "dark": darken($body-bg, 5%),
+  "slang": #FF9A04,
+);
+
 @import "~bootstrap/scss/bootstrap.scss";
+
+body {
+  max-height: 100vh;
+  height: 100vh;
+  overflow: hidden;
+}
