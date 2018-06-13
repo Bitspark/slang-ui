@@ -257,41 +257,37 @@ export class OperatorComponent implements OnInit {
         if (port2.getOperator() === this.operator) {
           if (port1.isIn() && port2.isOut()) {
             this.addConnection(port1, port2);
-            return;
           } else if (port2.isIn() && port1.isOut()) {
             this.addConnection(port2, port1);
-            return;
           }
         } else {
           if (port1.isIn() && port2.isIn()) {
             this.addConnection(port1, port2);
-            return;
           } else if (port2.isOut() && port1.isOut()) {
             this.addConnection(port2, port1);
-            return;
           }
         }
       } else {
         if (port2.getOperator() === this.operator) {
           if (port2.isIn() && port1.isIn()) {
             this.addConnection(port2, port1);
-            return;
           } else if (port1.isOut() && port2.isOut()) {
             this.addConnection(port1, port2);
-            return;
           }
         } else {
           if (port1.isOut() && port2.isIn()) {
             this.addConnection(port1, port2);
-            return;
           } else if (port2.isOut() && port1.isIn()) {
             this.addConnection(port2, port1);
+          } else {
             return;
           }
         }
       }
+      this.selectedEntity.entity = null;
+    } else {
+      this.selectedEntity.entity = port1;
     }
-    this.selectedEntity.entity = port1;
   }
 
   private displayVisual() {
