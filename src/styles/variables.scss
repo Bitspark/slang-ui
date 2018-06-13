@@ -1,0 +1,9 @@
+$body-bg: #1E394F;
+$body-color: #EFEEFE;
+$list-group-bg: lighten(#1E394F, 1%);
+$list-group-border-color: transparentize(#D3D5D6, .45);
+
+$theme-colors: (
+  "dark": darken($body-bg, 5%),
+  "slang": #FF9C04,
+);

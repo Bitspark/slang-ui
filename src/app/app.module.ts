@@ -30,7 +30,7 @@ import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
     NgbModule.forRoot(),
     RouterModule.forRoot(
       AppRoutes,
-      {enableTracing: true}
+      {enableTracing: false}
     ),
     BrowserModule,
     FormsModule,

@@ -1,3 +1,8 @@
-.sl-unsaved {
-  color: gray;
+@import "../../styles/variables.scss";
+
+.sl-operator-list {
+  ul {
+    max-height: 80vh;
+    overflow-y: scroll;
+  }
 }
