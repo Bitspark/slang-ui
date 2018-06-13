@@ -1,19 +1,22 @@
 <div>
-  <form>
-    <div>
-      <label for="workingDir">Working directory</label>
-      <input name="workingDir" id="workingDir" [(ngModel)]="workingDir" />
+  <div class="input-group mb-3 mt-3">
+    <div class="input-group-prepend">
+      <span class="input-group-text">Working directory</span>
     </div>
-    <div>
-      <button (click)="refreshOperators()">Refresh operators</button>
+    <input type="text" class="form-control" name="workingDir" id="workingDir" [(ngModel)]="workingDir">
+    <div class="input-group-append">
+      <button class="btn btn-primary" type="button" (click)="refreshOperators()">Refresh operators</button>
     </div>
-  </form>
-
+  </div>
   <div>
     <h2>Local operators</h2>
     <ul>
-      <li *ngFor="let op of getLocals()"><span [ngClass]="{'sl-saved': op.isSaved(), 'sl-unsaved': !op.isSaved()}">{{ op.getName() }}</span> <button (click)="openOperator(op)">Open</button></li>
-      <li><input title="Operator name" [(ngModel)]="newOperatorName" /> <button (click)="newOperator()">New</button></li>
+      <li *ngFor="let op of getLocals()"><span [ngClass]="{'sl-saved': op.isSaved(), 'sl-unsaved': !op.isSaved()}">{{ op.getName() }}</span>
+        <button (click)="openOperator(op)">Open</button>
+      </li>
+      <li><input title="Operator name" [(ngModel)]="newOperatorName"/>
+        <button (click)="newOperator()">New</button>
+      </li>
     </ul>
   </div>
 
