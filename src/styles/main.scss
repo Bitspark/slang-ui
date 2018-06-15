@@ -29,6 +29,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .sl-operator-list {
+  margin-top: 2*$spacer;
   li {
     height: 4*$spacer;
     padding: 0;

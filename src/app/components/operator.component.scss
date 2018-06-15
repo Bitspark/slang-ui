@@ -41,10 +41,16 @@ svg text::selection {
 }
 
 .sl-ui-sidebar {
+  padding-top: $spacer;
   height: calc(100vh - 36px);
   .sl-ui-scrollable {
     overflow-y: scroll;
   }
+}
+
+.sl-ui-mainbar, .sl-ui-sidebar {
+  padding-left: $spacer;
+  padding-right: $spacer;
 }
 
 #sl-operator-sidebar {
