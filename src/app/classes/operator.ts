@@ -381,16 +381,10 @@ export class OperatorInstance extends Composable {
             opName = opSplit.join('.');
           }
           const op = this.operatorSrv.getOperator(opName);
-          let opIns = this.instances.get(insName);
-          let ipos: [number, number];
-          if (typeof opIns !== 'undefined') {
-            ipos = [opIns.getPosX(), opIns.getPosY()];
-          } else {
-            ipos = [Math.random() * 1000, Math.random() * 1000];
-          }
           if (!op) {
             continue;
           }
+          let opIns = this.instances.get(insName);
           let opDef = JSON.parse(JSON.stringify(op.getDef()));
           OperatorDef.specifyOperatorDef(opDef, ins['generics'], ins['properties'], opDef['properties']);
           opDef = {
@@ -399,8 +393,11 @@ export class OperatorInstance extends Composable {
           };
           if (typeof opIns === 'undefined') {
             opIns = new OperatorInstance(this.operatorSrv, opName, insName, op, this, opDef);
+            opIns.translate([
+              Math.random() * (this.dim[0] - OperatorInstance.style.opMinWidth),
+              Math.random() * (this.dim[1] - OperatorInstance.style.opMinHeight)]);
           } else {
-            opIns.updateOperator(opDef, ipos);
+            opIns.updateOperator(opDef);
           }
           this.instances.set(insName, opIns);
           opIns.show();
