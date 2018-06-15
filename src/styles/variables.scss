@@ -1,9 +1,10 @@
-$body-bg: #1E394F;
-$body-color: #EFEEFE;
-$list-group-bg: lighten(#1E394F, 1%);
-$list-group-border-color: transparentize(#D3D5D6, .45);
+$body-bg: #373B47;
+$body-color: #FEFEFD;
+$list-group-bg: darken($body-bg, 5%);
+
+$yellow: #FF8813;
 
 $theme-colors: (
+  "primary": #FFD559,
   "dark": darken($body-bg, 5%),
-  "slang": #FF9C04,
 );

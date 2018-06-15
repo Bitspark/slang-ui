@@ -1,16 +1,22 @@
-<div class="input-group mb-3 mt-3">
-  <div class="input-group-prepend">
-    <span class="input-group-text">Working directory</span>
-  </div>
-  <input type="text" class="form-control" name="workingDir" id="workingDir" [(ngModel)]="workingDir">
-  <div class="input-group-append">
-    <button class="btn btn-primary" type="button" (click)="refreshOperators()">Refresh operators</button>
-  </div>
-</div>
-
 <div class="container-fluid">
+
   <div class="row">
-    <div class="col-2">
+    <div class="col-12">
+      <div class="input-group mb-3 mt-3">
+        <div class="input-group-prepend">
+          <span class="input-group-text">Working directory</span>
+        </div>
+        <input type="text" class="form-control" name="workingDir" id="workingDir" [(ngModel)]="workingDir">
+        <div class="input-group-append">
+          <button class="btn btn-primary" type="button" (click)="refreshOperators()"><i class="fas fa-sync"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-4">
       <div class="sl-operator-list">
         <h2>Local operators</h2>
         <div class="input-group mb-3 mt-3">
@@ -20,11 +26,13 @@
           </div>
         </div>
         <ul class="list-group list-group-flush">
-          <li class="list-group-item" [ngClass]="{'sl-saved': op.isSaved(), 'sl-unsaved': !op.isSaved()}"
+          <li class="list-group-item d-flex justify-content-between align-items-center" [ngClass]="{'sl-saved': op.isSaved(), 'sl-unsaved': !op.isSaved()}"
               *ngFor="let op of getLocals()">
-            <button class="btn btn-link" (click)="openOperator(op)"><i class="fas fa-folder-open"></i></button>
-            <span class="sl-operator-name">{{ op.getName() }}</span>
-            <span *ngIf="!op.isSaved()" class="badge badge-warning badge-pill"><i class="fas fa-save"></i></span>
+            <span>
+                <button class="btn btn-link" (click)="openOperator(op)"><i class="fas fa-folder-open"></i></button>
+                <span class="sl-operator-name">{{ op.getName() }}</span>
+            </span>
+            <span *ngIf="!op.isSaved()" class="badge badge-info badge-pill"><i class="fas fa-save"></i></span>
           </li>
         </ul>
       </div>
