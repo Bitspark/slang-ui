@@ -411,7 +411,7 @@ export class OperatorComponent implements OnInit {
     if (!insOpDef.generics) {
       insOpDef.generics = {};
     }
-    insOpDef.generics[genName] = TypeDefFormComponent.newPrimitiveTypeDef();
+    insOpDef.generics[genName] = TypeDefFormComponent.newDefaultTypeDef('primitive');
   }
 
   public isPropertySpecified(ins: OperatorInstance, prop: { name: string, def: any }): boolean {
