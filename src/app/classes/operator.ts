@@ -304,8 +304,8 @@ export class Composable extends Transformable {
 export class OperatorInstance extends Composable {
 
   private static style = {
-    opMinWidth: 130,
-    opMinHeight: 150,
+    opMinWidth: 75,
+    opMinHeight: 75,
     dlgP: 10,
     dlgM: 5
   };
@@ -344,6 +344,7 @@ export class OperatorInstance extends Composable {
     if (def.delegates) {
       for (const dlgName in def.delegates) {
         if (def.delegates.hasOwnProperty(dlgName)) {
+          width = Math.max(width, 130);
           const dlgDef = def.delegates[dlgName];
           const dlg = new Delegate(this, dlgName, this, dlgDef);
           dlgHeight += dlg.getWidth();
@@ -740,15 +741,15 @@ export class Port extends Composable {
    */
   private static style = {
     x: 20,
-    y: 10,
+    y: 15,
 
     str: {
-      px: 3,
-      py: 3,
+      px: 4,
+      py: 4,
     },
 
     map: {
-      px: 2,
+      px: 4,
     },
 
     portColors: {

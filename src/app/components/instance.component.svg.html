@@ -2,7 +2,9 @@
   <svg:rect x="0" y="0" [attr.width]="instance.getWidth()" [attr.height]="instance.getHeight()" fill="orange"
             [attr.stroke]="instance === selectedEntity.entity ? '#f0f' : ''" stroke-width="3"
             (mousedown)="selectInstance.emit(instance)"></svg:rect>
-  <svg:text text-anchor="middle" x="65" y="75" font-family="Arial" font-size="16"
+  <svg:text text-anchor="middle"
+            [attr.x]="instance.getWidth() / 2" [attr.y]="instance.getHeight() / 2 + 4"
+            font-family="Arial" font-size="16"
             [attr.fill]="(selectedEntity.entity === instance) ? '#f0f' : 'white'"
             style="pointer-events: none">{{instance.getName()}}
   </svg:text>
