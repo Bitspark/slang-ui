@@ -3,10 +3,10 @@
             x="0" y="0" [attr.width]="instance.getWidth()" [attr.height]="instance.getHeight()" [attr.fill]="color()"
             [attr.stroke]="instance === selectedEntity.entity ? '#f0f' : ''" stroke-width="3"
             (mousedown)="selectInstance.emit(instance)"></svg:rect>
-  <svg:rect *ngIf="form() === 'circle'"
-            x="0" y="0" [attr.width]="instance.getWidth()" [attr.height]="instance.getHeight()" [attr.fill]="color()"
+  <svg:circle *ngIf="form() === 'circle'"
+            [attr.cx]="radius()" [attr.cy]="radius()" [attr.r]="radius()" [attr.fill]="color()"
             [attr.stroke]="instance === selectedEntity.entity ? '#f0f' : ''" stroke-width="3"
-            (mousedown)="selectInstance.emit(instance)"></svg:rect>
+            (mousedown)="selectInstance.emit(instance)"></svg:circle>
   <svg:text text-anchor="middle"
             [attr.x]="instance.getWidth() / 2" [attr.y]="instance.getHeight() / 2 - 4"
             font-family="Arial" font-size="16"

@@ -26,6 +26,10 @@ export class InstanceComponent {
   }
 
   public form(): string {
+    const fqn = this.instance.getFullyQualifiedName();
+    if (fqn === 'slang.const') {
+      return 'circle';
+    }
     return 'rect';
   }
 
@@ -56,6 +60,10 @@ export class InstanceComponent {
   public fqn(): string {
     const fqn = this.instance.getFullyQualifiedName().split('.');
     return fqn[fqn.length - 1];
+  }
+
+  public radius(): number {
+    return Math.max(this.instance.getWidth(), this.instance.getHeight()) / 2;
   }
 
 }
