@@ -280,6 +280,7 @@ export class OperatorComponent implements OnInit {
           } else if (port2.isOut() && port1.isIn()) {
             this.addConnection(port2, port1);
           } else {
+            this.selectedEntity.entity = port1;
             return;
           }
         }
