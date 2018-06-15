@@ -304,8 +304,8 @@ export class Composable extends Transformable {
 export class OperatorInstance extends Composable {
 
   private static style = {
-    opMinWidth: 75,
-    opMinHeight: 75,
+    opMinWidth: 90,
+    opMinHeight: 90,
     dlgP: 10,
     dlgM: 5
   };
@@ -317,15 +317,19 @@ export class OperatorInstance extends Composable {
   private instances: Map<string, OperatorInstance>;
   private connections: Set<Connection>;
   private visible: boolean;
+  private operatorType: string;
 
   constructor(private operatorSrv: OperatorService,
               private fqOperator: string,
               private name: string,
               private opDef: OperatorDef,
+              private properties: any,
               parent: Composable,
               def: any,
               dim?: [number, number]) {
     super(parent);
+    const op = this.operatorSrv.getOperator(fqOperator);
+    this.operatorType = op[1];
     this.instances = new Map<string, OperatorInstance>();
     this.connections = new Set<Connection>();
     this.updateOperator(def, dim);
@@ -386,14 +390,14 @@ export class OperatorInstance extends Composable {
             continue;
           }
           let opIns = this.instances.get(insName);
-          let opDef = JSON.parse(JSON.stringify(op.getDef()));
+          let opDef = JSON.parse(JSON.stringify(op[0].getDef()));
           OperatorDef.specifyOperatorDef(opDef, ins['generics'], ins['properties'], opDef['properties']);
           opDef = {
             services: opDef['services'],
             delegates: opDef['delegates']
           };
           if (typeof opIns === 'undefined') {
-            opIns = new OperatorInstance(this.operatorSrv, opName, insName, op, this, opDef);
+            opIns = new OperatorInstance(this.operatorSrv, opName, insName, op[0], ins['properties'], this, opDef);
             opIns.translate([
               Math.random() * (this.dim[0] - OperatorInstance.style.opMinWidth),
               Math.random() * (this.dim[1] - OperatorInstance.style.opMinHeight)]);
@@ -647,6 +651,18 @@ export class OperatorInstance extends Composable {
 
   public getPropertyDefs(): Map<string, any> {
     return this.opDef.getPropertyDefs();
+  }
+
+  public getOperatorType(): string {
+    return this.operatorType;
+  }
+
+  public getFullyQualifiedName(): string {
+    return this.fqOperator;
+  }
+
+  public getProperties(): any {
+    return this.properties;
   }
 
   private distributeDelegatesVertically() {

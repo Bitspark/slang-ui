@@ -24,4 +24,38 @@ export class InstanceComponent {
   public transform(trans: Transformable): string {
     return generateSvgTransform(trans);
   }
+
+  public form(): string {
+    return 'rect';
+  }
+
+  public color(): string {
+    switch (this.instance.getOperatorType()) {
+      case 'local':
+        return '#33cc33';
+      case 'library':
+        return '#ff9933';
+      case 'elementary':
+        return '#6699ff';
+    }
+  }
+
+  public text(): string {
+    const fqn = this.instance.getFullyQualifiedName();
+    const props = this.instance.getProperties();
+
+    if (fqn === 'slang.const') {
+      return JSON.stringify(props['value']);
+    } else if (fqn === 'slang.eval') {
+      return props['expression'];
+    }
+
+    return this.instance.getName();
+  }
+
+  public fqn(): string {
+    const fqn = this.instance.getFullyQualifiedName().split('.');
+    return fqn[fqn.length - 1];
+  }
+
 }

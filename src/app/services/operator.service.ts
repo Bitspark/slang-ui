@@ -98,18 +98,18 @@ export class OperatorService {
     return Array.from(this.elementaryOperators.values()).find(op => op.getName() === operatorName);
   }
 
-  public getOperator(operatorName: string): OperatorDef {
+  public getOperator(operatorName: string): [OperatorDef, string] {
     let op = this.getLocal(operatorName);
     if (op) {
-      return op;
+      return [op, 'local'];
     }
     op = this.getLibrary(operatorName);
     if (op) {
-      return op;
+      return [op, 'library'];
     }
     op = this.getElementary(operatorName);
     if (op) {
-      return op;
+      return [op, 'elementary'];
     }
     return null;
   }

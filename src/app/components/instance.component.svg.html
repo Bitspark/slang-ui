@@ -1,12 +1,25 @@
 <svg:g xmlns:svg="http://www.w3.org/2000/svg" [attr.transform]="transform(instance)">
-  <svg:rect x="0" y="0" [attr.width]="instance.getWidth()" [attr.height]="instance.getHeight()" fill="orange"
+  <svg:rect *ngIf="form() === 'rect'"
+            x="0" y="0" [attr.width]="instance.getWidth()" [attr.height]="instance.getHeight()" [attr.fill]="color()"
+            [attr.stroke]="instance === selectedEntity.entity ? '#f0f' : ''" stroke-width="3"
+            (mousedown)="selectInstance.emit(instance)"></svg:rect>
+  <svg:rect *ngIf="form() === 'circle'"
+            x="0" y="0" [attr.width]="instance.getWidth()" [attr.height]="instance.getHeight()" [attr.fill]="color()"
             [attr.stroke]="instance === selectedEntity.entity ? '#f0f' : ''" stroke-width="3"
             (mousedown)="selectInstance.emit(instance)"></svg:rect>
   <svg:text text-anchor="middle"
-            [attr.x]="instance.getWidth() / 2" [attr.y]="instance.getHeight() / 2 + 4"
+            [attr.x]="instance.getWidth() / 2" [attr.y]="instance.getHeight() / 2 - 4"
             font-family="Arial" font-size="16"
             [attr.fill]="(selectedEntity.entity === instance) ? '#f0f' : 'white'"
-            style="pointer-events: none">{{instance.getName()}}
+            style="pointer-events: none">
+    {{text()}}
+  </svg:text>
+  <svg:text text-anchor="middle"
+            [attr.x]="instance.getWidth() / 2" [attr.y]="instance.getHeight() / 2 - 4 + 16"
+            font-family="Arial" font-size="16"
+            [attr.fill]="(selectedEntity.entity === instance) ? '#f0f' : 'white'"
+            style="pointer-events: none">
+    ({{fqn()}})
   </svg:text>
   <svg:g *ngFor="let dlg of instance.getDelegates()" [attr.transform]="transform(dlg)">
     <svg:g [attr.transform]="transform(dlg.getIn())" app-port [port]="dlg.getIn()"
