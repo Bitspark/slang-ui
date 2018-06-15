@@ -10,9 +10,6 @@
             [ngClass]="{'active': isUIModeVisual()}"><i class="fas fa-project-diagram"></i></button>
     <button type="button" class="btn-outline-secondary" ngbButton (click)="setUIMode('yaml')"
             [ngClass]="{'active': isUIModeYAML()}"><i class="fas fa-code"></i></button>
-    <label class="btn-outline-secondary" ngbButtonLabel>
-      <input type="checkbox" ngbButton [(ngModel)]="showInOutPorts"> Ports
-    </label>
   </div>
 </nav>
 
