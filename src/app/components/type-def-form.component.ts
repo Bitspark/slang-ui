@@ -7,7 +7,7 @@ import {OperatorDef, Type} from '../classes/operator';
   styleUrls: ['./type-def-form.component.css']
 })
 export class TypeDefFormComponent implements OnInit {
-  public typeDef_: any = TypeDefFormComponent.newPrimitiveTypeDef();
+  public typeDef_: any = TypeDefFormComponent.newDefaultTypeDef('primitive');
 
   @Input()
   get typeDef() {
@@ -24,15 +24,45 @@ export class TypeDefFormComponent implements OnInit {
 
   public subs: Array<{ name: string, def: any }> = [];
   public types = Object.keys(Type).filter(t => typeof Type[t] === 'number');
-  public newMapPortName: string;
+  public newMapPortName = '';
+  public newMapPortType = 'primitive';
 
   constructor() {
   }
 
-  public static newPrimitiveTypeDef(): any {
-    return {
-      type: 'primitive'
-    };
+  public static newDefaultTypeDef(type: string): any {
+    switch (type) {
+      case 'primitive':
+      case 'string':
+      case 'binary':
+      case 'number':
+      case 'boolean':
+      case 'trigger':
+        return {
+          type: type
+        };
+      case 'generic':
+        return {
+          type: type,
+          generic: 'itemType'
+        };
+      case 'stream':
+        return {
+          type: type,
+          stream: {
+            type: 'primitive'
+          }
+        };
+      case 'map':
+        return {
+          type: type,
+          map: {
+            defaultEntry: {
+              type: 'primitive'
+            }
+          }
+        };
+    }
   }
 
   ngOnInit() {
@@ -65,10 +95,10 @@ export class TypeDefFormComponent implements OnInit {
     }
     switch (tp) {
       case 'map':
-        this.subs = [{name: 'entryName', def: TypeDefFormComponent.newPrimitiveTypeDef()}];
+        this.subs = [{name: 'entryName', def: TypeDefFormComponent.newDefaultTypeDef('primitive')}];
         break;
       case 'stream':
-        this.typeDef[tp] = TypeDefFormComponent.newPrimitiveTypeDef();
+        this.typeDef[tp] = TypeDefFormComponent.newDefaultTypeDef('primitive');
         break;
       case 'generic':
         this.typeDef[tp] = 'itemType';
@@ -85,12 +115,12 @@ export class TypeDefFormComponent implements OnInit {
     return this.subs.findIndex(curr => curr.name === name);
   }
 
-  public addSub(name: string) {
+  public addSub(name: string, type: string) {
     const existingMapEntry = this.getSub(name);
     if (!name || existingMapEntry) {
       return;
     }
-    this.subs.push({name: name, def: TypeDefFormComponent.newPrimitiveTypeDef()});
+    this.subs.push({name: name, def: TypeDefFormComponent.newDefaultTypeDef(type)});
     this.resetNewMapPortName();
     this.handleTypeDefChanged();
   }
@@ -138,6 +168,10 @@ export class TypeDefFormComponent implements OnInit {
 
   public isGeneric(): boolean {
     return OperatorDef.isGeneric(this.typeDef);
+  }
+
+  public validPortName(name: string): boolean {
+    return name.length > 0 && (!this.typeDef.map || !this.typeDef.map[name]);
   }
 
 }
