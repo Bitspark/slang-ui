@@ -10,6 +10,7 @@ import {AppRoutes} from './app.routes';
 import {AppComponent} from './app.component';
 import {IndexComponent} from './components/index.component';
 import {OperatorComponent} from './components/operator.component';
+import {InstanceComponent} from './components/instance.component';
 import {PortComponent} from './components/port.component';
 import {TypeDefFormComponent} from './components/type-def-form.component';
 import {TypeValueFormComponent} from './components/type-value-form.component';
@@ -20,7 +21,7 @@ import {VisualService} from './services/visual.service';
 
 @NgModule({
   declarations: [
-    AppComponent, IndexComponent, OperatorComponent, PortComponent, TypeDefFormComponent, TypeValueFormComponent
+    AppComponent, IndexComponent, OperatorComponent, InstanceComponent, PortComponent, TypeDefFormComponent, TypeValueFormComponent
   ],
   imports: [
     RouterModule.forRoot(

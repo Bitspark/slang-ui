@@ -75,25 +75,9 @@
                    (select)="selectPort($event)" [selectedEntity]="selectedEntity"></svg:g>
           </svg:g>
 
-          <!-- Instances -->
-          <svg:g *ngFor="let ins of visualInstances()" [attr.transform]="transform(ins)">
-            <svg:rect x="0" y="0" [attr.width]="ins.getWidth()" [attr.height]="ins.getHeight()" fill="orange"
-                      [attr.stroke]="ins === selectedEntity.entity ? '#f0f' : ''" stroke-width="3"
-                      (mousedown)="selectInstance(ins)"></svg:rect>
-            <svg:text text-anchor="middle" x="65" y="75" font-family="Arial" font-size="16"
-                      [attr.fill]="(selectedEntity.entity === ins) ? '#f0f' : 'white'"
-                      style="pointer-events: none">{{ins.getName()}}
-            </svg:text>
-            <svg:g *ngFor="let dlg of ins.getDelegates()" [attr.transform]="transform(dlg)">
-              <svg:g [attr.transform]="transform(dlg.getIn())" app-port [port]="dlg.getIn()"
-                     (select)="selectPort($event)" [selectedEntity]="selectedEntity"></svg:g>
-              <svg:g [attr.transform]="transform(dlg.getOut())" app-port [port]="dlg.getOut()"
-                     (select)="selectPort($event)" [selectedEntity]="selectedEntity"></svg:g>
-            </svg:g>
-            <svg:g [attr.transform]="transform(ins.getMainIn())" app-port [port]="ins.getMainIn()"
-                   (select)="selectPort($event)" [selectedEntity]="selectedEntity"></svg:g>
-            <svg:g [attr.transform]="transform(ins.getMainOut())" app-port [port]="ins.getMainOut()"
-                   (select)="selectPort($event)" [selectedEntity]="selectedEntity"></svg:g>
+          <svg:g app-instance *ngFor="let ins of visualInstances()"
+                 [instance]="ins" [selectedEntity]="selectedEntity"
+                 (selectPort)="selectPort($event)" (selectInstance)="selectInstance($event)">
           </svg:g>
 
         </svg:g>

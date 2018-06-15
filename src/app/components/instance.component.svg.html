@@ -1,0 +1,34 @@
+<svg:g xmlns:svg="http://www.w3.org/2000/svg" [attr.transform]="transform(instance)">
+  <svg:rect *ngIf="form() === 'rect'"
+            x="0" y="0" [attr.width]="instance.getWidth()" [attr.height]="instance.getHeight()" [attr.fill]="color()"
+            [attr.stroke]="instance === selectedEntity.entity ? '#f0f' : ''" stroke-width="3"
+            (mousedown)="selectInstance.emit(instance)"></svg:rect>
+  <svg:circle *ngIf="form() === 'circle'"
+            [attr.cx]="radius()" [attr.cy]="radius()" [attr.r]="radius()" [attr.fill]="color()"
+            [attr.stroke]="instance === selectedEntity.entity ? '#f0f' : ''" stroke-width="3"
+            (mousedown)="selectInstance.emit(instance)"></svg:circle>
+  <svg:text text-anchor="middle"
+            [attr.x]="instance.getWidth() / 2" [attr.y]="instance.getHeight() / 2 - 4"
+            font-family="Arial" font-size="16"
+            [attr.fill]="(selectedEntity.entity === instance) ? '#f0f' : 'white'"
+            style="pointer-events: none">
+    {{text()}}
+  </svg:text>
+  <svg:text text-anchor="middle"
+            [attr.x]="instance.getWidth() / 2" [attr.y]="instance.getHeight() / 2 - 4 + 16"
+            font-family="Arial" font-size="16"
+            [attr.fill]="(selectedEntity.entity === instance) ? '#f0f' : 'white'"
+            style="pointer-events: none">
+    ({{fqn()}})
+  </svg:text>
+  <svg:g *ngFor="let dlg of instance.getDelegates()" [attr.transform]="transform(dlg)">
+    <svg:g [attr.transform]="transform(dlg.getIn())" app-port [port]="dlg.getIn()"
+           (select)="selectPort.emit($event)" [selectedEntity]="selectedEntity"></svg:g>
+    <svg:g [attr.transform]="transform(dlg.getOut())" app-port [port]="dlg.getOut()"
+           (select)="selectPort.emit($event)" [selectedEntity]="selectedEntity"></svg:g>
+  </svg:g>
+  <svg:g [attr.transform]="transform(instance.getMainIn())" app-port [port]="instance.getMainIn()"
+         (select)="selectPort.emit($event)" [selectedEntity]="selectedEntity"></svg:g>
+  <svg:g [attr.transform]="transform(instance.getMainOut())" app-port [port]="instance.getMainOut()"
+         (select)="selectPort.emit($event)" [selectedEntity]="selectedEntity"></svg:g>
+</svg:g>
