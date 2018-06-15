@@ -101,8 +101,15 @@
         <!-- Connections -->
         <svg:line *ngFor="let conn of visualConnections()"
                   stroke-width="2px"
-                  (click)="selectConnection(conn)"
                   [attr.stroke]="conn === selectedEntity.entity ? '#f0f' : 'black'"
+                  [attr.x1]="conn.getSource().getPortPosX()"
+                  [attr.y1]="conn.getSource().getPortPosY()"
+                  [attr.x2]="conn.getDestination().getPortPosX()"
+                  [attr.y2]="conn.getDestination().getPortPosY()"></svg:line>
+        <svg:line *ngFor="let conn of visualConnections()"
+                  stroke-width="24px"
+                  stroke="transparent"
+                  (click)="selectConnection(conn)"
                   [attr.x1]="conn.getSource().getPortPosX()"
                   [attr.y1]="conn.getSource().getPortPosY()"
                   [attr.x2]="conn.getDestination().getPortPosX()"
