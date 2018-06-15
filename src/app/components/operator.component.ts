@@ -381,6 +381,15 @@ export class OperatorComponent implements OnInit {
       .sort(compareOperatorDefs);
   }
 
+  public getGlobals(filterString: string): Array<OperatorDef> {
+    return []
+      .concat(
+        Array.from(this.operators.getLibraries().values()),
+        Array.from(this.operators.getElementaries().values()))
+      .filter(op => op.getName().toLowerCase().indexOf(filterString.toLowerCase()) !== -1)
+      .sort(compareOperatorDefs);
+  }
+
   public getElementaries(filterString: string): Array<OperatorDef> {
     return Array
       .from(this.operators.getElementaries().values())
