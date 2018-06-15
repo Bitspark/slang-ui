@@ -1,6 +1,22 @@
+@import url('https://fonts.googleapis.com/css?family=Share+Tech+Mono|Chau+Philomene+One|Roboto');
+
+$font-mono: 'Share+Tech+Mono', monospace;
+$font-title: 'Chau Philomene One', sans-serif;
+$font-text: 'Roboto', sans-serif;
+
 $body-bg: #373B47;
 $body-color: #FEFEFD;
 $list-group-bg: darken($body-bg, 5%);
+
+$font-size-base: 0.85rem;
+/*
+$h1-font-size: $font-size-base * 2.5 !default;
+$h2-font-size: $font-size-base * 2 !default;
+$h3-font-size: $font-size-base * 1.75 !default;
+$h4-font-size: $font-size-base * 1.5 !default;
+$h5-font-size: $font-size-base * 1.25 !default;
+$h6-font-size: $font-size-base !default;
+*/
 
 $yellow: #FF8813;
 

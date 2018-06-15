@@ -2,11 +2,20 @@
 @import "~bootstrap/scss/bootstrap.scss";
 
 body {
+  font-family: $font-text;
   max-height: 100vh;
   height: 100vh;
   overflow: hidden;
 }
 
 .sl-operator-name {
-  font-family: monospace;
+  font-family: $font-mono;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: $font-title;
+}
+
+.card-title, .modal-title, .card-subtitle, .panel-title, .headertitle {
+  font-family: $font-text;
 }
