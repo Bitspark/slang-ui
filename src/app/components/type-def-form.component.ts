@@ -116,8 +116,7 @@ export class TypeDefFormComponent implements OnInit {
   }
 
   public addSub(name: string, type: string) {
-    const existingMapEntry = this.getSub(name);
-    if (!name || existingMapEntry) {
+    if (!this.validPortName(name)) {
       return;
     }
     this.subs.push({name: name, def: TypeDefFormComponent.newDefaultTypeDef(type)});
@@ -171,7 +170,7 @@ export class TypeDefFormComponent implements OnInit {
   }
 
   public validPortName(name: string): boolean {
-    return name.length > 0 && (!this.typeDef.map || !this.typeDef.map[name]);
+    return name.length > 0 && !this.getSub(name);
   }
 
 }
