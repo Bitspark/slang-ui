@@ -1,5 +1,5 @@
 <div style="display: inline-block; vertical-align: top">
-  <select [(ngModel)]="typeDef.type" (ngModelChange)="setType($event)">
+  <select title="type" [(ngModel)]="typeDef.type" (ngModelChange)="setType($event)">
     <option *ngFor="let t of types" [value]="t">
       {{t}}
     </option>
@@ -11,8 +11,14 @@
       <input [ngModel]="p.name" (ngModelChange)="renameSubName(p.name, $event)" title="entry name" style="width: 60px" />
       <app-type-def-form [(typeDef)]="p.def" (typeDefChange)="handleTypeDefChanged()"></app-type-def-form>
     </p>
-    <button (click)="addSub(newMapPortName.trim())"><i class="fa fa-plus"></i></button>
+    <hr>
+    <button (click)="addSub(newMapPortName.trim(), newMapPortType)" [disabled]="!validPortName(newMapPortName.trim())"><i class="fa fa-plus"></i></button>
     <input [(ngModel)]="newMapPortName" title="new entry name" style="width: 60px" />
+    <select title="type" [(ngModel)]="newMapPortType">
+      <option *ngFor="let t of types" [value]="t">
+        {{t}}
+      </option>
+    </select>
   </div>
 
   <app-type-def-form *ngIf="isStream()" [(typeDef)]="typeDef.stream" (typeDefChange)="handleTypeDefChanged()"></app-type-def-form>
