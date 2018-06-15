@@ -6,6 +6,7 @@ svg text {
   -ms-user-select: none;
   user-select: none;
 }
+
 svg text::selection {
   background: none;
 }
@@ -21,3 +22,22 @@ svg text::selection {
   }
 }
 
+#sl-visual-ui {
+  display: inline-block;
+  width: 100vw;
+  height: 90vh;
+}
+
+.sl-operator-list {
+  ul {
+    overflow-y: visible;
+  }
+}
+
+.sl-ui-sidebar {
+  height: calc(100vh - 36px);
+  .sl-ui-scrollable {
+    overflow-y: scroll;
+    height: calc(100% - 100px);
+  }
+}

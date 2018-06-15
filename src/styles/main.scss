@@ -1,15 +1,15 @@
 @import "variables.scss";
 @import "~bootstrap/scss/bootstrap.scss";
 
+/***
+ * Overriding bootstrap rules
+ */
+
 body {
   font-family: $font-text;
   max-height: 100vh;
   height: 100vh;
   overflow: hidden;
-}
-
-.sl-operator-name {
-  font-family: $font-mono;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -18,4 +18,22 @@ h1, h2, h3, h4, h5, h6 {
 
 .card-title, .modal-title, .card-subtitle, .panel-title, .headertitle {
   font-family: $font-text;
+}
+
+/***
+ * Defining global rules
+ */
+
+.sl-operator-name {
+  font-family: $font-mono;
+}
+
+.sl-operator-list {
+  li {
+    height: 4*$spacer;
+    padding: 0;
+  }
+  .badge {
+    padding: 8px;
+  }
 }

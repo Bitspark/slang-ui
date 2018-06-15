@@ -2,10 +2,7 @@
 
 .sl-operator-list {
   ul {
-    max-height: 80vh;
     overflow-y: scroll;
-  }
-  badge {
-    padding: 4px;
+    max-height: calc(100vh - 80px);
   }
 }

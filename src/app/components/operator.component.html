@@ -16,7 +16,8 @@
   </div>
 </nav>
 
-<div class="container-fluid">
+<div id="sl-main-content" class="container-fluid">
+  <!-- ui-mode yaml -->
   <div *ngIf="isUIModeYAML()">
     <codemirror [ngModel]="yamlRepr"
                 [config]="editorConfig"
@@ -24,39 +25,69 @@
                 (blur)="storeYaml()">
     </codemirror>
   </div>
-  <div *ngIf="isUIModeVisual()"
-       style="width: 1000px; height: 800px; overflow: scroll; display: inline-block; border: 1px dotted black; background-color: grey">
-    <svg [attr.width]="2000*scale" [attr.height]="2000*scale" style="background-color: white"
-         viewBox="0 0 2000 2000"
-         xmlns:svg="http://www.w3.org/2000/svg"
-         (mousedown)="startDrag($event)"
-         (mouseup)="stopDrag($event)"
-         (mousemove)="drag($event)">
+  <!-- ui-mode visuals -->
+  <div id="sl-visual-ui" *ngIf="isUIModeVisual()">
+    <div class="row">
+      <div id="sl-operator-sidebar" class="sl-ui-sidebar col-3">
+        <label for="opSearch" style="font-size: 10px">Search operators</label><br>
+        <input id="opSearch" [(ngModel)]="filterString">
+        <div class="sl-ui-scrollable">
 
-      <svg:g *ngIf="operator" [attr.transform]="transform(operator)">
+          <div class="sl-operator-list">
+            <h3>Local operators</h3>
+            <ul class="list-group">
+              <li class="list-group-item"
+                  *ngFor="let op of getLocals(filterString)">
+                <button class="btn btn-link" (click)="addInstance(op)"><i class="fas fa-plus-square"></i></button>
+                <span class="sl-operator-name">{{ op.getName() }}</span>
+              </li>
+            </ul>
+          </div>
 
-        <!-- Surrounding operator -->
-        <svg:rect x="0" y="0" [attr.width]="operator.getWidth()" [attr.height]="operator.getHeight()"
-                  fill="transparent" stroke-width="3" stroke-dasharray="3 3"
-                  [attr.stroke]="operator === selectedEntity.entity ? '#f0f' : 'orange'"
-                  (mousedown)="selectInstance(operator)"></svg:rect>
+          <div class="sl-operator-list">
+            <h3>Global operators</h3>
+            <ul class="list-group list-group-flush">
+              <li class="list-group-item"
+                  *ngFor="let op of getGlobals(filterString)">
+                <button class="btn btn-link" (click)="addInstance(op)"><i class="fas fa-plus-square"></i></button>
+                <span class="sl-operator-name">{{ op.getName() }}</span>
+              </li>
+            </ul>
+          </div>
 
-        <!-- Delegates -->
-        <svg:g *ngFor="let dlg of operator.getDelegates()" [attr.transform]="transform(dlg)">
-          <svg:g [attr.transform]="transform(dlg.getIn())" app-port [port]="dlg.getIn()"
-                 (select)="selectPort($event)"
-                 [selectedEntity]="selectedEntity"></svg:g>
-          <svg:g [attr.transform]="transform(dlg.getOut())" app-port [port]="dlg.getOut()"
-                 (select)="selectPort($event)" [selectedEntity]="selectedEntity"></svg:g>
-        </svg:g>
+        </div>
+      </div>
+      <svg [attr.width]="2000*scale" [attr.height]="2000*scale" style="background-color: white"
+           viewBox="0 0 2000 2000"
+           xmlns:svg="http://www.w3.org/2000/svg"
+           (mousedown)="startDrag($event)"
+           (mouseup)="stopDrag($event)"
+           (mousemove)="drag($event)">
 
-        <!-- Services -->
-        <svg:g>
-          <svg:g [attr.transform]="transform(operator.getMainIn())" app-port [port]="operator.getMainIn()"
-                 (select)="selectPort($event)" [selectedEntity]="selectedEntity"></svg:g>
-          <svg:g [attr.transform]="transform(operator.getMainOut())" app-port [port]="operator.getMainOut()"
-                 (select)="selectPort($event)" [selectedEntity]="selectedEntity"></svg:g>
-        </svg:g>
+        <svg:g *ngIf="operator" [attr.transform]="transform(operator)">
+
+          <!-- Surrounding operator -->
+          <svg:rect x="0" y="0" [attr.width]="operator.getWidth()" [attr.height]="operator.getHeight()"
+                    fill="transparent" stroke-width="3" stroke-dasharray="3 3"
+                    [attr.stroke]="operator === selectedEntity.entity ? '#f0f' : 'orange'"
+                    (mousedown)="selectInstance(operator)"></svg:rect>
+
+          <!-- Delegates -->
+          <svg:g *ngFor="let dlg of operator.getDelegates()" [attr.transform]="transform(dlg)">
+            <svg:g [attr.transform]="transform(dlg.getIn())" app-port [port]="dlg.getIn()"
+                   (select)="selectPort($event)"
+                   [selectedEntity]="selectedEntity"></svg:g>
+            <svg:g [attr.transform]="transform(dlg.getOut())" app-port [port]="dlg.getOut()"
+                   (select)="selectPort($event)" [selectedEntity]="selectedEntity"></svg:g>
+          </svg:g>
+
+          <!-- Services -->
+          <svg:g>
+            <svg:g [attr.transform]="transform(operator.getMainIn())" app-port [port]="operator.getMainIn()"
+                   (select)="selectPort($event)" [selectedEntity]="selectedEntity"></svg:g>
+            <svg:g [attr.transform]="transform(operator.getMainOut())" app-port [port]="operator.getMainOut()"
+                   (select)="selectPort($event)" [selectedEntity]="selectedEntity"></svg:g>
+          </svg:g>
 
           <svg:g app-instance *ngFor="let ins of visualInstances()"
                  [instance]="ins" [selectedEntity]="selectedEntity"
@@ -84,20 +115,22 @@
                   [attr.x2]="conn.getDestination().getPortPosX()"
                   [attr.y2]="conn.getDestination().getPortPosY()"></svg:line>
 
-      <!-- Text/Labels -->
-      <svg:g *ngFor="let port of getPorts()" (click)="selectPort(port)" [attr.transform]="translate(port)">
-        <!--<circle [attr.cx]="getPortLabelX(port)-1" [attr.cy]="getPortLabelY(port)-1" r="2"/>-->
-        <svg:text [attr.text-anchor]="getPortLabelAnchor(port)" alignment-baseline="middle"
-                  font-family="Arial" stroke-width="10" font-size="16"
-                  [attr.transform]="transformLabel(port)"
-                  [attr.x]="getPortLabelX(port)" [attr.y]="getPortLabelY(port)"
-                  [attr.fill]="(selectedEntity.entity === port) ? '#f0f' : 'blue'">
-          {{port.getName()}}
-        </svg:text>
-      </svg:g>
-    </svg>
-  </div>
+        <!-- Text/Labels -->
+        <svg:g *ngFor="let port of getPorts()" (click)="selectPort(port)" [attr.transform]="translate(port)">
+          <!--<circle [attr.cx]="getPortLabelX(port)-1" [attr.cy]="getPortLabelY(port)-1" r="2"/>-->
+          <svg:text [attr.text-anchor]="getPortLabelAnchor(port)" alignment-baseline="middle"
+                    font-family="Arial" stroke-width="10" font-size="16"
+                    [attr.transform]="transformLabel(port)"
+                    [attr.x]="getPortLabelX(port)" [attr.y]="getPortLabelY(port)"
+                    [attr.fill]="(selectedEntity.entity === port) ? '#f0f' : 'blue'">
+            {{port.getName()}}
+          </svg:text>
+        </svg:g>
 
+      </svg>
+
+    </div>
+  </div>
   <div style="padding: 2px" *ngIf="showInOutPorts && mainSrvPort">
     <h4>
       IN
@@ -117,22 +150,7 @@
     <div>
       <div
         style="border: 1px dotted black; display: inline-block; height: 780px; overflow: scroll; margin-left: 20px; padding: 10px">
-        <div>
-          <label for="opSearch" style="font-size: 10px">Search operators</label><br>
-          <input id="opSearch" [(ngModel)]="filterString">
-          <h3>Local operators</h3>
-          <ul>
-            <li *ngFor="let op of getLocals(filterString)">{{ op.getName() }}
-              <button (click)="addInstance(op)">+</button>
-            </li>
-          </ul>
-          <h3>Global operators</h3>
-          <ul>
-            <li *ngFor="let op of getGlobals(filterString)">{{ op.getName() }}
-              <button (click)="addInstance(op)">+</button>
-            </li>
-          </ul>
-        </div>
+
       </div>
 
     </div>
