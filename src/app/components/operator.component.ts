@@ -24,7 +24,7 @@ export class OperatorComponent implements OnInit {
 
   // YAML
   public yamlRepr = '';
-  public showYAML = false;
+  public uiMode = 'visual';
   public editorConfig = {
     theme: 'default',
     mode: 'text/x-yaml',
@@ -478,4 +478,16 @@ export class OperatorComponent implements OnInit {
     }
   }
 
+  public setUIMode(mode: string): string {
+    this.uiMode = mode.toLowerCase();
+    return this.uiMode;
+  }
+
+  public isUIModeVisual(): boolean {
+    return this.uiMode === 'visual';
+  }
+
+  public isUIModeYAML(): boolean {
+    return this.uiMode === 'yaml';
+  }
 }

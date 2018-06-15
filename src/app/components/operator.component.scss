@@ -1,3 +1,5 @@
+@import "../../styles/variables.scss";
+
 svg text {
   -webkit-user-select: none;
   -moz-user-select: none;
@@ -7,3 +9,15 @@ svg text {
 svg text::selection {
   background: none;
 }
+
+.navbar {
+  padding-top: 0;
+  padding-bottom: 0;
+  .sl-operator-name {
+    display: inline-block;
+    padding-top: 0;
+    padding-bottom: 0;
+    font-size: 1.6em;
+  }
+}
+
