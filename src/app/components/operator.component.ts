@@ -239,9 +239,15 @@ export class OperatorComponent implements OnInit {
       this.selectedEntity.entity.constructor.name === OperatorInstance.name;
   }
 
-  public getSelectedEntityName(): string {
+  public getSelectedInstanceName(): string {
     if (this.isInstanceSelected()) {
       return (this.selectedEntity.entity as OperatorInstance).getName();
+    }
+    return '';
+  }
+  public getSelectedInstanceFQName(): string {
+    if (this.isInstanceSelected()) {
+      return (this.selectedEntity.entity as OperatorInstance).getFullyQualifiedName();
     }
     return '';
   }

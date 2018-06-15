@@ -1,5 +1,11 @@
 @import "../../styles/variables.scss";
 
+svg {
+  background-color: $body-color;
+  width: 100%;
+  height: 100%;
+}
+
 svg text {
   -webkit-user-select: none;
   -moz-user-select: none;
@@ -38,6 +44,21 @@ svg text::selection {
   height: calc(100vh - 36px);
   .sl-ui-scrollable {
     overflow-y: scroll;
-    height: calc(100% - 100px);
   }
 }
+
+#sl-operator-sidebar {
+  .sl-ui-scrollable {
+    height: calc(100% - 100px);
+    width: 100%;
+    overflow: scroll;
+  }
+}
+
+#sl-instance-sidebar {
+  .sl-ui-scrollable {
+    height: 50%;
+  }
+}
+
+
