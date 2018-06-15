@@ -1,5 +1,4 @@
 <div class="container-fluid">
-
   <div class="row">
     <div class="col-12">
       <div class="input-group mb-3 mt-3">
@@ -26,7 +25,8 @@
           </div>
         </div>
         <ul class="list-group list-group-flush">
-          <li class="list-group-item d-flex justify-content-between align-items-center" [ngClass]="{'sl-saved': op.isSaved(), 'sl-unsaved': !op.isSaved()}"
+          <li class="list-group-item d-flex justify-content-between align-items-center"
+              [ngClass]="{'sl-saved': op.isSaved(), 'sl-unsaved': !op.isSaved()}"
               *ngFor="let op of getLocals()">
             <span>
                 <button class="btn btn-link" (click)="openOperator(op)"><i class="fas fa-folder-open"></i></button>
@@ -42,7 +42,8 @@
       <div class="sl-operator-list">
         <h1>Library operators</h1>
         <ul class="sl-operator-list list-group list-group-flush">
-          <li class="list-group-item" *ngFor="let op of getLibraries()"><span class="sl-operator-name">{{ op.getName() }}</span>
+          <li class="list-group-item" *ngFor="let op of getLibraries()"><span
+            class="sl-operator-name">{{ op.getName() }}</span>
           </li>
         </ul>
       </div>
