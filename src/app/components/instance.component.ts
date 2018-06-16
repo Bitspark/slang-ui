@@ -49,9 +49,9 @@ export class InstanceComponent {
     const props = this.instance.getProperties();
 
     if (fqn === 'slang.const') {
-      return JSON.stringify(props['value']);
+      return !!props ? JSON.stringify(props['value']) : '?';
     } else if (fqn === 'slang.eval') {
-      return props['expression'];
+      return !!props ? props['expression'] : '?';
     }
 
     return this.instance.getName();
