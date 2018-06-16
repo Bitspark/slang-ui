@@ -13,7 +13,7 @@
   </div>
 </nav>
 
-<div id="sl-main-content" class="container-fluid">
+<div class="container-fluid">
   <!-- ui-mode yaml -->
   <div *ngIf="isUIModeYAML()">
     <codemirror [ngModel]="yamlRepr"
@@ -54,77 +54,79 @@
         </div>
       </div>
       <div class="sl-ui-mainbar col">
-        <svg [attr.width]="2000*scale" [attr.height]="2000*scale"
-             viewBox="0 0 2000 2000"
-             xmlns:svg="http://www.w3.org/2000/svg"
-             (mousedown)="startDrag($event)"
-             (mouseup)="stopDrag($event)"
-             (mousemove)="drag($event)">
+        <div id="sl-svg-container">
+          <svg [attr.width]="2000*scale" [attr.height]="1800*scale"
+               viewBox="0 0 2000 1800"
+               xmlns:svg="http://www.w3.org/2000/svg"
+               (mousedown)="startDrag($event)"
+               (mouseup)="stopDrag($event)"
+               (mousemove)="drag($event)">
 
-          <svg:g *ngIf="operator" [attr.transform]="transform(operator)">
+            <svg:g *ngIf="operator" [attr.transform]="transform(operator)">
 
-            <!-- Surrounding operator -->
-            <svg:rect x="0" y="0" [attr.width]="operator.getWidth()" [attr.height]="operator.getHeight()"
-                      fill="transparent" stroke-width="3" stroke-dasharray="3 3"
-                      [attr.stroke]="operator === selectedEntity.entity ? '#0ff' : 'orange'"
-                      (mousedown)="selectInstance(operator)"></svg:rect>
+              <!-- Surrounding operator -->
+              <svg:rect x="0" y="0" [attr.width]="operator.getWidth()" [attr.height]="operator.getHeight()"
+                        fill="transparent" stroke-width="3" stroke-dasharray="3 3"
+                        [attr.stroke]="operator === selectedEntity.entity ? '#0ff' : 'orange'"
+                        (mousedown)="selectInstance(operator)"></svg:rect>
 
-            <!-- Delegates -->
-            <svg:g *ngFor="let dlg of operator.getDelegates()" [attr.transform]="transform(dlg)">
-              <svg:g [attr.transform]="transform(dlg.getIn())" app-port [port]="dlg.getIn()"
-                     (select)="selectPort($event)"
-                     [selectedEntity]="selectedEntity"></svg:g>
-              <svg:g [attr.transform]="transform(dlg.getOut())" app-port [port]="dlg.getOut()"
-                     (select)="selectPort($event)" [selectedEntity]="selectedEntity"></svg:g>
+              <!-- Delegates -->
+              <svg:g *ngFor="let dlg of operator.getDelegates()" [attr.transform]="transform(dlg)">
+                <svg:g [attr.transform]="transform(dlg.getIn())" app-port [port]="dlg.getIn()"
+                       (select)="selectPort($event)"
+                       [selectedEntity]="selectedEntity"></svg:g>
+                <svg:g [attr.transform]="transform(dlg.getOut())" app-port [port]="dlg.getOut()"
+                       (select)="selectPort($event)" [selectedEntity]="selectedEntity"></svg:g>
+              </svg:g>
+
+              <!-- Services -->
+              <svg:g>
+                <svg:g [attr.transform]="transform(operator.getMainIn())" app-port [port]="operator.getMainIn()"
+                       (select)="selectPort($event)" [selectedEntity]="selectedEntity"></svg:g>
+                <svg:g [attr.transform]="transform(operator.getMainOut())" app-port [port]="operator.getMainOut()"
+                       (select)="selectPort($event)" [selectedEntity]="selectedEntity"></svg:g>
+              </svg:g>
+
+              <svg:g app-instance *ngFor="let ins of visualInstances()"
+                     [instance]="ins" [selectedEntity]="selectedEntity"
+                     (selectPort)="selectPort($event)" (selectInstance)="selectInstance($event)">
+              </svg:g>
+
             </svg:g>
 
-            <!-- Services -->
-            <svg:g>
-              <svg:g [attr.transform]="transform(operator.getMainIn())" app-port [port]="operator.getMainIn()"
-                     (select)="selectPort($event)" [selectedEntity]="selectedEntity"></svg:g>
-              <svg:g [attr.transform]="transform(operator.getMainOut())" app-port [port]="operator.getMainOut()"
-                     (select)="selectPort($event)" [selectedEntity]="selectedEntity"></svg:g>
+            <!-- Visible Connections -->
+            <svg:line *ngFor="let conn of visualConnections()"
+                      stroke-width="2px"
+                      [attr.stroke]="conn === selectedEntity.entity ? '#0ff' : 'black'"
+                      [attr.x1]="conn.getSource().getPortPosX()"
+                      [attr.y1]="conn.getSource().getPortPosY()"
+                      [attr.x2]="conn.getDestination().getPortPosX()"
+                      [attr.y2]="conn.getDestination().getPortPosY()"></svg:line>
+
+            <!-- Clickable Invisible Connections -->
+            <svg:line *ngFor="let conn of visualConnections()"
+                      stroke-width="24px"
+                      stroke="transparent"
+                      (click)="selectConnection(conn)"
+                      [attr.x1]="conn.getSource().getPortPosX()"
+                      [attr.y1]="conn.getSource().getPortPosY()"
+                      [attr.x2]="conn.getDestination().getPortPosX()"
+                      [attr.y2]="conn.getDestination().getPortPosY()"></svg:line>
+
+            <!-- Text/Labels -->
+            <svg:g *ngFor="let port of getPorts()" (click)="selectPort(port)" [attr.transform]="translate(port)">
+              <!--<circle [attr.cx]="getPortLabelX(port)-1" [attr.cy]="getPortLabelY(port)-1" r="2"/>-->
+              <svg:text [attr.text-anchor]="getPortLabelAnchor(port)" alignment-baseline="middle"
+                        font-family="Arial" stroke-width="10" font-size="16"
+                        [attr.transform]="transformLabel(port)"
+                        [attr.x]="getPortLabelX(port)" [attr.y]="getPortLabelY(port)"
+                        [attr.fill]="(selectedEntity.entity === port) ? '#0ff' : 'blue'">
+                {{port.getName()}}
+              </svg:text>
             </svg:g>
 
-            <svg:g app-instance *ngFor="let ins of visualInstances()"
-                   [instance]="ins" [selectedEntity]="selectedEntity"
-                   (selectPort)="selectPort($event)" (selectInstance)="selectInstance($event)">
-            </svg:g>
-
-          </svg:g>
-
-          <!-- Visible Connections -->
-          <svg:line *ngFor="let conn of visualConnections()"
-                    stroke-width="2px"
-                    [attr.stroke]="conn === selectedEntity.entity ? '#0ff' : 'black'"
-                    [attr.x1]="conn.getSource().getPortPosX()"
-                    [attr.y1]="conn.getSource().getPortPosY()"
-                    [attr.x2]="conn.getDestination().getPortPosX()"
-                    [attr.y2]="conn.getDestination().getPortPosY()"></svg:line>
-
-          <!-- Clickable Invisible Connections -->
-          <svg:line *ngFor="let conn of visualConnections()"
-                    stroke-width="24px"
-                    stroke="transparent"
-                    (click)="selectConnection(conn)"
-                    [attr.x1]="conn.getSource().getPortPosX()"
-                    [attr.y1]="conn.getSource().getPortPosY()"
-                    [attr.x2]="conn.getDestination().getPortPosX()"
-                    [attr.y2]="conn.getDestination().getPortPosY()"></svg:line>
-
-          <!-- Text/Labels -->
-          <svg:g *ngFor="let port of getPorts()" (click)="selectPort(port)" [attr.transform]="translate(port)">
-            <!--<circle [attr.cx]="getPortLabelX(port)-1" [attr.cy]="getPortLabelY(port)-1" r="2"/>-->
-            <svg:text [attr.text-anchor]="getPortLabelAnchor(port)" alignment-baseline="middle"
-                      font-family="Arial" stroke-width="10" font-size="16"
-                      [attr.transform]="transformLabel(port)"
-                      [attr.x]="getPortLabelX(port)" [attr.y]="getPortLabelY(port)"
-                      [attr.fill]="(selectedEntity.entity === port) ? '#0ff' : 'blue'">
-              {{port.getName()}}
-            </svg:text>
-          </svg:g>
-
-        </svg>
+          </svg>
+        </div>
       </div>
       <div id="sl-instance-sidebar" class="sl-ui-sidebar col-2">
         <div class="sl-ui-scrollable">
