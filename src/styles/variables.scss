@@ -4,14 +4,19 @@ $font-mono: 'Share+Tech+Mono', monospace;
 $font-title: 'Chau Philomene One', sans-serif;
 $font-text: 'Roboto', sans-serif;
 
-$body-bg: #373B47;
-$body-color: #FEFEFD;
-$yellow: #FF8813;
-$primary: #FFD559;
-$secondary: #606dbc;
-$dark: darken($body-bg, 5%);
-$list-group-bg: lighten($body-bg, 5%);
-$list-group-border-color: $body-bg;
+$blue: #123c94;
+$cyan: #268aac;
+$orange: #F57D23;
+$yellow: #FFD559;
+$purple: #6050bc;
+$light: #ddd;
+$dark: #142a37;
+
+$body-bg: $light;
+$body-color: $dark;
+$primary: $blue;
+$list-group-bg: transparentize($body-color, .95);
+$list-group-border-color: transparentize($body-color, .90);
 
 $font-size-base: 0.85rem;
 $spacer: 0.5rem;
