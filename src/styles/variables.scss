@@ -1,0 +1,18 @@
+@import url('https://fonts.googleapis.com/css?family=Share+Tech+Mono|Chau+Philomene+One|Roboto');
+
+$font-mono: 'Share+Tech+Mono', monospace;
+$font-title: 'Chau Philomene One', sans-serif;
+$font-text: 'Roboto', sans-serif;
+
+$font-size-base: 0.85rem;
+$spacer: 0.5rem;
+
+$blue: #123c94;
+$cyan: #268aac;
+$orange: #F57D23;
+$yellow: #FFD559;
+$purple: #6050bc;
+$light: #ddd;
+$dark: #142a37;
+
+@import "dark";

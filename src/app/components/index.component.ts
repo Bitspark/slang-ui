@@ -5,9 +5,10 @@ import {Router} from '@angular/router';
 import * as initialDef from '../initial-def.json';
 import {compareOperatorDefs} from '../utils';
 
+
 @Component({
   templateUrl: './index.component.html',
-  styleUrls: ['./index.component.css']
+  styleUrls: ['./index.component.scss'],
 })
 export class IndexComponent {
 

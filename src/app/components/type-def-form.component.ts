@@ -4,7 +4,7 @@ import {OperatorDef, Type} from '../classes/operator';
 @Component({
   selector: 'app-type-def-form',
   templateUrl: './type-def-form.component.html',
-  styleUrls: ['./type-def-form.component.css']
+  styleUrls: ['./type-def-form.component.scss']
 })
 export class TypeDefFormComponent implements OnInit {
   public typeDef_: any = TypeDefFormComponent.newDefaultTypeDef('primitive');

@@ -1,23 +1,23 @@
 <svg:g xmlns:svg="http://www.w3.org/2000/svg" [attr.transform]="transform(instance)">
   <svg:rect *ngIf="form() === 'rect'"
             x="0" y="0" [attr.width]="instance.getWidth()" [attr.height]="instance.getHeight()" [attr.fill]="color()"
-            [attr.stroke]="instance === selectedEntity.entity ? '#f0f' : ''" stroke-width="3"
+            [attr.stroke]="instance === selectedEntity.entity ? '#0ff' : ''" stroke-width="3"
             (mousedown)="selectInstance.emit(instance)"></svg:rect>
   <svg:circle *ngIf="form() === 'circle'"
             [attr.cx]="radius()" [attr.cy]="radius()" [attr.r]="radius()" [attr.fill]="color()"
-            [attr.stroke]="instance === selectedEntity.entity ? '#f0f' : ''" stroke-width="3"
+            [attr.stroke]="instance === selectedEntity.entity ? '#0ff' : ''" stroke-width="3"
             (mousedown)="selectInstance.emit(instance)"></svg:circle>
   <svg:text text-anchor="middle"
             [attr.x]="instance.getWidth() / 2" [attr.y]="instance.getHeight() / 2 - 4"
             font-family="Arial" font-size="16"
-            [attr.fill]="(selectedEntity.entity === instance) ? '#f0f' : 'white'"
+            [attr.fill]="(selectedEntity.entity === instance) ? '#0ff' : 'white'"
             style="pointer-events: none">
     {{text()}}
   </svg:text>
   <svg:text text-anchor="middle"
             [attr.x]="instance.getWidth() / 2" [attr.y]="instance.getHeight() / 2 - 4 + 16"
             font-family="Arial" font-size="16"
-            [attr.fill]="(selectedEntity.entity === instance) ? '#f0f' : 'white'"
+            [attr.fill]="(selectedEntity.entity === instance) ? '#0ff' : 'white'"
             style="pointer-events: none">
     ({{fqn()}})
   </svg:text>

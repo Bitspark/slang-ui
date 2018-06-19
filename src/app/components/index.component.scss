@@ -1,0 +1,8 @@
+@import "../../styles/variables.scss";
+
+.sl-operator-list {
+  ul {
+    overflow-y: scroll;
+    max-height: calc(100vh - 80px);
+  }
+}

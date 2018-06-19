@@ -1,0 +1,84 @@
+@import "../../styles/variables.scss";
+
+#sl-svg-container {
+  width: 100%;
+  height: 100%;
+  background: repeating-linear-gradient(
+      -65deg,
+      transparentize($body-color, .95),
+      transparentize($body-color, .95) 5px,
+      transparentize($body-bg, .95) 5px,
+      transparentize($body-bg, .95) 10px
+  );
+}
+
+svg {
+  background-color: lighten($body-bg, 10%);
+}
+
+svg text {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+svg text::selection {
+  background: none;
+}
+
+.navbar {
+  padding-top: 0;
+  padding-bottom: 0;
+  .sl-operator-name {
+    display: inline-block;
+    padding-top: 0;
+    padding-bottom: 0;
+    font-size: 1.6em;
+  }
+}
+
+#sl-visual-ui {
+  display: inline-block;
+  width: 100vw;
+  height: 90vh;
+}
+
+.sl-operator-list {
+  ul {
+    overflow-y: visible;
+  }
+}
+
+.sl-ui-mainbar {
+  overflow: hidden;
+}
+
+.sl-ui-sidebar {
+  padding-top: $spacer;
+  height: calc(100vh - 36px);
+  .sl-ui-scrollable {
+    overflow-y: scroll;
+  }
+}
+
+.sl-ui-mainbar, .sl-ui-sidebar {
+  padding-left: $spacer;
+  padding-right: $spacer;
+}
+
+#sl-operator-sidebar {
+  .sl-ui-scrollable {
+    height: calc(100% - 100px);
+    width: 100%;
+    overflow: scroll;
+  }
+}
+
+#sl-instance-sidebar {
+  .sl-ui-scrollable {
+    height: 50%;
+  }
+}
+
+

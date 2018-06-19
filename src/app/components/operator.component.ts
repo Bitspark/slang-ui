@@ -11,7 +11,7 @@ import {TypeDefFormComponent} from './type-def-form.component';
 
 @Component({
   templateUrl: './operator.component.html',
-  styleUrls: ['./operator.component.css']
+  styleUrls: ['./operator.component.scss']
 })
 export class OperatorComponent implements OnInit {
   // General
@@ -24,7 +24,7 @@ export class OperatorComponent implements OnInit {
 
   // YAML
   public yamlRepr = '';
-  public showYAML = false;
+  public uiMode = 'visual';
   public editorConfig = {
     theme: 'default',
     mode: 'text/x-yaml',
@@ -239,9 +239,15 @@ export class OperatorComponent implements OnInit {
       this.selectedEntity.entity.constructor.name === OperatorInstance.name;
   }
 
-  public getSelectedEntityName(): string {
+  public getSelectedInstanceName(): string {
     if (this.isInstanceSelected()) {
       return (this.selectedEntity.entity as OperatorInstance).getName();
+    }
+    return '';
+  }
+  public getSelectedInstanceFQName(): string {
+    if (this.isInstanceSelected()) {
+      return (this.selectedEntity.entity as OperatorInstance).getFullyQualifiedName();
     }
     return '';
   }
@@ -381,6 +387,15 @@ export class OperatorComponent implements OnInit {
       .sort(compareOperatorDefs);
   }
 
+  public getGlobals(filterString: string): Array<OperatorDef> {
+    return []
+      .concat(
+        Array.from(this.operators.getLibraries().values()),
+        Array.from(this.operators.getElementaries().values()))
+      .filter(op => op.getName().toLowerCase().indexOf(filterString.toLowerCase()) !== -1)
+      .sort(compareOperatorDefs);
+  }
+
   public getElementaries(filterString: string): Array<OperatorDef> {
     return Array
       .from(this.operators.getElementaries().values())
@@ -478,4 +493,16 @@ export class OperatorComponent implements OnInit {
     }
   }
 
+  public setUIMode(mode: string): string {
+    this.uiMode = mode.toLowerCase();
+    return this.uiMode;
+  }
+
+  public isUIModeVisual(): boolean {
+    return this.uiMode === 'visual';
+  }
+
+  public isUIModeYAML(): boolean {
+    return this.uiMode === 'yaml';
+  }
 }
