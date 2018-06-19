@@ -12,7 +12,7 @@
     <input [(ngModel)]="typeValue" type="text" title="value" />
   </div>
   <div *ngIf="typeDef.type === 'boolean'">
-    <input [(ngModel)]="typeValue" type="checkbox" title="value" /> {{ typeValue }}
+    <label><input [(ngModel)]="typeValue" type="checkbox" title="value" [id]="" />{{ typeValue }}</label>
   </div>
   <div *ngIf="typeDef.type === 'trigger'">
     &bull; Trigger

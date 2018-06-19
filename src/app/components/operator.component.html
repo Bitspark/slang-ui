@@ -133,13 +133,13 @@
           <h4>
             IN
           </h4>
-          <div style="display: inline-block">
+          <div style="display: inline-block" *ngIf="mainSrvPort">
             <app-type-def-form [(typeDef)]="mainSrvPort.in" (typeDefChange)="refresh()"></app-type-def-form>
           </div>
           <h4>
             OUT
           </h4>
-          <div style="display: inline-block">
+          <div style="display: inline-block" *ngIf="mainSrvPort">
             <app-type-def-form [(typeDef)]="mainSrvPort.out" (typeDefChange)="refresh()"></app-type-def-form>
           </div>
         </div>

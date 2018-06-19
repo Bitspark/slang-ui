@@ -318,12 +318,13 @@ export class OperatorInstance extends Composable {
   private connections: Set<Connection>;
   private visible: boolean;
   private operatorType: string;
+  private properties: any;
 
   constructor(private operatorSrv: OperatorService,
               private fqOperator: string,
               private name: string,
               private opDef: OperatorDef,
-              private properties: any,
+              properties: any,
               parent: Composable,
               def: any,
               dim?: [number, number]) {
@@ -332,11 +333,15 @@ export class OperatorInstance extends Composable {
     this.operatorType = op[1];
     this.instances = new Map<string, OperatorInstance>();
     this.connections = new Set<Connection>();
-    this.updateOperator(def, dim);
+    this.properties = properties;
+    this.updateOperator(def, properties, dim);
   }
 
-  public updateOperator(def: any, dim?: [number, number]) {
+  public updateOperator(def: any, props: any, dim?: [number, number]) {
     let [width, height] = (this.dim) ? this.dim : (dim) ? dim : [0, 0];
+
+    console.log(this.properties, props);
+    this.properties = props;
 
     this.mainIn = new Port(this, 'service', 'main', true, null, '', this, def.services['main']['in']);
     const tmpMainOut = new Port(this, 'service', 'main', false, null, '', this, def.services['main']['out']);
@@ -402,7 +407,7 @@ export class OperatorInstance extends Composable {
               Math.random() * (this.dim[0] - OperatorInstance.style.opMinWidth),
               Math.random() * (this.dim[1] - OperatorInstance.style.opMinHeight)]);
           } else {
-            opIns.updateOperator(opDef);
+            opIns.updateOperator(opDef, ins['properties']);
           }
           this.instances.set(insName, opIns);
           opIns.show();
