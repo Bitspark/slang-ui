@@ -26,7 +26,7 @@ export class OperatorComponent implements OnInit {
   public yamlRepr = '';
   public uiMode = 'visual';
   public editorConfig = {
-    theme: 'lesser-dark',
+    theme: 'slang-dark',
     mode: 'text/x-yaml',
     lineNumbers: true,
     extraKeys: {
@@ -299,7 +299,7 @@ export class OperatorComponent implements OnInit {
 
   private displayVisual() {
     const def = this.operatorDef.getDef();
-    this.operator.updateOperator(def);
+    this.operator.updateOperator(def, undefined);
   }
 
   public addInstance(op: any) {
