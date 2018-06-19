@@ -105,7 +105,7 @@
 
             <!-- Clickable Invisible Connections -->
             <svg:line *ngFor="let conn of visualConnections()"
-                      stroke-width="24px"
+                      stroke-width="10px"
                       stroke="transparent"
                       (click)="selectConnection(conn)"
                       [attr.x1]="conn.getSource().getPortPosX()"
