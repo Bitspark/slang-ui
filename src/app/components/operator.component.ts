@@ -26,7 +26,7 @@ export class OperatorComponent implements OnInit {
   public yamlRepr = '';
   public uiMode = 'visual';
   public editorConfig = {
-    theme: 'default',
+    theme: 'lesser-dark',
     mode: 'text/x-yaml',
     lineNumbers: true,
     extraKeys: {
