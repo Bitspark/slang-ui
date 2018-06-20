@@ -147,8 +147,8 @@
             <h5><button (click)="removePropertyDef(propName)"><i class="fa fa-trash"></i></button> {{propName}}</h5>
             <app-type-def-form [(typeDef)]="propertyDefs[propName]" (typeDefChange)="refresh()"></app-type-def-form>
           </div>
-          <h5>New property</h5>
-          <input [(ngModel)]="newPropName"><button (click)="addPropertyDef(newPropName); newPropName = '';">add</button>
+          <h5><label for="newPropName">New property</label></h5>
+          <input id="newPropName" [(ngModel)]="newPropName"><button (click)="addPropertyDef(newPropName); newPropName = '';">add</button>
         </div>
 
         <div class="sl-ui-scrollable">
