@@ -27,6 +27,7 @@
 
   <div *ngIf="typeDef.type === 'stream'">
     <div *ngFor="let i of getEntries()">
+      <button (click)="removeIndex(i)"><i class="fa fa-trash-o"></i></button>
       {{i + 1}}.
       <app-type-value-form [(typeValue)]="typeValue[i]" (typeValueChange)="emitChange()" [typeDef]="typeDef.stream"></app-type-value-form>
     </div>
