@@ -7,8 +7,7 @@ function expandExpressionPart(exprPart: string, props: any, propDefs: any): Arra
   }
   const prop = props[exprPart];
   if (!prop) {
-    console.error('missing property', exprPart);
-    return null;
+    return [];
   }
   const propDef = propDefs[exprPart];
   if (propDef['type'] === 'stream') {
