@@ -142,6 +142,13 @@
           <div style="display: inline-block" *ngIf="mainSrvPort">
             <app-type-def-form [(typeDef)]="mainSrvPort.out" (typeDefChange)="refresh()"></app-type-def-form>
           </div>
+          <h4>Properties</h4>
+          <div *ngFor="let propName of getPropertyNames()">
+            <h5><button (click)="removePropertyDef(propName)"><i class="fa fa-trash"></i></button> {{propName}}</h5>
+            <app-type-def-form [(typeDef)]="propertyDefs[propName]" (typeDefChange)="refresh()"></app-type-def-form>
+          </div>
+          <h5>New property</h5>
+          <input [(ngModel)]="newPropName"><button (click)="addPropertyDef(newPropName); newPropName = '';">add</button>
         </div>
 
         <div class="sl-ui-scrollable">

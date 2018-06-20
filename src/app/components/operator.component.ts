@@ -19,8 +19,10 @@ export class OperatorComponent implements OnInit {
   public operatorDef: OperatorDef = null;
   public operator: OperatorInstance = null;
   public mainSrvPort: any = null;
+  public propertyDefs: any = null;
   public status;
   public showInOutPorts = false;
+  public newPropName = '';
 
   // YAML
   public yamlRepr = '';
@@ -189,9 +191,24 @@ export class OperatorComponent implements OnInit {
 
   private updateDef(def: any) {
     this.operatorDef.setDef(def);
-    this.mainSrvPort = this.operatorDef.getDef().services.main;
+    const opDef = this.operatorDef.getDef();
+    this.mainSrvPort = opDef.services.main;
+    if (!opDef.properties) {
+      opDef.properties = {};
+    }
+    this.propertyDefs = opDef.properties;
     this.status = `Updated definition of operator "${this.operatorName}".`;
     this.refresh();
+  }
+
+  public getPropertyNames(): Array<string> {
+    const names = [];
+    for (const propName in this.propertyDefs) {
+      if (this.propertyDefs.hasOwnProperty(propName)) {
+        names.push(propName);
+      }
+    }
+    return names;
   }
 
   private displayYaml() {
@@ -299,6 +316,7 @@ export class OperatorComponent implements OnInit {
 
   private displayVisual() {
     const def = this.operatorDef.getDef();
+    console.log(def);
     this.operator.updateOperator(def, undefined);
   }
 
@@ -319,6 +337,19 @@ export class OperatorComponent implements OnInit {
       operator: op.name
     };
     this.updateDef(def);
+  }
+
+  public addPropertyDef(propName: string) {
+    if (this.propertyDefs[propName]) {
+      return;
+    }
+    this.propertyDefs[propName] = TypeDefFormComponent.newDefaultTypeDef('primitive');
+    this.refresh();
+  }
+
+  public removePropertyDef(propName: string) {
+    delete this.propertyDefs[propName];
+    this.refresh();
   }
 
   public getPorts(): Array<Port> {
