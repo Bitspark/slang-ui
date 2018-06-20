@@ -471,6 +471,10 @@ export class OperatorInstance extends Composable {
     return this.name;
   }
 
+  public setName(name: string) {
+    this.name = name;
+  }
+
   public getDelegates(): Array<PortGroup> {
     return Array.from(this.delegates.values());
   }

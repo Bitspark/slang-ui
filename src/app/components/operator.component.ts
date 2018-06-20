@@ -245,6 +245,7 @@ export class OperatorComponent implements OnInit {
 
   public selectInstance(ins: OperatorInstance) {
     this.selectedEntity.entity = ins;
+    this.newInstanceName = ins.getName();
   }
 
   public selectConnection(conn: Connection) {
@@ -262,11 +263,28 @@ export class OperatorComponent implements OnInit {
     }
     return '';
   }
+
   public getSelectedInstanceFQName(): string {
     if (this.isInstanceSelected()) {
       return (this.selectedEntity.entity as OperatorInstance).getFullyQualifiedName();
     }
     return '';
+  }
+
+  public newInstanceName = '';
+
+  public renameInstance(ins: OperatorInstance, newName: string) {
+    const oDef = this.operatorDef.getDef();
+    const oldName = ins.getName();
+    oDef.operators[newName] = JSON.parse(JSON.stringify(oDef.operators[oldName]));
+    console.log(oDef.operators[oldName]);
+    delete oDef.operators[oldName];
+    for (const src in oDef.connections) {
+      if (oDef.connections.hasOwnProperty(src)) {
+        // TODO
+      }
+    }
+    this.refresh();
   }
 
   public genericNames(ins: OperatorInstance): Array<string> {

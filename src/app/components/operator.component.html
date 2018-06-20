@@ -158,8 +158,9 @@
           <div *ngIf="isInstanceSelected()">
             <h5>Operator</h5>
             <p class="sl-operator-name">{{ getSelectedInstanceFQName() }}</p>
-            <h5>Instance</h5>
+            <h5><label for="instanceName">Instance</label></h5>
             <p class="sl-operator-name">{{ getSelectedInstanceName() }}</p>
+            <input id="instanceName" [(ngModel)]="newInstanceName"/> <button (click)="renameInstance(selectedEntity.entity, newInstanceName); selectedEntity.entity = null">rename</button>
             <h5>Generics ({{ genericNames(selectedEntity.entity).length }})</h5>
             <div *ngFor="let genName of genericNames(selectedEntity.entity)">{{ genName }}
               <app-type-def-form *ngIf="isGenericSpecified(selectedEntity.entity, genName)"
