@@ -3,7 +3,15 @@ import {ActivatedRoute} from '@angular/router';
 import {OperatorService} from '../services/operator.service';
 import {Composable, Connection, OperatorDef, OperatorInstance, Port, Transformable} from '../classes/operator';
 import {safeDump, safeLoad} from 'js-yaml';
-import {compareOperatorDefs, createDefaultValue, generateSvgTransform, normalizeConnections, stringifyConnections} from '../utils';
+import {
+  buildRefString,
+  compareOperatorDefs,
+  createDefaultValue,
+  generateSvgTransform,
+  normalizeConnections,
+  parseRefString,
+  stringifyConnections
+} from '../utils';
 import {ApiService} from '../services/api.service';
 import {VisualService} from '../services/visual.service';
 import 'codemirror/mode/yaml/yaml.js';
@@ -273,17 +281,9 @@ export class OperatorComponent implements OnInit {
   }
 
   public renameInstance(ins: OperatorInstance, newName: string) {
-    const oDef = this.operatorDef.getDef();
-    const oldName = ins.getName();
-    oDef.operators[newName] = JSON.parse(JSON.stringify(oDef.operators[oldName]));
-    console.log(oDef.operators[oldName]);
-    delete oDef.operators[oldName];
-    for (const src in oDef.connections) {
-      if (oDef.connections.hasOwnProperty(src)) {
-
-      }
-    }
+    this.operator.renameInstance(ins.getName(), newName);
     this.refresh();
+    console.log(this.operatorDef);
   }
 
   public genericNames(ins: OperatorInstance): Array<string> {
@@ -333,7 +333,6 @@ export class OperatorComponent implements OnInit {
 
   private displayVisual() {
     const def = this.operatorDef.getDef();
-    console.log(def);
     this.operator.updateOperator(def, undefined);
   }
 

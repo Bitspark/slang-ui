@@ -288,3 +288,22 @@ export function parseRefString(ref: string): {instance: string, delegate: string
 
   return ret;
 }
+
+export function buildRefString(info: {instance: string, delegate: string, service: string, dirIn: boolean, port: string}): string {
+  let opStr = '';
+  if (typeof info.service !== 'undefined') {
+    if (info.service === 'main' || info.service === '') {
+      opStr = info.instance;
+    } else {
+      opStr = `${info.service}@${info.instance}`;
+    }
+  } else if (typeof info.delegate !== 'undefined') {
+    opStr = `${info.instance}.${info.delegate}`;
+  }
+
+  if (info.dirIn) {
+    return `${info.port}(${opStr}`;
+  } else {
+    return `${opStr})${info.port}`;
+  }
+}

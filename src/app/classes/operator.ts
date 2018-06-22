@@ -1,4 +1,4 @@
-import {connectDeep, expandProperties, parseRefString} from '../utils';
+import {buildRefString, connectDeep, expandProperties, parseRefString} from '../utils';
 import {OperatorService} from '../services/operator.service';
 import {Mat2, Mat3} from './matrix';
 
@@ -322,7 +322,7 @@ export class OperatorInstance extends Composable {
   constructor(private operatorSrv: OperatorService,
               private fqOperator: string,
               private name: string,
-              private opDef: OperatorDef,
+              public opDef: OperatorDef,
               properties: any,
               parent: Composable,
               def: any,
@@ -444,6 +444,57 @@ export class OperatorInstance extends Composable {
       visual.instances[insName] = ins.mat.all();
     });
     return visual;
+  }
+
+  public renameInstance(oldName: string, newName: string) {
+    const ins = this.instances.get(oldName);
+    const oDef = this.opDef.getDef();
+
+    // Replace operator entry
+    oDef.operators[newName] = JSON.parse(JSON.stringify(oDef.operators[oldName]));
+    delete oDef.operators[oldName];
+
+    // Step 1: adapt destinations
+    for (const src in oDef.connections) {
+      if (oDef.connections.hasOwnProperty(src)) {
+        const newDsts = [];
+        for (const dst of oDef.connections[src]) {
+          const dstInfo = parseRefString(dst);
+          if (dstInfo.instance === oldName) {
+            dstInfo.instance = newName;
+            const newDst = buildRefString(dstInfo);
+            newDsts.push(newDst);
+          } else {
+            newDsts.push(dst);
+          }
+        }
+        oDef.connections[src] = newDsts;
+      }
+    }
+
+    // Step 2: adapt sources
+    const newConns = {};
+    for (const src in oDef.connections) {
+      if (oDef.connections.hasOwnProperty(src)) {
+        const srcInfo = parseRefString(src);
+        console.log('srcInfo', srcInfo);
+        if (srcInfo.instance === oldName) {
+          srcInfo.instance = newName;
+          const newSrc = buildRefString(srcInfo);
+          console.log('new ----->', newSrc);
+          newConns[newSrc] = oDef.connections[src];
+        } else {
+          newConns[src] = oDef.connections[src];
+        }
+      }
+    }
+
+    oDef.connections = newConns;
+
+    ins.setName(newName);
+
+    this.instances.set(newName, ins);
+    this.instances.delete(oldName);
   }
 
   public getMainIn(): Port {
