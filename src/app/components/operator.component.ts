@@ -130,9 +130,11 @@ export class OperatorComponent implements OnInit {
     const xDiff = event.screenX - MouseMoueTracker.getLastX();
     const yDiff = event.screenY - MouseMoueTracker.getLastY();
 
-
     if (t.isDragging()) {
       this.selectedEntity.entity.translate([xDiff / this.scale, yDiff / this.scale]);
+    } else if (t.isResizing()) {
+      this.operator.resize([xDiff / this.scale, yDiff / this.scale]);
+      this.refresh();
     }
   });
 

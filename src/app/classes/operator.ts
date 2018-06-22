@@ -234,6 +234,12 @@ export class Transformable {
     return this;
   }
 
+  public resize(vec: [number, number]): Transformable {
+    this.dim[0] += vec[0];
+    this.dim[1] += vec[1];
+    return this;
+  }
+
   public getWidth(): number {
     return this.dim[0];
   }

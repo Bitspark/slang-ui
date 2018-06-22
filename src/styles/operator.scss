@@ -81,8 +81,9 @@ svg {
     -moz-transition: r 200ms ease-in-out;
     transition: r 200ms ease-in-out;
     &:hover {
-      r: 10px;
+      r: 12px;
       fill-opacity: .95;
+      cursor: nwse-resize;
     }
   }
 

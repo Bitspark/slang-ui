@@ -67,13 +67,14 @@
               <!-- Surrounding operator -->
               <svg:rect x="0" y="0" [attr.width]="operator.getWidth()" [attr.height]="operator.getHeight()"
                         class="sl-svg-op sl-svg-op-surr"
-                        [ngClass]="isSelected(operator) ? 'selected' : ''"
+                        [ngClass]="{selected: isSelected(operator)}"
                         paint-order="stroke fill"
                         (mousedown)="selectInstance(operator)">
               </svg:rect>
               <!-- Surrounding operator resizer -->
               <svg:circle [attr.cx]="operator.getWidth() - 20" [attr.cy]="operator.getHeight() - 20"
-                          class="sl-svg-op-resize">
+                          class="sl-svg-op-resize"
+                          (mousedown)="mouseTracker.setResizing()">
               </svg:circle>
 
               <!-- Delegates -->
