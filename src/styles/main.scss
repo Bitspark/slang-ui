@@ -1,5 +1,6 @@
-@import "variables.scss";
-@import "~bootstrap/scss/bootstrap.scss";
+@import "variables";
+@import "~bootstrap/scss/bootstrap";
+@import "operator";
 
 /***
  * Overriding bootstrap rules

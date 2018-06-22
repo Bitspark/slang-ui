@@ -4,6 +4,9 @@ $primary: $orange;
 $list-group-bg: transparentize($body-color, .95);
 $list-group-border-color: transparentize($body-color, .90);
 
+$svg-bg: lighten(desaturate($body-bg, 14%), 12%);
+$svg-selected: $yellow;
+
 // YAML Codemirror
 
 /*

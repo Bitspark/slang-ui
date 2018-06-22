@@ -1,0 +1,99 @@
+@import "variables";
+$svg-op-elem: #20293B;
+$svg-op-lib: lighten($svg-op-elem, 10%);
+$svg-op-loc: #315585;
+
+svg {
+  background-color: $svg-bg;
+
+  text {
+    /* override browser default */
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    &::selection {
+      background: none;
+    }
+
+    fill: $body-color;
+    &.selected {
+      fill: $svg-selected;
+    }
+  }
+
+  rect, circle, line, path {
+    stroke: transparent;
+    stroke-width: 2px;
+    stroke-linecap: butt;
+    &.selected {
+      stroke: $svg-selected;
+    }
+  }
+
+  .sl-svg-conn {
+    stroke: $body-color;
+    stroke-width: 2px;
+  }
+
+  .sl-svg-conn-clickable {
+    stroke: transparent;
+    stroke-width: 24px;
+  }
+
+  .sl-svg-op {
+    fill: transparent;
+    stroke: $body-color;
+    stroke-dasharray: 6 3;
+  }
+
+  .sl-svg-op-ins {
+    stroke-opacity: .35;
+
+    &.sl-svg-op-type {
+      &.elementary {
+        fill: $svg-op-elem
+      }
+      &.library {
+        fill: $svg-op-lib;
+      }
+      &.local {
+        fill: $svg-op-loc;
+      }
+      &.selected {
+        stroke: $svg-selected;
+        stroke-width: 20px;
+      }
+    }
+  }
+
+  .sl-svg-port {
+    stroke-width: 10px;
+    stroke-opacity: .35;
+
+    &.sl-svg-port-type {
+      &.primitive {
+        fill: #008BE0;
+      }
+      &.number {
+        fill: #33AFE0;
+      }
+      &.string {
+        fill: #1e72e0;
+      }
+      &.boolean {
+        fill: #bc3f3c;
+      }
+      &.binary {
+        fill: #752922;
+      }
+      &.trigger {
+        fill: #555;
+      }
+      &.generic {
+        fill: #9e008e;
+      }
+    }
+  }
+}
+

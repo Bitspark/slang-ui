@@ -66,8 +66,8 @@
 
               <!-- Surrounding operator -->
               <svg:rect x="0" y="0" [attr.width]="operator.getWidth()" [attr.height]="operator.getHeight()"
-                        fill="transparent" stroke-width="3" stroke-dasharray="3 3"
-                        [attr.stroke]="operator === selectedEntity.entity ? '#0ff' : 'orange'"
+                        class="sl-svg-op"
+                        [ngClass]="isSelected(operator) ? 'selected' : ''"
                         (mousedown)="selectInstance(operator)"></svg:rect>
 
               <!-- Delegates -->
@@ -96,8 +96,8 @@
 
             <!-- Visible Connections -->
             <svg:line *ngFor="let conn of visualConnections()"
-                      stroke-width="2px"
-                      [attr.stroke]="conn === selectedEntity.entity ? '#0ff' : 'black'"
+                      class="sl-svg-conn"
+                      [ngClass]="isSelected(conn) ? 'selected' : ''"
                       [attr.x1]="conn.getSource().getPortPosX()"
                       [attr.y1]="conn.getSource().getPortPosY()"
                       [attr.x2]="conn.getDestination().getPortPosX()"
@@ -105,8 +105,7 @@
 
             <!-- Clickable Invisible Connections -->
             <svg:line *ngFor="let conn of visualConnections()"
-                      stroke-width="10px"
-                      stroke="transparent"
+                      class="sl-svg-conn-clickable"
                       (click)="selectConnection(conn)"
                       [attr.x1]="conn.getSource().getPortPosX()"
                       [attr.y1]="conn.getSource().getPortPosY()"
@@ -120,7 +119,7 @@
                         font-family="Arial" stroke-width="10" font-size="16"
                         [attr.transform]="transformLabel(port)"
                         [attr.x]="getPortLabelX(port)" [attr.y]="getPortLabelY(port)"
-                        [attr.fill]="(selectedEntity.entity === port) ? '#0ff' : 'blue'">
+                        [ngClass]="isSelected(port) ? 'selected' : ''">
                 {{port.getName()}}
               </svg:text>
             </svg:g>

@@ -301,7 +301,6 @@ export class Composable extends Transformable {
 }
 
 export class OperatorInstance extends Composable {
-
   private static style = {
     opMinWidth: 90,
     opMinHeight: 90,
@@ -765,6 +764,8 @@ export class Port extends Composable {
       px: 4,
     },
 
+    /* Deprecated
+     */
     portColors: {
       primitive: '#C4739C',
       number: '#0e7800',
@@ -1018,4 +1019,3 @@ export class Port extends Composable {
     return portName;
   }
 }
-

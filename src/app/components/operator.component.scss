@@ -12,20 +12,6 @@
   );
 }
 
-svg {
-  background-color: lighten($body-bg, 10%);
-}
-
-svg text {
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
-}
-
-svg text::selection {
-  background: none;
-}
 
 .navbar {
   padding-top: 0;
