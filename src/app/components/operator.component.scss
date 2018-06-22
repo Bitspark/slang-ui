@@ -49,8 +49,7 @@
   padding: $spacer;
   height: calc(100vh - 36px);
   .sl-ui-scrollable {
-    padding-bottom: $spacer;
-    padding-top: $spacer;
+    padding: $spacer;
     overflow: auto;
     white-space: nowrap;
     width: 100%;
