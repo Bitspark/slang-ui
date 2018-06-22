@@ -261,6 +261,10 @@ export class OperatorComponent implements OnInit {
     this.selectedEntity.entity = conn;
   }
 
+  public isSelected(entity: any) {
+    return this.selectedEntity.entity && this.selectedEntity.entity === entity;
+  }
+
   public isInstanceSelected() {
     return this.selectedEntity.entity && this.selectedEntity.entity !== this.operator &&
       this.selectedEntity.entity.constructor.name === OperatorInstance.name;
@@ -283,7 +287,6 @@ export class OperatorComponent implements OnInit {
   public renameInstance(ins: OperatorInstance, newName: string) {
     this.operator.renameInstance(ins.getName(), newName);
     this.refresh();
-    console.log(this.operatorDef);
   }
 
   public genericNames(ins: OperatorInstance): Array<string> {

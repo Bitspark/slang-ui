@@ -1,0 +1,108 @@
+@import "variables";
+
+$svg-op-elem: #3E4A54;
+$svg-op-lib: lighten($svg-op-elem, 10%);
+$svg-op-loc: #4C5773;
+
+svg {
+  background-color: transparentize($white, .9);
+
+  text {
+    /* override browser default */
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    &::selection {
+      background: none;
+    }
+
+    fill: $body-color;
+    font-size: 1em;
+
+    &.selected {
+      fill: $svg-selected;
+    }
+  }
+
+  rect, circle, line, path {
+    stroke: transparent;
+    stroke-width: 2px;
+    stroke-linecap: butt;
+    &.selected {
+      stroke: $svg-selected;
+    }
+  }
+
+  .sl-svg-conn {
+    stroke: $body-color;
+    stroke-width: 2px;
+  }
+
+  .sl-svg-conn-click-overlay {
+    stroke: transparent;
+    stroke-width: 14px;
+  }
+
+  .sl-svg-op {
+    rx: 20px;
+    ry: 20px;
+    stroke: $body-color;
+    stroke-width: 14px;
+    stroke-opacity: .35;
+
+    &.selected {
+      stroke: $svg-selected;
+    }
+    &.sl-svg-op-surr {
+      fill: $svg-bg;
+      //stroke-dasharray: 6 3;
+    }
+    &.sl-svg-op-ins {
+      &.sl-svg-op-type {
+        &.elementary {
+          fill: $svg-op-elem
+        }
+        &.library {
+          fill: $svg-op-lib;
+        }
+        &.local {
+          fill: $svg-op-loc;
+        }
+      }
+    }
+
+  }
+
+  .sl-svg-port {
+    stroke-width: 10px;
+    stroke-opacity: .35;
+
+    &.sl-svg-port-type {
+      &.primitive {
+        fill: #7156FB;
+      }
+      &.number {
+        fill: #40A1DE;
+      }
+      &.string {
+        fill: #46B5E8;
+      }
+      &.boolean {
+        fill: #3CCC90;
+      }
+      &.binary {
+        fill: #FBEB56;
+      }
+      &.trigger {
+        fill: #9ab;
+      }
+      &.generic {
+        fill: #9e008e;
+      }
+    }
+  }
+  .sl-svg-port-label {
+  }
+}
+

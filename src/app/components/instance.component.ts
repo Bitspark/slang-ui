@@ -9,7 +9,7 @@ import {generateSvgTransform} from '../utils';
 })
 export class InstanceComponent {
   @Input()
-  public selectedEntity: any = { entity: null };
+  public selectedEntity: any = {entity: null};
   @Input()
   public instance: OperatorInstance;
 
@@ -19,6 +19,18 @@ export class InstanceComponent {
   public selectInstance: EventEmitter<any> = new EventEmitter();
 
   public constructor() {
+  }
+
+  public getCSSClass(): any {
+    const cssClass = {};
+    cssClass['selected'] = this.isSelected();
+    cssClass['sl-svg-op-type'] = true;
+    cssClass[this.instance.getOperatorType()] = true;
+    return cssClass;
+  }
+
+  public isSelected() {
+    return this.selectedEntity.entity && this.selectedEntity.entity === this.instance;
   }
 
   public transform(trans: Transformable): string {
@@ -31,17 +43,6 @@ export class InstanceComponent {
       return 'circle';
     }
     return 'rect';
-  }
-
-  public color(): string {
-    switch (this.instance.getOperatorType()) {
-      case 'local':
-        return '#33cc33';
-      case 'library':
-        return '#ff9933';
-      case 'elementary':
-        return '#6699ff';
-    }
   }
 
   public text(): string {
