@@ -55,12 +55,22 @@
       </div>
       <div class="sl-ui-mainbar col">
         <div id="sl-svg-container">
+
           <svg [attr.width]="2000*scale" [attr.height]="1800*scale"
                viewBox="0 0 2000 1800"
                xmlns:svg="http://www.w3.org/2000/svg"
                (mousedown)="startDrag($event)"
                (mouseup)="stopDrag($event)"
                (mousemove)="drag($event)">
+
+            <!-- Visible Connections -->
+            <svg:line *ngFor="let conn of visualConnections()"
+                      class="sl-svg-conn"
+                      [ngClass]="isSelected(conn) ? 'selected' : ''"
+                      [attr.x1]="conn.getSource().getPortPosX()"
+                      [attr.y1]="conn.getSource().getPortPosY()"
+                      [attr.x2]="conn.getDestination().getPortPosX()"
+                      [attr.y2]="conn.getDestination().getPortPosY()"></svg:line>
 
             <svg:g *ngIf="operator" [attr.transform]="transform(operator)">
 
@@ -93,15 +103,6 @@
               </svg:g>
 
             </svg:g>
-
-            <!-- Visible Connections -->
-            <svg:line *ngFor="let conn of visualConnections()"
-                      class="sl-svg-conn"
-                      [ngClass]="isSelected(conn) ? 'selected' : ''"
-                      [attr.x1]="conn.getSource().getPortPosX()"
-                      [attr.y1]="conn.getSource().getPortPosY()"
-                      [attr.x2]="conn.getDestination().getPortPosX()"
-                      [attr.y2]="conn.getDestination().getPortPosY()"></svg:line>
 
             <!-- Clickable Invisible Connections -->
             <svg:line *ngFor="let conn of visualConnections()"
