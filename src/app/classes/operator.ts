@@ -338,7 +338,6 @@ export class OperatorInstance extends Composable {
   public updateOperator(def: any, props: any, dim?: [number, number]) {
     let [width, height] = (this.dim) ? this.dim : (dim) ? dim : [0, 0];
 
-    console.log(this.properties, props);
     this.properties = props;
 
     this.mainIn = new Port(this, 'service', 'main', true, null, '', this, def.services['main']['in']);
@@ -479,11 +478,9 @@ export class OperatorInstance extends Composable {
     for (const src in oDef.connections) {
       if (oDef.connections.hasOwnProperty(src)) {
         const srcInfo = parseRefString(src);
-        console.log('srcInfo', srcInfo);
         if (srcInfo.instance === oldName) {
           srcInfo.instance = newName;
           const newSrc = buildRefString(srcInfo);
-          console.log('new ----->', newSrc);
           newConns[newSrc] = oDef.connections[src];
         } else {
           newConns[src] = oDef.connections[src];

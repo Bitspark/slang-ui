@@ -287,7 +287,6 @@ export class OperatorComponent implements OnInit {
   public renameInstance(ins: OperatorInstance, newName: string) {
     this.operator.renameInstance(ins.getName(), newName);
     this.refresh();
-    console.log(this.operatorDef);
   }
 
   public genericNames(ins: OperatorInstance): Array<string> {

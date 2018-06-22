@@ -22,7 +22,6 @@ export class PortComponent {
     cssClass['selected'] = this.isSelected();
     cssClass['sl-svg-port-type'] = true;
     cssClass[Type[this.port.getType()]] = true;
-    console.log(cssClass);
     return cssClass;
   }
 
