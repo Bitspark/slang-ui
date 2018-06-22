@@ -53,6 +53,9 @@
     overflow: auto;
     white-space: nowrap;
     width: 100%;
+    .sl-operator-name {
+      margin-bottom: 8px;
+    }
   }
 }
 
@@ -82,5 +85,16 @@
     box-sizing: border-box;
     margin-bottom: $spacer;
     padding: 5px;
+  }
+}
+
+.sl-form-box {
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  label {
+    margin: 0
   }
 }
