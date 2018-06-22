@@ -12,10 +12,10 @@
   );
 }
 
-
 .navbar {
   padding-top: 0;
   padding-bottom: 0;
+  height: 36px;
   .sl-operator-name {
     display: inline-block;
     padding-top: 0;
@@ -24,10 +24,14 @@
   }
 }
 
+.row {
+  width: 100%;
+}
+
 #sl-visual-ui {
   display: inline-block;
   width: 100vw;
-  height: 90vh;
+  height: calc(100vh - 36px);
 }
 
 .sl-operator-list {
@@ -41,28 +45,43 @@
 }
 
 .sl-ui-sidebar {
-  padding-top: $spacer;
+  background-color: $dark-tone;
+  padding: $spacer;
   height: calc(100vh - 36px);
   .sl-ui-scrollable {
-    overflow-y: scroll;
+    padding-bottom: $spacer;
+    padding-top: $spacer;
+    overflow: auto;
+    white-space: nowrap;
+    width: 100%;
   }
 }
 
-.sl-ui-mainbar, .sl-ui-sidebar {
-  padding-left: $spacer;
-  padding-right: $spacer;
+.sl-ui-mainbar {
+  padding: 0;
 }
 
 #sl-operator-sidebar {
+  .sl-ui-form-box {
+    height: 34px;
+    background-color: $body-bg;
+    margin-bottom: $spacer;
+  }
   .sl-ui-scrollable {
-    height: calc(100% - 100px);
-    width: 100%;
-    overflow: scroll;
+    background-color: $body-bg;
+    height: calc(100% - 34px - 0.5rem);
+    border-top: $spacer solid transparent;
+    box-sizing: border-box;
   }
 }
 
 #sl-instance-sidebar {
   .sl-ui-scrollable {
-    height: 50%;
+    background-color: $body-bg;
+    height: calc(50% - 0.25rem);
+    width: 100%;
+    box-sizing: border-box;
+    margin-bottom: $spacer;
+    padding: 5px;
   }
 }

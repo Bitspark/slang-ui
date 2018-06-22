@@ -26,7 +26,9 @@
   <div id="sl-visual-ui" *ngIf="isUIModeVisual()">
     <div class="row">
       <div id="sl-operator-sidebar" class="sl-ui-sidebar col-2">
-        <input placeholder="Search for operators" type="text" class="form-control" [(ngModel)]="filterString"/>
+        <div class="sl-ui-form-box">
+          <input placeholder="Search for operators" type="text" class="form-control" [(ngModel)]="filterString"/>
+        </div>
         <div class="sl-ui-scrollable">
 
           <div class="sl-operator-list">
