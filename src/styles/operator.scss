@@ -17,7 +17,7 @@ svg {
       background: none;
     }
 
-    fill: $body-color;
+    fill: $light-gray;
     font-size: 1em;
 
     &.selected {
@@ -35,7 +35,7 @@ svg {
   }
 
   .sl-svg-conn {
-    stroke: $body-color;
+    stroke: $light-gray;
     stroke-width: 2px;
   }
 
@@ -47,7 +47,7 @@ svg {
   .sl-svg-op {
     rx: 20px;
     ry: 20px;
-    stroke: $body-color;
+    stroke: $light-gray;
     stroke-width: 14px;
     stroke-opacity: .35;
 
@@ -71,7 +71,19 @@ svg {
         }
       }
     }
+  }
 
+  .sl-svg-op-resize {
+    r: 8px;
+    fill: $light-gray;
+    fill-opacity: .50;
+    -webkit-transition: r 200ms ease-in-out;
+    -moz-transition: r 200ms ease-in-out;
+    transition: r 200ms ease-in-out;
+    &:hover {
+      r: 10px;
+      fill-opacity: .95;
+    }
   }
 
   .sl-svg-port {

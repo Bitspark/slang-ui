@@ -59,18 +59,22 @@
           <svg [attr.width]="50000*scale" [attr.height]="50000*scale"
                viewBox="0 0 50000 50000"
                xmlns:svg="http://www.w3.org/2000/svg"
-               (mousedown)="startDrag($event)"
-               (mouseup)="stopDrag($event)"
-               (mousemove)="drag($event)">
+               (mousedown)="mouseTracker.start($event)"
+               (mouseup)="mouseTracker.stop($event)"
+               (mousemove)="mouseTracker.track($event)">
 
             <svg:g *ngIf="operator" [attr.transform]="transform(operator)">
-
               <!-- Surrounding operator -->
               <svg:rect x="0" y="0" [attr.width]="operator.getWidth()" [attr.height]="operator.getHeight()"
                         class="sl-svg-op sl-svg-op-surr"
                         [ngClass]="isSelected(operator) ? 'selected' : ''"
                         paint-order="stroke fill"
-                        (mousedown)="selectInstance(operator)"></svg:rect>
+                        (mousedown)="selectInstance(operator)">
+              </svg:rect>
+              <!-- Surrounding operator resizer -->
+              <svg:circle [attr.cx]="operator.getWidth() - 20" [attr.cy]="operator.getHeight() - 20"
+                          class="sl-svg-op-resize">
+              </svg:circle>
 
               <!-- Delegates -->
               <svg:g *ngFor="let dlg of operator.getDelegates()" [attr.transform]="transform(dlg)">
@@ -93,7 +97,6 @@
                      [instance]="ins" [selectedEntity]="selectedEntity"
                      (selectPort)="selectPort($event)" (selectInstance)="selectInstance($event)">
               </svg:g>
-
             </svg:g>
 
             <!-- Visible Connections -->
@@ -145,11 +148,15 @@
           </div>
           <h4>Properties</h4>
           <div *ngFor="let propName of getPropertyNames()">
-            <h5><button (click)="removePropertyDef(propName)"><i class="fa fa-trash"></i></button> {{propName}}</h5>
+            <h5>
+              <button (click)="removePropertyDef(propName)"><i class="fa fa-trash"></i></button>
+              {{propName}}
+            </h5>
             <app-type-def-form [(typeDef)]="propertyDefs[propName]" (typeDefChange)="refresh()"></app-type-def-form>
           </div>
           <h5><label for="newPropName">New property</label></h5>
-          <input id="newPropName" [(ngModel)]="newPropName"><button (click)="addPropertyDef(newPropName); newPropName = '';">add</button>
+          <input id="newPropName" [(ngModel)]="newPropName">
+          <button (click)="addPropertyDef(newPropName); newPropName = '';">add</button>
         </div>
 
         <div class="sl-ui-scrollable">
@@ -161,7 +168,10 @@
             <p class="sl-operator-name">{{ getSelectedInstanceFQName() }}</p>
             <h5><label for="instanceName">Instance</label></h5>
             <p class="sl-operator-name">{{ getSelectedInstanceName() }}</p>
-            <input id="instanceName" [(ngModel)]="newInstanceName"/> <button (click)="renameInstance(selectedEntity.entity, newInstanceName); selectedEntity.entity = null">rename</button>
+            <input id="instanceName" [(ngModel)]="newInstanceName"/>
+            <button (click)="renameInstance(selectedEntity.entity, newInstanceName); selectedEntity.entity = null">
+              rename
+            </button>
             <h5>Generics ({{ genericNames(selectedEntity.entity).length }})</h5>
             <div *ngFor="let genName of genericNames(selectedEntity.entity)">{{ genName }}
               <app-type-def-form *ngIf="isGenericSpecified(selectedEntity.entity, genName)"

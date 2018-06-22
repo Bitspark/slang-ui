@@ -17,6 +17,67 @@ import {VisualService} from '../services/visual.service';
 import 'codemirror/mode/yaml/yaml.js';
 import {TypeDefFormComponent} from './type-def-form.component';
 
+class MouseMoueTracker {
+  private static lastX: number;
+  private static lastY: number;
+
+  private moving: boolean;
+  private actionType = '';
+
+  constructor(private mouseAction: (t: MouseMoueTracker, event: any, actionPhase: string) => void) {
+  }
+
+  public static getLastX(): number {
+    return this.lastX;
+  }
+
+  public static getLastY(): number {
+    return this.lastY;
+  }
+
+  public setResizing() {
+    this.actionType = 'resize';
+  }
+
+  public setDragging() {
+    this.actionType = 'drag';
+  }
+
+  public isResizing() {
+    return this.actionType === 'resize';
+  }
+
+  public isDragging() {
+    return this.actionType === 'drag';
+  }
+
+  public start(event: any) {
+    this.moving = true;
+    this.mouseAction(this, event, 'start');
+    MouseMoueTracker.lastX = event.screenX;
+    MouseMoueTracker.lastY = event.screenY;
+  }
+
+  public stop(event: any) {
+    this.moving = false;
+    this.mouseAction(this, event, 'stop');
+    MouseMoueTracker.lastX = event.screenX;
+    MouseMoueTracker.lastY = event.screenY;
+    this.actionType = '';
+  }
+
+  public track(event: any) {
+    if (event.buttons === 0) {
+      this.moving = false;
+    }
+    if (this.moving) {
+      this.mouseAction(this, event, 'ongoing');
+      MouseMoueTracker.lastX = event.screenX;
+      MouseMoueTracker.lastY = event.screenY;
+    }
+  }
+}
+
 @Component({
   templateUrl: './operator.component.html',
   styleUrls: ['./operator.component.scss']
@@ -29,7 +90,6 @@ export class OperatorComponent implements OnInit {
   public mainSrvPort: any = null;
   public propertyDefs: any = null;
   public status;
-  public showInOutPorts = false;
   public newPropName = '';
   public newInstanceName = '';
 
@@ -53,11 +113,28 @@ export class OperatorComponent implements OnInit {
   public scale = 0.6;
   public filterString = '';
 
-  // Dragging
-  private dragging = false;
-  private lastX: number;
-  private lastY: number;
   private insPropDefs = new Map<string, Array<{ name: string, def: any }>>();
+
+  // Dragging
+  public mouseTracker = new MouseMoueTracker((t, event, phase) => {
+    if (!this.selectedEntity.entity && typeof this.selectedEntity.entity.translate !== 'function') {
+      return;
+    }
+
+    const update = phase === 'ongoing';
+
+    if (!update) {
+      return;
+    }
+
+    const xDiff = event.screenX - MouseMoueTracker.getLastX();
+    const yDiff = event.screenY - MouseMoueTracker.getLastY();
+
+
+    if (t.isDragging()) {
+      this.selectedEntity.entity.translate([xDiff / this.scale, yDiff / this.scale]);
+    }
+  });
 
   @HostListener('window:keyup', ['$event'])
   keyEvent(event: KeyboardEvent) {
@@ -253,6 +330,7 @@ export class OperatorComponent implements OnInit {
   }
 
   public selectInstance(ins: OperatorInstance) {
+    this.mouseTracker.setDragging();
     this.selectedEntity.entity = ins;
     this.newInstanceName = ins.getName();
   }
@@ -512,35 +590,6 @@ export class OperatorComponent implements OnInit {
       insOpDef.properties = {};
     }
     insOpDef.properties[prop.name] = createDefaultValue(prop.def);
-  }
-
-  // Dragging
-
-  private updateDrag(event, update?: boolean) {
-    if (this.selectedEntity.entity && typeof this.selectedEntity.entity.translate === 'function' && update) {
-      this.selectedEntity.entity.translate([(event.screenX - this.lastX) / this.scale, (event.screenY - this.lastY) / this.scale]);
-    }
-    this.lastX = event.screenX;
-    this.lastY = event.screenY;
-  }
-
-  public startDrag(event: any) {
-    this.dragging = true;
-    this.updateDrag(event);
-  }
-
-  public stopDrag(event: any) {
-    this.dragging = false;
-    this.updateDrag(event, true);
-  }
-
-  public drag(event: any) {
-    if (event.buttons === 0) {
-      this.dragging = false;
-    }
-    if (this.dragging) {
-      this.updateDrag(event, true);
-    }
   }
 
   public setUIMode(mode: string): string {
