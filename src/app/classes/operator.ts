@@ -302,8 +302,8 @@ export class Composable extends Transformable {
 
 export class OperatorInstance extends Composable {
   private static style = {
-    opMinWidth: 90,
-    opMinHeight: 90,
+    opMinWidth: 100,
+    opMinHeight: 100,
     dlgP: 10,
     dlgM: 5
   };
@@ -367,8 +367,8 @@ export class OperatorInstance extends Composable {
     this.mainOut = new Port(this, 'service', 'main', false, null, '', this, def.services['main']['out']);
     this.mainOut.scale([1, -1]).translate([0, height]);
 
-    this.mainIn.translate([0, -6]);
-    this.mainOut.translate([0, 6]);
+    this.mainIn.translate([0, -7]);
+    this.mainOut.translate([0, 7]);
     this.mainIn.justifyHorizontally();
     this.mainOut.justifyHorizontally();
     this.distributeDelegatesVertically();
@@ -752,8 +752,8 @@ export class Port extends Composable {
    * p*: padding [px]
    */
   private static style = {
-    x: 20,
-    y: 15,
+    x: 17,
+    y: 14,
 
     str: {
       px: 4,

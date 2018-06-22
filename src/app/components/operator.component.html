@@ -56,28 +56,20 @@
       <div class="sl-ui-mainbar col">
         <div id="sl-svg-container">
 
-          <svg [attr.width]="2000*scale" [attr.height]="1800*scale"
-               viewBox="0 0 2000 1800"
+          <svg [attr.width]="50000*scale" [attr.height]="50000*scale"
+               viewBox="0 0 50000 50000"
                xmlns:svg="http://www.w3.org/2000/svg"
                (mousedown)="startDrag($event)"
                (mouseup)="stopDrag($event)"
                (mousemove)="drag($event)">
 
-            <!-- Visible Connections -->
-            <svg:line *ngFor="let conn of visualConnections()"
-                      class="sl-svg-conn"
-                      [ngClass]="isSelected(conn) ? 'selected' : ''"
-                      [attr.x1]="conn.getSource().getPortPosX()"
-                      [attr.y1]="conn.getSource().getPortPosY()"
-                      [attr.x2]="conn.getDestination().getPortPosX()"
-                      [attr.y2]="conn.getDestination().getPortPosY()"></svg:line>
-
             <svg:g *ngIf="operator" [attr.transform]="transform(operator)">
 
               <!-- Surrounding operator -->
               <svg:rect x="0" y="0" [attr.width]="operator.getWidth()" [attr.height]="operator.getHeight()"
-                        class="sl-svg-op"
+                        class="sl-svg-op sl-svg-op-surr"
                         [ngClass]="isSelected(operator) ? 'selected' : ''"
+                        paint-order="stroke fill"
                         (mousedown)="selectInstance(operator)"></svg:rect>
 
               <!-- Delegates -->
@@ -104,9 +96,18 @@
 
             </svg:g>
 
+            <!-- Visible Connections -->
+            <svg:line *ngFor="let conn of visualConnections()"
+                      class="sl-svg-conn"
+                      [ngClass]="{selected: isSelected(conn)}"
+                      [attr.x1]="conn.getSource().getPortPosX()"
+                      [attr.y1]="conn.getSource().getPortPosY()"
+                      [attr.x2]="conn.getDestination().getPortPosX()"
+                      [attr.y2]="conn.getDestination().getPortPosY()"></svg:line>
+
             <!-- Clickable Invisible Connections -->
             <svg:line *ngFor="let conn of visualConnections()"
-                      class="sl-svg-conn-clickable"
+                      class="sl-svg-conn-click-overlay"
                       (click)="selectConnection(conn)"
                       [attr.x1]="conn.getSource().getPortPosX()"
                       [attr.y1]="conn.getSource().getPortPosY()"
@@ -117,10 +118,10 @@
             <svg:g *ngFor="let port of getPorts()" (click)="selectPort(port)" [attr.transform]="translate(port)">
               <!--<circle [attr.cx]="getPortLabelX(port)-1" [attr.cy]="getPortLabelY(port)-1" r="2"/>-->
               <svg:text [attr.text-anchor]="getPortLabelAnchor(port)" alignment-baseline="middle"
-                        font-family="Arial" stroke-width="10" font-size="16"
                         [attr.transform]="transformLabel(port)"
                         [attr.x]="getPortLabelX(port)" [attr.y]="getPortLabelY(port)"
-                        [ngClass]="isSelected(port) ? 'selected' : ''">
+                        class="sl-svg-port-label"
+                        [ngClass]="{selected: isSelected(port)}">
                 {{port.getName()}}
               </svg:text>
             </svg:g>

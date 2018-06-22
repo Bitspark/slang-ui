@@ -6,16 +6,17 @@
           class="sl-svg-port"
           [ngClass]="getCSSClass()"
           paint-order="stroke fill"
-          d="M 0 0 L 20 0 L 10 15 z"></path>
+          d="M 0 0 L 17 0 L 8 14 z"></path>
     <!-- d="M left-x left-y L right-x right-y L bottom-x bottom-y z" -->
     <path *ngIf="port.isOut()"
           class="sl-svg-port"
           [ngClass]="getCSSClass()"
           paint-order="stroke fill"
-          d="M 0 15 L 20 15 L 10 0 z"></path>
+          d="M 0 14 L 17 14 L 8 0 z"></path>
   </svg:g>
   <!-- Clickable port -->
   <svg:rect fill="transparent"
+            class="sl-svg-port-click-overlay"
             (click)="select.emit(port)"
             [attr.width]="port.getWidth()" [attr.height]="port.getHeight()"/>
 

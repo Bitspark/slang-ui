@@ -1,14 +1,14 @@
 <svg:g xmlns:svg="http://www.w3.org/2000/svg" [attr.transform]="transform(instance)">
 
   <svg:rect *ngIf="form() === 'rect'"
-            class="sl-svg-op-ins"
+            class="sl-svg-op sl-svg-op-ins"
             [ngClass]="getCSSClass()"
             x="0" y="0" [attr.width]="instance.getWidth()" [attr.height]="instance.getHeight()"
             (mousedown)="selectInstance.emit(instance)"
             paint-order="stroke fill"
   ></svg:rect>
   <svg:circle *ngIf="form() === 'circle'"
-              class="sl-svg-op-ins"
+              class="sl-svg-op sl-svg-op-ins"
               [ngClass]="getCSSClass()"
               [attr.cx]="radius()" [attr.cy]="radius()" [attr.r]="radius()"
               (mousedown)="selectInstance.emit(instance)"
@@ -16,11 +16,13 @@
   ></svg:circle>
   <svg:text text-anchor="middle"
             [attr.x]="instance.getWidth() / 2" [attr.y]="instance.getHeight() / 2 - 4"
+            (mousedown)="selectInstance.emit(instance)"
             [ngClass]="getCSSClass()">
     {{text()}}
   </svg:text>
   <svg:text text-anchor="middle"
             [attr.x]="instance.getWidth() / 2" [attr.y]="instance.getHeight() / 2 - 4 + 16"
+            (mousedown)="selectInstance.emit(instance)"
             [ngClass]="getCSSClass()">
     ({{fqn()}})
   </svg:text>

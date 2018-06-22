@@ -1,10 +1,11 @@
 @import "variables";
-$svg-op-elem: #20293B;
+
+$svg-op-elem: #3E4A54;
 $svg-op-lib: lighten($svg-op-elem, 10%);
-$svg-op-loc: #315585;
+$svg-op-loc: #4C5773;
 
 svg {
-  background-color: $svg-bg;
+  background-color: transparentize($white, .9);
 
   text {
     /* override browser default */
@@ -17,6 +18,8 @@ svg {
     }
 
     fill: $body-color;
+    font-size: 1em;
+
     &.selected {
       fill: $svg-selected;
     }
@@ -36,35 +39,39 @@ svg {
     stroke-width: 2px;
   }
 
-  .sl-svg-conn-clickable {
+  .sl-svg-conn-click-overlay {
     stroke: transparent;
-    stroke-width: 24px;
+    stroke-width: 14px;
   }
 
   .sl-svg-op {
-    fill: transparent;
+    rx: 20px;
+    ry: 20px;
     stroke: $body-color;
-    stroke-dasharray: 6 3;
-  }
-
-  .sl-svg-op-ins {
+    stroke-width: 14px;
     stroke-opacity: .35;
 
-    &.sl-svg-op-type {
-      &.elementary {
-        fill: $svg-op-elem
-      }
-      &.library {
-        fill: $svg-op-lib;
-      }
-      &.local {
-        fill: $svg-op-loc;
-      }
-      &.selected {
-        stroke: $svg-selected;
-        stroke-width: 20px;
+    &.selected {
+      stroke: $svg-selected;
+    }
+    &.sl-svg-op-surr {
+      fill: $svg-bg;
+      //stroke-dasharray: 6 3;
+    }
+    &.sl-svg-op-ins {
+      &.sl-svg-op-type {
+        &.elementary {
+          fill: $svg-op-elem
+        }
+        &.library {
+          fill: $svg-op-lib;
+        }
+        &.local {
+          fill: $svg-op-loc;
+        }
       }
     }
+
   }
 
   .sl-svg-port {
@@ -73,27 +80,29 @@ svg {
 
     &.sl-svg-port-type {
       &.primitive {
-        fill: #008BE0;
+        fill: #7156FB;
       }
       &.number {
-        fill: #33AFE0;
+        fill: #40A1DE;
       }
       &.string {
-        fill: #1e72e0;
+        fill: #46B5E8;
       }
       &.boolean {
-        fill: #bc3f3c;
+        fill: #3CCC90;
       }
       &.binary {
-        fill: #752922;
+        fill: #FBEB56;
       }
       &.trigger {
-        fill: #555;
+        fill: #9ab;
       }
       &.generic {
         fill: #9e008e;
       }
     }
+  }
+  .sl-svg-port-label {
   }
 }
 
