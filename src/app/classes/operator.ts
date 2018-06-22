@@ -355,7 +355,10 @@ export class OperatorInstance extends Composable {
           const dlgDef = def.delegates[dlgName];
           const dlg = new Delegate(this, dlgName, this, dlgDef);
           dlgHeight += dlg.getWidth();
-          dlg.scale([-1, 1]).rotate(-Math.PI / 2).translate([width, dlg.getWidth()]);
+          dlg
+            .scale([-1, 1])
+            .rotate(-Math.PI / 2)
+            .translate([width, dlg.getWidth()]);
           this.delegates.set(dlgName, dlg);
           dlgHeight += OperatorInstance.style.dlgM;
         }
@@ -368,7 +371,7 @@ export class OperatorInstance extends Composable {
     this.mainOut.scale([1, -1]).translate([0, height]);
 
     this.mainIn.translate([0, -7]);
-    this.mainOut.translate([0, 7]);
+    this.mainOut.translate([0, 14]);
     this.mainIn.justifyHorizontally();
     this.mainOut.justifyHorizontally();
     this.distributeDelegatesVertically();
@@ -708,9 +711,9 @@ export class PortGroup extends Composable {
               portGrpDef: any) {
     super(parent);
     this.in = new Port(operator, groupType, groupName, true, null, '', this, portGrpDef.in);
-    this.in.translate([0, -6]);
+    this.in.translate([0, -7]);
     this.out = new Port(operator, groupType, groupName, false, null, '', this, portGrpDef.out);
-    this.out.translate([0, -6]).translate([this.in.getWidth() + 5, 0]);
+    this.out.translate([0, -14]).translate([this.in.getWidth() + 5, 0]);
     this.dim = [this.in.getWidth() + this.out.getWidth() + 10, Math.max(this.in.getHeight(), this.out.getHeight())];
   }
 
