@@ -1,4 +1,5 @@
 <svg:g xmlns:svg="http://www.w3.org/2000/svg" [attr.transform]="transform(instance)">
+
   <svg:rect *ngIf="form() === 'rect'"
             class="sl-svg-op-ins"
             [ngClass]="getCSSClass()"
@@ -23,6 +24,7 @@
             [ngClass]="getCSSClass()">
     ({{fqn()}})
   </svg:text>
+
   <svg:g *ngFor="let dlg of instance.getDelegates()" [attr.transform]="transform(dlg)">
     <svg:g [attr.transform]="transform(dlg.getIn())" app-port [port]="dlg.getIn()"
            (select)="selectPort.emit($event)" [selectedEntity]="selectedEntity"></svg:g>
@@ -33,4 +35,5 @@
          (select)="selectPort.emit($event)" [selectedEntity]="selectedEntity"></svg:g>
   <svg:g [attr.transform]="transform(instance.getMainOut())" app-port [port]="instance.getMainOut()"
          (select)="selectPort.emit($event)" [selectedEntity]="selectedEntity"></svg:g>
+
 </svg:g>

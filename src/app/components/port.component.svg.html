@@ -1,18 +1,24 @@
 <svg:g xmlns:svg="http://www.w3.org/2000/svg">
   <!-- Primitive -->
+  <!-- Visible port -->
   <svg:g *ngIf="(port.isPrimitive() || port.isGeneric())">
-    <path (click)="select.emit(port)" *ngIf="port.isIn()"
+    <path *ngIf="port.isIn()"
           class="sl-svg-port"
           [ngClass]="getCSSClass()"
           paint-order="stroke fill"
           d="M 0 0 L 20 0 L 10 15 z"></path>
     <!-- d="M left-x left-y L right-x right-y L bottom-x bottom-y z" -->
-    <path (click)="select.emit(port)" *ngIf="port.isOut()"
+    <path *ngIf="port.isOut()"
           class="sl-svg-port"
           [ngClass]="getCSSClass()"
           paint-order="stroke fill"
           d="M 0 15 L 20 15 L 10 0 z"></path>
   </svg:g>
+  <!-- Clickable port -->
+  <svg:rect fill="transparent"
+            (click)="select.emit(port)"
+            [attr.width]="port.getWidth()" [attr.height]="port.getHeight()"/>
+
   <!-- Stream -->
   <svg:rect *ngIf="port.isStream()" fill="white" stroke-width="2" fill="transparent"
             paint-order="stroke fill"
