@@ -7,8 +7,7 @@ function expandExpressionPart(exprPart: string, props: any, propDefs: any): Arra
   }
   const prop = props[exprPart];
   if (!prop) {
-    console.error('missing property', exprPart);
-    return null;
+    return [];
   }
   const propDef = propDefs[exprPart];
   if (propDef['type'] === 'stream') {
@@ -222,4 +221,89 @@ export function createDefaultValue(typeDef: any): any {
 
 export function compareOperatorDefs(lhs, rhs: OperatorDef): number {
   return (lhs.getName() < rhs.getName()) ? -1 : 1;
+}
+
+export function parseRefString(ref: string): {instance: string, delegate: string, service: string, dirIn: boolean, port: string} {
+  if (ref.length === 0) {
+    return null;
+  }
+
+  const ret = {
+    instance: undefined,
+    delegate: undefined,
+    service: undefined,
+    dirIn: undefined,
+    port: undefined
+  };
+
+  let sep = '';
+  let opIdx = 0;
+  let portIdx = 0;
+  if (ref.indexOf('(') !== -1) {
+    ret.dirIn = true;
+    sep = '(';
+    opIdx = 1;
+    portIdx = 0;
+  } else if (ref.indexOf(')') !== -1) {
+    ret.dirIn = false;
+    sep = ')';
+    opIdx = 0;
+    portIdx = 1;
+  } else {
+    return null;
+  }
+
+  const refSplit = ref.split(sep);
+  if (refSplit.length !== 2) {
+    return null;
+  }
+  const opPart = refSplit[opIdx];
+  ret.port = refSplit[portIdx];
+
+  if (opPart === '') {
+    ret.instance = '';
+    ret.service = 'main';
+  } else {
+    if (opPart.indexOf('.') !== -1 && opPart.indexOf('@') !== -1) {
+      // Delegate and service must not both occur in string
+      return null;
+    }
+    if (opPart.indexOf('.') !== -1) {
+      const opSplit = opPart.split('.');
+      if (opSplit.length === 2) {
+        ret.instance = opSplit[0];
+        ret.delegate = opSplit[1];
+      }
+    } else if (opPart.indexOf('@') !== -1) {
+      const opSplit = opPart.split('@');
+      if (opSplit.length === 2) {
+        ret.instance = opSplit[1];
+        ret.service = opSplit[0];
+      }
+    } else {
+      ret.instance = opPart;
+      ret.service = 'main';
+    }
+  }
+
+  return ret;
+}
+
+export function buildRefString(info: {instance: string, delegate: string, service: string, dirIn: boolean, port: string}): string {
+  let opStr = '';
+  if (typeof info.service !== 'undefined') {
+    if (info.service === 'main' || info.service === '') {
+      opStr = info.instance;
+    } else {
+      opStr = `${info.service}@${info.instance}`;
+    }
+  } else if (typeof info.delegate !== 'undefined') {
+    opStr = `${info.instance}.${info.delegate}`;
+  }
+
+  if (info.dirIn) {
+    return `${info.port}(${opStr}`;
+  } else {
+    return `${opStr})${info.port}`;
+  }
 }

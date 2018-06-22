@@ -1,4 +1,4 @@
-import {connectDeep, expandProperties} from '../utils';
+import {buildRefString, connectDeep, expandProperties, parseRefString} from '../utils';
 import {OperatorService} from '../services/operator.service';
 import {Mat2, Mat3} from './matrix';
 
@@ -255,7 +255,6 @@ export class Transformable {
   }
 }
 
-
 export class Composable extends Transformable {
   constructor(private parent: Composable) {
     super();
@@ -318,12 +317,13 @@ export class OperatorInstance extends Composable {
   private connections: Set<Connection>;
   private visible: boolean;
   private operatorType: string;
+  private properties: any;
 
   constructor(private operatorSrv: OperatorService,
               private fqOperator: string,
               private name: string,
-              private opDef: OperatorDef,
-              private properties: any,
+              public opDef: OperatorDef,
+              properties: any,
               parent: Composable,
               def: any,
               dim?: [number, number]) {
@@ -332,11 +332,15 @@ export class OperatorInstance extends Composable {
     this.operatorType = op[1];
     this.instances = new Map<string, OperatorInstance>();
     this.connections = new Set<Connection>();
-    this.updateOperator(def, dim);
+    this.properties = properties;
+    this.updateOperator(def, properties, dim);
   }
 
-  public updateOperator(def: any, dim?: [number, number]) {
+  public updateOperator(def: any, props: any, dim?: [number, number]) {
     let [width, height] = (this.dim) ? this.dim : (dim) ? dim : [0, 0];
+
+    console.log(this.properties, props);
+    this.properties = props;
 
     this.mainIn = new Port(this, 'service', 'main', true, null, '', this, def.services['main']['in']);
     const tmpMainOut = new Port(this, 'service', 'main', false, null, '', this, def.services['main']['out']);
@@ -402,7 +406,7 @@ export class OperatorInstance extends Composable {
               Math.random() * (this.dim[0] - OperatorInstance.style.opMinWidth),
               Math.random() * (this.dim[1] - OperatorInstance.style.opMinHeight)]);
           } else {
-            opIns.updateOperator(opDef);
+            opIns.updateOperator(opDef, ins['properties']);
           }
           this.instances.set(insName, opIns);
           opIns.show();
@@ -442,6 +446,57 @@ export class OperatorInstance extends Composable {
     return visual;
   }
 
+  public renameInstance(oldName: string, newName: string) {
+    const ins = this.instances.get(oldName);
+    const oDef = this.opDef.getDef();
+
+    // Replace operator entry
+    oDef.operators[newName] = JSON.parse(JSON.stringify(oDef.operators[oldName]));
+    delete oDef.operators[oldName];
+
+    // Step 1: adapt destinations
+    for (const src in oDef.connections) {
+      if (oDef.connections.hasOwnProperty(src)) {
+        const newDsts = [];
+        for (const dst of oDef.connections[src]) {
+          const dstInfo = parseRefString(dst);
+          if (dstInfo.instance === oldName) {
+            dstInfo.instance = newName;
+            const newDst = buildRefString(dstInfo);
+            newDsts.push(newDst);
+          } else {
+            newDsts.push(dst);
+          }
+        }
+        oDef.connections[src] = newDsts;
+      }
+    }
+
+    // Step 2: adapt sources
+    const newConns = {};
+    for (const src in oDef.connections) {
+      if (oDef.connections.hasOwnProperty(src)) {
+        const srcInfo = parseRefString(src);
+        console.log('srcInfo', srcInfo);
+        if (srcInfo.instance === oldName) {
+          srcInfo.instance = newName;
+          const newSrc = buildRefString(srcInfo);
+          console.log('new ----->', newSrc);
+          newConns[newSrc] = oDef.connections[src];
+        } else {
+          newConns[src] = oDef.connections[src];
+        }
+      }
+    }
+
+    oDef.connections = newConns;
+
+    ins.setName(newName);
+
+    this.instances.set(newName, ins);
+    this.instances.delete(oldName);
+  }
+
   public getMainIn(): Port {
     return this.mainIn;
   }
@@ -464,6 +519,10 @@ export class OperatorInstance extends Composable {
 
   public getName(): string {
     return this.name;
+  }
+
+  public setName(name: string) {
+    this.name = name;
   }
 
   public getDelegates(): Array<PortGroup> {
@@ -512,112 +571,50 @@ export class OperatorInstance extends Composable {
   }
 
   public getPort(ref: string): Port {
-    if (ref.length === 0) {
+    const portInfo = parseRefString(ref);
+    if (typeof portInfo.instance === 'undefined') {
       return null;
     }
-
-    let dirIn = false;
-    let sep = '';
-    let opIdx = 0;
-    let portIdx = 0;
-    if (ref.indexOf('(') !== -1) {
-      dirIn = true;
-      sep = '(';
-      opIdx = 1;
-      portIdx = 0;
-    } else if (ref.indexOf(')') !== -1) {
-      dirIn = false;
-      sep = ')';
-      opIdx = 0;
-      portIdx = 1;
-    } else {
-      return null;
-    }
-
-    const refSplit = ref.split(sep);
-    if (refSplit.length !== 2) {
-      return null;
-    }
-    const opPart = refSplit[opIdx];
-    const portPart = refSplit[portIdx];
 
     let o: OperatorInstance = null;
     let p: Port = null;
-    if (opPart === '') {
+    if (portInfo.instance === '') {
       o = this;
-      if (dirIn) {
+    } else {
+      o = this.instances.get(portInfo.instance);
+    }
+
+    if (portInfo.service === 'main') {
+      if (portInfo.dirIn) {
         p = o.getMainIn();
       } else {
         p = o.getMainOut();
       }
-    } else {
-      if (opPart.indexOf('.') !== -1 && opPart.indexOf('@') !== -1) {
-        return null;
-      }
-      if (opPart.indexOf('.') !== -1) {
-        const opSplit = opPart.split('.');
-        if (opSplit.length !== 2) {
-          return null;
-        }
-        const opName = opSplit[0];
-        const dlgName = opSplit[1];
-        if (opName === '') {
-          o = this;
+    } else if (portInfo.service) {
+      const srv = o.getService(portInfo.service);
+      if (srv) {
+        if (portInfo.dirIn) {
+          p = srv.getIn();
         } else {
-          o = this.instances.get(opName);
-          if (!o) {
-            return null;
-          }
-        }
-        const dlg = o.getDelegate(dlgName);
-        if (dlg) {
-          if (dirIn) {
-            p = dlg.getIn();
-          } else {
-            p = dlg.getOut();
-          }
-        } else {
-          return null;
-        }
-      } else if (opPart.indexOf('@') !== -1) {
-        const opSplit = opPart.split('@');
-        if (opSplit.length !== 2) {
-          return null;
-        }
-        const opName = opSplit[1];
-        const srvName = opSplit[0];
-        if (opName === '') {
-          o = this;
-        } else {
-          o = this.instances.get(opName);
-          if (!o) {
-            return null;
-          }
-        }
-        const srv = o.getService(srvName);
-        if (srv) {
-          if (dirIn) {
-            p = srv.getIn();
-          } else {
-            p = srv.getOut();
-          }
-        } else {
-          return null;
+          p = srv.getOut();
         }
       } else {
-        o = this.instances.get(opPart);
-        if (!o) {
-          return null;
-        }
-        if (dirIn) {
-          p = o.getMainIn();
+        return null;
+      }
+    } else if (portInfo.delegate) {
+      const dlg = o.getDelegate(portInfo.delegate);
+      if (dlg) {
+        if (portInfo.dirIn) {
+          p = dlg.getIn();
         } else {
-          p = o.getMainOut();
+          p = dlg.getOut();
         }
+      } else {
+        return null;
       }
     }
 
-    const pathSplit = portPart.split('.');
+    const pathSplit = portInfo.port.split('.');
     if (pathSplit.length === 1 && pathSplit[0] === '') {
       return p;
     }

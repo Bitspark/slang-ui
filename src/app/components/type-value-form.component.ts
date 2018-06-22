@@ -74,4 +74,8 @@ export class TypeValueFormComponent implements OnInit, OnChanges {
     this.typeValue[i] = val;
   }
 
+  public removeIndex(i: number) {
+    this.typeValue.splice(i, 1);
+  }
+
 }

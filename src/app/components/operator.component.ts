@@ -3,7 +3,15 @@ import {ActivatedRoute} from '@angular/router';
 import {OperatorService} from '../services/operator.service';
 import {Composable, Connection, OperatorDef, OperatorInstance, Port, Transformable} from '../classes/operator';
 import {safeDump, safeLoad} from 'js-yaml';
-import {compareOperatorDefs, createDefaultValue, generateSvgTransform, normalizeConnections, stringifyConnections} from '../utils';
+import {
+  buildRefString,
+  compareOperatorDefs,
+  createDefaultValue,
+  generateSvgTransform,
+  normalizeConnections,
+  parseRefString,
+  stringifyConnections
+} from '../utils';
 import {ApiService} from '../services/api.service';
 import {VisualService} from '../services/visual.service';
 import 'codemirror/mode/yaml/yaml.js';
@@ -19,14 +27,17 @@ export class OperatorComponent implements OnInit {
   public operatorDef: OperatorDef = null;
   public operator: OperatorInstance = null;
   public mainSrvPort: any = null;
+  public propertyDefs: any = null;
   public status;
   public showInOutPorts = false;
+  public newPropName = '';
+  public newInstanceName = '';
 
   // YAML
   public yamlRepr = '';
   public uiMode = 'visual';
   public editorConfig = {
-    theme: 'default',
+    theme: 'slang-dark',
     mode: 'text/x-yaml',
     lineNumbers: true,
     extraKeys: {
@@ -189,9 +200,24 @@ export class OperatorComponent implements OnInit {
 
   private updateDef(def: any) {
     this.operatorDef.setDef(def);
-    this.mainSrvPort = this.operatorDef.getDef().services.main;
+    const opDef = this.operatorDef.getDef();
+    this.mainSrvPort = opDef.services.main;
+    if (!opDef.properties) {
+      opDef.properties = {};
+    }
+    this.propertyDefs = opDef.properties;
     this.status = `Updated definition of operator "${this.operatorName}".`;
     this.refresh();
+  }
+
+  public getPropertyNames(): Array<string> {
+    const names = [];
+    for (const propName in this.propertyDefs) {
+      if (this.propertyDefs.hasOwnProperty(propName)) {
+        names.push(propName);
+      }
+    }
+    return names;
   }
 
   private displayYaml() {
@@ -228,6 +254,7 @@ export class OperatorComponent implements OnInit {
 
   public selectInstance(ins: OperatorInstance) {
     this.selectedEntity.entity = ins;
+    this.newInstanceName = ins.getName();
   }
 
   public selectConnection(conn: Connection) {
@@ -245,11 +272,18 @@ export class OperatorComponent implements OnInit {
     }
     return '';
   }
+
   public getSelectedInstanceFQName(): string {
     if (this.isInstanceSelected()) {
       return (this.selectedEntity.entity as OperatorInstance).getFullyQualifiedName();
     }
     return '';
+  }
+
+  public renameInstance(ins: OperatorInstance, newName: string) {
+    this.operator.renameInstance(ins.getName(), newName);
+    this.refresh();
+    console.log(this.operatorDef);
   }
 
   public genericNames(ins: OperatorInstance): Array<string> {
@@ -299,7 +333,7 @@ export class OperatorComponent implements OnInit {
 
   private displayVisual() {
     const def = this.operatorDef.getDef();
-    this.operator.updateOperator(def);
+    this.operator.updateOperator(def, undefined);
   }
 
   public addInstance(op: any) {
@@ -319,6 +353,19 @@ export class OperatorComponent implements OnInit {
       operator: op.name
     };
     this.updateDef(def);
+  }
+
+  public addPropertyDef(propName: string) {
+    if (this.propertyDefs[propName]) {
+      return;
+    }
+    this.propertyDefs[propName] = TypeDefFormComponent.newDefaultTypeDef('primitive');
+    this.refresh();
+  }
+
+  public removePropertyDef(propName: string) {
+    delete this.propertyDefs[propName];
+    this.refresh();
   }
 
   public getPorts(): Array<Port> {

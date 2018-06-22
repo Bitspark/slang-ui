@@ -1,5 +1,5 @@
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-  <a class="navbar-brand" href="#"><i class="fas fa-arrow-left"></i></a>
+  <a class="navbar-brand" routerLink="/"><i class="fas fa-arrow-left"></i></a>
   <div class="navbar-text sl-operator-name">{{operatorName}}</div>
   <div class="btn-group btn-group-sm ml-3">
     <button class="btn btn-outline-secondary"><i class="fas fa-pen-square"></i></button>
@@ -105,7 +105,7 @@
 
             <!-- Clickable Invisible Connections -->
             <svg:line *ngFor="let conn of visualConnections()"
-                      stroke-width="24px"
+                      stroke-width="10px"
                       stroke="transparent"
                       (click)="selectConnection(conn)"
                       [attr.x1]="conn.getSource().getPortPosX()"
@@ -133,15 +133,22 @@
           <h4>
             IN
           </h4>
-          <div style="display: inline-block">
+          <div style="display: inline-block" *ngIf="mainSrvPort">
             <app-type-def-form [(typeDef)]="mainSrvPort.in" (typeDefChange)="refresh()"></app-type-def-form>
           </div>
           <h4>
             OUT
           </h4>
-          <div style="display: inline-block">
+          <div style="display: inline-block" *ngIf="mainSrvPort">
             <app-type-def-form [(typeDef)]="mainSrvPort.out" (typeDefChange)="refresh()"></app-type-def-form>
           </div>
+          <h4>Properties</h4>
+          <div *ngFor="let propName of getPropertyNames()">
+            <h5><button (click)="removePropertyDef(propName)"><i class="fa fa-trash"></i></button> {{propName}}</h5>
+            <app-type-def-form [(typeDef)]="propertyDefs[propName]" (typeDefChange)="refresh()"></app-type-def-form>
+          </div>
+          <h5><label for="newPropName">New property</label></h5>
+          <input id="newPropName" [(ngModel)]="newPropName"><button (click)="addPropertyDef(newPropName); newPropName = '';">add</button>
         </div>
 
         <div class="sl-ui-scrollable">
@@ -151,8 +158,9 @@
           <div *ngIf="isInstanceSelected()">
             <h5>Operator</h5>
             <p class="sl-operator-name">{{ getSelectedInstanceFQName() }}</p>
-            <h5>Instance</h5>
+            <h5><label for="instanceName">Instance</label></h5>
             <p class="sl-operator-name">{{ getSelectedInstanceName() }}</p>
+            <input id="instanceName" [(ngModel)]="newInstanceName"/> <button (click)="renameInstance(selectedEntity.entity, newInstanceName); selectedEntity.entity = null">rename</button>
             <h5>Generics ({{ genericNames(selectedEntity.entity).length }})</h5>
             <div *ngFor="let genName of genericNames(selectedEntity.entity)">{{ genName }}
               <app-type-def-form *ngIf="isGenericSpecified(selectedEntity.entity, genName)"
