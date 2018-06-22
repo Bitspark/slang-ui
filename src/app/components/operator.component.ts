@@ -23,6 +23,7 @@ export class OperatorComponent implements OnInit {
   public status;
   public showInOutPorts = false;
   public newPropName = '';
+  public newInstanceName = '';
 
   // YAML
   public yamlRepr = '';
@@ -271,8 +272,6 @@ export class OperatorComponent implements OnInit {
     return '';
   }
 
-  public newInstanceName = '';
-
   public renameInstance(ins: OperatorInstance, newName: string) {
     const oDef = this.operatorDef.getDef();
     const oldName = ins.getName();
@@ -281,7 +280,7 @@ export class OperatorComponent implements OnInit {
     delete oDef.operators[oldName];
     for (const src in oDef.connections) {
       if (oDef.connections.hasOwnProperty(src)) {
-        // TODO
+
       }
     }
     this.refresh();
