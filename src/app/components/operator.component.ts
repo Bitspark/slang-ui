@@ -194,8 +194,8 @@ export class OperatorComponent implements OnInit {
     if (this.operatorDef) {
       const def = this.operatorDef.getDef();
       const visual = await this.visuals.loadVisual(this.operators.getWorkingDir(), operatorName);
-      let dim = [1200, 1100];
-      let pos = [50, 50];
+      let dim: [number, number] = [1200, 1100];
+      let pos: [number, number] = [50, 50];
       if (visual && visual.geometry) {
         if (typeof visual.geometry.width !== 'undefined' && typeof visual.geometry.height !== 'undefined') {
           dim = [visual.geometry.width, visual.geometry.height];
