@@ -117,7 +117,7 @@ export class OperatorComponent implements OnInit {
 
   // Dragging
   public mouseTracker = new MouseMoueTracker((t, event, phase) => {
-    if (!this.selectedEntity.entity && typeof this.selectedEntity.entity.translate !== 'function') {
+    if (!this.selectedEntity.entity || typeof this.selectedEntity.entity.translate !== 'function') {
       return;
     }
 
@@ -194,13 +194,15 @@ export class OperatorComponent implements OnInit {
     if (this.operatorDef) {
       const def = this.operatorDef.getDef();
       const visual = await this.visuals.loadVisual(this.operators.getWorkingDir(), operatorName);
-      let dim, pos;
-      if (visual) {
-        dim = [visual.geometry.width, visual.geometry.height];
-        pos = [visual.geometry.x, visual.geometry.y];
-      } else {
-        dim = [1200, 1100];
-        pos = [50, 50];
+      let dim = [1200, 1100];
+      let pos = [50, 50];
+      if (visual && visual.geometry) {
+        if (typeof visual.geometry.width !== 'undefined' && typeof visual.geometry.height !== 'undefined') {
+          dim = [visual.geometry.width, visual.geometry.height];
+        }
+        if (typeof visual.geometry.x !== 'undefined' && typeof visual.geometry.y !== 'undefined') {
+          pos = [visual.geometry.x, visual.geometry.y];
+        }
       }
       this.operator = new OperatorInstance(this.operators, this.operatorName, '', this.operatorDef, {}, null, def, dim);
       this.operator.translate(pos);
