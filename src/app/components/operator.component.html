@@ -61,18 +61,23 @@
           <svg [attr.width]="50000*scale" [attr.height]="50000*scale"
                viewBox="0 0 50000 50000"
                xmlns:svg="http://www.w3.org/2000/svg"
-               (mousedown)="startDrag($event)"
-               (mouseup)="stopDrag($event)"
-               (mousemove)="drag($event)">
+               (mousedown)="mouseTracker.start($event)"
+               (mouseup)="mouseTracker.stop($event)"
+               (mousemove)="mouseTracker.track($event)">
 
             <svg:g *ngIf="operator" [attr.transform]="transform(operator)">
-
               <!-- Surrounding operator -->
               <svg:rect x="0" y="0" [attr.width]="operator.getWidth()" [attr.height]="operator.getHeight()"
                         class="sl-svg-op sl-svg-op-surr"
-                        [ngClass]="isSelected(operator) ? 'selected' : ''"
+                        [ngClass]="{selected: isSelected(operator)}"
                         paint-order="stroke fill"
-                        (mousedown)="selectInstance(operator)"></svg:rect>
+                        (mousedown)="selectInstance(operator)">
+              </svg:rect>
+              <!-- Surrounding operator resizer -->
+              <svg:circle [attr.cx]="operator.getWidth() - 20" [attr.cy]="operator.getHeight() - 20"
+                          class="sl-svg-op-resize"
+                          (mousedown)="mouseTracker.setResizing()">
+              </svg:circle>
 
               <!-- Delegates -->
               <svg:g *ngFor="let dlg of operator.getDelegates()" [attr.transform]="transform(dlg)">
@@ -95,7 +100,6 @@
                      [instance]="ins" [selectedEntity]="selectedEntity"
                      (selectPort)="selectPort($event)" (selectInstance)="selectInstance($event)">
               </svg:g>
-
             </svg:g>
 
             <!-- Visible Connections -->
