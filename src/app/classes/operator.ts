@@ -234,6 +234,12 @@ export class Transformable {
     return this;
   }
 
+  public resize(vec: [number, number]): Transformable {
+    this.dim[0] += vec[0];
+    this.dim[1] += vec[1];
+    return this;
+  }
+
   public getWidth(): number {
     return this.dim[0];
   }
@@ -421,7 +427,6 @@ export class OperatorInstance extends Composable {
   }
 
   public updateVisual(visual: any) {
-    this.mat = new Mat3([1, 0, visual.pos.x, 0, 1, visual.pos.y, 0, 0, 1]);
     for (const insName in visual.instances) {
       if (visual.instances.hasOwnProperty(insName)) {
         const ins = this.instances.get(insName);
@@ -436,9 +441,11 @@ export class OperatorInstance extends Composable {
   public getVisual(): any {
     const visual = {
       instances: {},
-      pos: {
+      geometry: {
         x: this.getAbsX(),
         y: this.getAbsY(),
+        width: this.getWidth(),
+        height: this.getHeight()
       }
     };
     this.instances.forEach((ins, insName) => {
