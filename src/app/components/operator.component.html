@@ -26,7 +26,9 @@
   <div id="sl-visual-ui" *ngIf="isUIModeVisual()">
     <div class="row">
       <div id="sl-operator-sidebar" class="sl-ui-sidebar col-2">
-        <input placeholder="Search for operators" type="text" class="form-control" [(ngModel)]="filterString"/>
+        <div class="sl-ui-form-box">
+          <input placeholder="Search for operators" type="text" class="form-control" [(ngModel)]="filterString"/>
+        </div>
         <div class="sl-ui-scrollable">
 
           <div class="sl-operator-list">
@@ -42,7 +44,7 @@
 
           <div class="sl-operator-list">
             <h3>Global operators</h3>
-            <ul class="list-group list-group-flush">
+            <ul class="list-group">
               <li class="list-group-item"
                   *ngFor="let op of getGlobals(filterString)">
                 <button class="btn btn-link" (click)="addInstance(op)"><i class="fas fa-plus-square"></i></button>
@@ -135,29 +137,29 @@
       </div>
       <div id="sl-instance-sidebar" class="sl-ui-sidebar col-2">
         <div class="sl-ui-scrollable">
-          <h4>
-            IN
-          </h4>
-          <div style="display: inline-block" *ngIf="mainSrvPort">
+          <h4>Main operator</h4>
+          <h5>
+            In-ports
+          </h5>
+          <div class="sl-form-box" style="display: inline-block" *ngIf="mainSrvPort">
             <app-type-def-form [(typeDef)]="mainSrvPort.in" (typeDefChange)="refresh()"></app-type-def-form>
           </div>
-          <h4>
-            OUT
-          </h4>
-          <div style="display: inline-block" *ngIf="mainSrvPort">
+          <h5>
+            Out-ports
+          </h5>
+          <div class="sl-form-box" style="display: inline-block" *ngIf="mainSrvPort">
             <app-type-def-form [(typeDef)]="mainSrvPort.out" (typeDefChange)="refresh()"></app-type-def-form>
           </div>
-          <h4>Properties</h4>
-          <div *ngFor="let propName of getPropertyNames()">
-            <h5>
-              <button (click)="removePropertyDef(propName)"><i class="fa fa-trash"></i></button>
-              {{propName}}
-            </h5>
+          <h5>Properties</h5>
+          <div class="sl-form-box" *ngFor="let propName of getPropertyNames()">
+            <h6>{{propName}}</h6>
+            <button (click)="removePropertyDef(propName)"><i class="fa fa-trash"></i></button>
             <app-type-def-form [(typeDef)]="propertyDefs[propName]" (typeDefChange)="refresh()"></app-type-def-form>
           </div>
-          <h5><label for="newPropName">New property</label></h5>
-          <input id="newPropName" [(ngModel)]="newPropName">
-          <button (click)="addPropertyDef(newPropName); newPropName = '';">add</button>
+          <div class="sl-form-box">
+            <h6><label for="newPropName">New property</label></h6>
+            <input id="newPropName" [(ngModel)]="newPropName"><button (click)="addPropertyDef(newPropName); newPropName = '';">add</button>
+          </div>
         </div>
 
         <div class="sl-ui-scrollable">
@@ -165,16 +167,16 @@
             (no operator instance selected)
           </div>
           <div *ngIf="isInstanceSelected()">
+            <h4>Instance '{{ getSelectedInstanceName() }}'</h4>
             <h5>Operator</h5>
             <p class="sl-operator-name">{{ getSelectedInstanceFQName() }}</p>
-            <h5><label for="instanceName">Instance</label></h5>
-            <p class="sl-operator-name">{{ getSelectedInstanceName() }}</p>
-            <input id="instanceName" [(ngModel)]="newInstanceName"/>
-            <button (click)="renameInstance(selectedEntity.entity, newInstanceName); selectedEntity.entity = null">
-              rename
-            </button>
-            <h5>Generics ({{ genericNames(selectedEntity.entity).length }})</h5>
-            <div *ngFor="let genName of genericNames(selectedEntity.entity)">{{ genName }}
+            <h5><label for="instanceName">Rename</label></h5>
+            <div class="sl-form-box">
+              <input id="instanceName" [(ngModel)]="newInstanceName"/> <button (click)="renameInstance(selectedEntity.entity, newInstanceName); selectedEntity.entity = null">rename</button>
+            </div>
+            <h5 *ngIf="genericNames(selectedEntity.entity).length > 0">Generics</h5>
+            <div class="sl-form-box" *ngFor="let genName of genericNames(selectedEntity.entity)">
+              <h6>{{ genName }}</h6>
               <app-type-def-form *ngIf="isGenericSpecified(selectedEntity.entity, genName)"
                                  [(typeDef)]="getGenerics(selectedEntity.entity)[genName]"
                                  (typeDefChange)="refresh()"></app-type-def-form>
@@ -182,8 +184,9 @@
                       (click)="addGeneric(selectedEntity.entity, genName)">Specify
               </button>
             </div>
-            <h5>Properties ({{ getPropertyDefs(selectedEntity.entity).length }})</h5>
-            <div *ngFor="let prop of getPropertyDefs(selectedEntity.entity)">{{ prop.name }}
+            <h5 *ngIf="getPropertyDefs(selectedEntity.entity).length > 0">Properties</h5>
+            <div class="sl-form-box" *ngFor="let prop of getPropertyDefs(selectedEntity.entity)">
+              <h6>{{ prop.name }}</h6>
               <app-type-value-form *ngIf="isPropertySpecified(selectedEntity.entity, prop)"
                                    [typeDef]="prop.def"
                                    [(typeValue)]="getProperties(selectedEntity.entity)[prop.name]"
