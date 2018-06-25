@@ -193,10 +193,18 @@ export class OperatorComponent implements OnInit {
     this.operatorDef = this.operators.getLocal(this.operatorName);
     if (this.operatorDef) {
       const def = this.operatorDef.getDef();
-      this.operator = new OperatorInstance(this.operators, this.operatorName, '', this.operatorDef, {}, null, def, [1200, 1100]);
-      this.operator.translate([50, 50]);
-      this.updateDef(def);
       const visual = await this.visuals.loadVisual(this.operators.getWorkingDir(), operatorName);
+      let dim, pos;
+      if (visual) {
+        dim = [visual.geometry.width, visual.geometry.height];
+        pos = [visual.geometry.x, visual.geometry.y];
+      } else {
+        dim = [1200, 1100];
+        pos = [50, 50];
+      }
+      this.operator = new OperatorInstance(this.operators, this.operatorName, '', this.operatorDef, {}, null, def, dim);
+      this.operator.translate(pos);
+      this.updateDef(def);
       if (visual) {
         this.operator.updateVisual(visual);
       }
