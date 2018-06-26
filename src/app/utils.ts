@@ -223,7 +223,7 @@ export function compareOperatorDefs(lhs, rhs: OperatorDef): number {
   return (lhs.getName() < rhs.getName()) ? -1 : 1;
 }
 
-export function parseRefString(ref: string): {instance: string, delegate: string, service: string, dirIn: boolean, port: string} {
+export function parseRefString(ref: string): { instance: string, delegate: string, service: string, dirIn: boolean, port: string } {
   if (ref.length === 0) {
     return null;
   }
@@ -289,7 +289,7 @@ export function parseRefString(ref: string): {instance: string, delegate: string
   return ret;
 }
 
-export function buildRefString(info: {instance: string, delegate: string, service: string, dirIn: boolean, port: string}): string {
+export function buildRefString(info: { instance: string, delegate: string, service: string, dirIn: boolean, port: string }): string {
   let opStr = '';
   if (typeof info.service !== 'undefined') {
     if (info.service === 'main' || info.service === '') {
@@ -305,5 +305,69 @@ export function buildRefString(info: {instance: string, delegate: string, servic
     return `${info.port}(${opStr}`;
   } else {
     return `${opStr})${info.port}`;
+  }
+}
+
+export class SVGPolylineGenerator {
+  private points: Array<Array<number>> = [];
+
+  private constructor(private outerOperator, private conn: Connection) {
+    const src: [number, number] = [conn.getSource().getAbsX(), conn.getSource().getAbsY()];
+    const dst: [number, number] = [conn.getDestination().getAbsX(), conn.getDestination().getAbsY()];
+    let dist = this.getDistance(src, dst);
+    const srcOffset = this.getOffset(conn.getSource(), dist);
+    const dstOffset = this.getOffset(conn.getDestination(), dist);
+    const start: [number, number] = [src[0] + srcOffset[0], src[1] + srcOffset[1]];
+    const end: [number, number] = [dst[0] + dstOffset[0], dst[1] + dstOffset[1]];
+    dist = this.getDistance(start, end);
+    const mid = [
+      start[0] + (end[0] - start[0]) / 2,
+      start[1] + (end[1] - start[1]) / 2,
+
+    ];
+    this.points.push(src, start);
+
+    if (dist[1] < 0 && conn.getSource().isOut() && conn.getDestination().isIn()) {
+      this.points.push([mid[0], start[1]], [mid[0], end[1]]);
+    } else {
+      this.points.push([end[0], start[1]]);
+    }
+
+    this.points.push(end, dst);
+  }
+
+
+  public static generatePoints(op, conn): string {
+    return new SVGPolylineGenerator(op, conn).points.reduce((pointStr: string, point: [number, number]) => {
+      return pointStr + `${point[0]},${point[1]} `;
+    }, '');
+  }
+
+  private getDistance(src: [number, number], dst: [number, number]): [number, number] {
+    return [
+      dst[0] - src[0],
+      dst[1] - src[1],
+    ];
+  }
+
+  private getOffset(p: Port, distance): [number, number] {
+    let ori = p.getOrientation();
+    if (p.getOperator() === this.outerOperator) {
+      ori = (ori + 2) % 4;
+    }
+    const offset = [Math.max(distance[0] / 3, 1), Math.max(distance[1] / 3, 1)];
+    if (ori === 0) {
+      // to north
+      return [0, -offset[1]];
+    } else if (ori === 1) {
+      // to west
+      return [-offset[0], 0];
+    } else if (ori === 3) {
+      // to east
+      return [offset[0], 0];
+    } else {
+      // to south
+      return [0, offset[1]];
+    }
   }
 }

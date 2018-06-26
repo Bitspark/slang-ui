@@ -10,7 +10,7 @@ import {
   generateSvgTransform,
   normalizeConnections,
   parseRefString,
-  stringifyConnections
+  stringifyConnections, SVGPolylineGenerator
 } from '../utils';
 import {ApiService} from '../services/api.service';
 import {VisualService} from '../services/visual.service';
@@ -325,6 +325,10 @@ export class OperatorComponent implements OnInit {
 
   public translate(comp: Composable): string {
     return `translate(${comp.getAbsX()},${comp.getAbsY()})`;
+  }
+
+  public connectionPoints(conn: Connection): string {
+    return SVGPolylineGenerator.generatePoints(this.operator, conn);
   }
 
   public visualInstances(): Array<OperatorInstance> {

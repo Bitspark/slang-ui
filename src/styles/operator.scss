@@ -35,12 +35,14 @@ svg {
   }
 
   .sl-svg-conn {
+    fill: none;
     stroke: $light-gray;
-    stroke-width: 2px;
+    stroke-width: 8px;
   }
 
   .sl-svg-conn-click-overlay {
-    stroke: transparent;
+    fill: none;
+    stroke: none;
     stroke-width: 14px;
   }
 

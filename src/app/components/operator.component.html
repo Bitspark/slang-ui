@@ -103,22 +103,16 @@
             </svg:g>
 
             <!-- Visible Connections -->
-            <svg:line *ngFor="let conn of visualConnections()"
-                      class="sl-svg-conn"
-                      [ngClass]="{selected: isSelected(conn)}"
-                      [attr.x1]="conn.getSource().getPortPosX()"
-                      [attr.y1]="conn.getSource().getPortPosY()"
-                      [attr.x2]="conn.getDestination().getPortPosX()"
-                      [attr.y2]="conn.getDestination().getPortPosY()"></svg:line>
+            <svg:polyline *ngFor="let conn of visualConnections()"
+                          class="sl-svg-conn"
+                          [ngClass]="{selected: isSelected(conn)}"
+                          [attr.points]="connectionPoints(conn)"></svg:polyline>
 
             <!-- Clickable Invisible Connections -->
-            <svg:line *ngFor="let conn of visualConnections()"
-                      class="sl-svg-conn-click-overlay"
-                      (click)="selectConnection(conn)"
-                      [attr.x1]="conn.getSource().getPortPosX()"
-                      [attr.y1]="conn.getSource().getPortPosY()"
-                      [attr.x2]="conn.getDestination().getPortPosX()"
-                      [attr.y2]="conn.getDestination().getPortPosY()"></svg:line>
+            <svg:polyline *ngFor="let conn of visualConnections()"
+                          class="sl-svg-conn-click-overlay"
+                          (click)="selectConnection(conn)"
+                          [attr.points]="connectionPoints(conn)"></svg:polyline>
 
             <!-- Text/Labels -->
             <svg:g *ngFor="let port of getPorts()" (click)="selectPort(port)" [attr.transform]="translate(port)">
@@ -158,7 +152,8 @@
           </div>
           <div class="sl-form-box">
             <h6><label for="newPropName">New property</label></h6>
-            <input id="newPropName" [(ngModel)]="newPropName"><button (click)="addPropertyDef(newPropName); newPropName = '';">add</button>
+            <input id="newPropName" [(ngModel)]="newPropName">
+            <button (click)="addPropertyDef(newPropName); newPropName = '';">add</button>
           </div>
         </div>
 
@@ -172,7 +167,10 @@
             <p class="sl-operator-name">{{ getSelectedInstanceFQName() }}</p>
             <h5><label for="instanceName">Rename</label></h5>
             <div class="sl-form-box">
-              <input id="instanceName" [(ngModel)]="newInstanceName"/> <button (click)="renameInstance(selectedEntity.entity, newInstanceName); selectedEntity.entity = null">rename</button>
+              <input id="instanceName" [(ngModel)]="newInstanceName"/>
+              <button (click)="renameInstance(selectedEntity.entity, newInstanceName); selectedEntity.entity = null">
+                rename
+              </button>
             </div>
             <h5 *ngIf="genericNames(selectedEntity.entity).length > 0">Generics</h5>
             <div class="sl-form-box" *ngFor="let genName of genericNames(selectedEntity.entity)">
