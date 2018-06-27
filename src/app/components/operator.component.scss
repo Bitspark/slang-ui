@@ -40,10 +40,6 @@
   }
 }
 
-.sl-ui-mainbar {
-  overflow: hidden;
-}
-
 .sl-ui-sidebar {
   background-color: $dark-tone;
   padding: $spacer;
@@ -60,7 +56,55 @@
 }
 
 .sl-ui-mainbar {
+  overflow: hidden;
   padding: 0;
+
+  #sl-svg-container {
+    overflow: hidden;
+    height: calc(100vh - 36px - 300px);
+
+    &.large {
+      height: initial;
+    }
+  }
+
+  #sl-main-bottom {
+    height: 300px;
+    background: $dark-tone;
+    overflow: hidden;
+    padding: 8px 0 8px 0;
+    display: flex;
+
+    .preview-object, .response {
+      font-size: 0.7em;
+      color: white;
+    }
+
+    h6 {
+      margin-top: 10px;
+    }
+
+    > div {
+      height: 100%;
+      width: 100%;
+      background: $dark;
+      overflow: auto;
+      padding: 5px;
+      position: relative;
+
+      .close-pane {
+        font-size: 16px;
+        display: block;
+        position: absolute;
+        right: 5px;
+        top: 5px;
+      }
+    }
+
+    > div:not(:first-child) {
+      margin-left: 8px;
+    }
+  }
 }
 
 #sl-operator-sidebar {

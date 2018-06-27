@@ -4,18 +4,17 @@ import {OperatorService} from '../services/operator.service';
 import {Composable, Connection, OperatorDef, OperatorInstance, Port, Transformable} from '../classes/operator';
 import {safeDump, safeLoad} from 'js-yaml';
 import {
-  buildRefString,
   compareOperatorDefs,
   createDefaultValue,
   generateSvgTransform,
   normalizeConnections,
-  parseRefString,
   stringifyConnections
 } from '../utils';
 import {ApiService} from '../services/api.service';
 import {VisualService} from '../services/visual.service';
 import 'codemirror/mode/yaml/yaml.js';
 import {TypeDefFormComponent} from './type-def-form.component';
+import {HttpClient} from '@angular/common/http';
 
 class MouseMoueTracker {
   private static lastX: number;
@@ -115,6 +114,14 @@ export class OperatorComponent implements OnInit {
 
   private insPropDefs = new Map<string, Array<{ name: string, def: any }>>();
 
+  // Executing
+  public inputValue: any = {};
+  public debugging = false;
+  public running = false;
+  public debuggingLog: Array<string> = [];
+  public debuggingReponses: Array<any> = [];
+  public operatorEndpoint = '';
+
   // Dragging
   public mouseTracker = new MouseMoueTracker((t, event, phase) => {
     if (!this.selectedEntity.entity || typeof this.selectedEntity.entity.translate !== 'function') {
@@ -165,7 +172,11 @@ export class OperatorComponent implements OnInit {
     }
   }
 
-  constructor(private route: ActivatedRoute, public operators: OperatorService, public visuals: VisualService, public api: ApiService) {
+  constructor(private route: ActivatedRoute,
+              private http: HttpClient,
+              public operators: OperatorService,
+              public visuals: VisualService,
+              public api: ApiService) {
   }
 
   ngOnInit() {
@@ -262,7 +273,7 @@ export class OperatorComponent implements OnInit {
   }
 
   public stringify(val: any): string {
-    return JSON.stringify(val);
+    return JSON.stringify(val, undefined, 2);
   }
 
   // YAML
@@ -616,4 +627,48 @@ export class OperatorComponent implements OnInit {
   public isUIModeYAML(): boolean {
     return this.uiMode === 'yaml';
   }
+
+  // Executing
+
+  public debugLog(msg: string) {
+    this.debuggingLog.push(msg);
+  }
+
+  public runOperator() {
+    this.debugging = true;
+    this.inputValue = createDefaultValue(this.mainSrvPort.in);
+
+    this.debugLog('Request daemon to start operator...');
+
+    this.http.post('http://localhost:5149/run/', {
+      cwd: this.operators.getWorkingDir(),
+      fqn: this.operatorName
+    }).toPromise()
+      .then(data => {
+        if (data['status'] === 'success') {
+          this.operatorEndpoint =  data['url'];
+          this.debugLog('Operator is running at ' + this.operatorEndpoint);
+          this.running = true;
+        } else {
+          const error = data['error'];
+          this.debugLog(`Error ${error.code} occurred: ${error.msg}`);
+        }
+      });
+  }
+
+  public sendInputValue(obj: any) {
+    this.http.post(this.operatorEndpoint, obj).toPromise()
+      .then(data => {
+        this.debuggingReponses.push(data);
+      });
+  }
+
+  public stopOperator() {
+    this.running = false;
+  }
+
+  public closeDebugPanel() {
+    this.debugging = false;
+  }
+
 }
