@@ -312,8 +312,8 @@ export class SVGPolylineGenerator {
   private points: Array<Array<number>> = [];
 
   private constructor(private outerOperator, private conn: Connection) {
-    const src: [number, number] = [conn.getSource().getAbsX(), conn.getSource().getAbsY()];
-    const dst: [number, number] = [conn.getDestination().getAbsX(), conn.getDestination().getAbsY()];
+    const src: [number, number] = [conn.getSource().getPortPosX(), conn.getSource().getPortPosY()];
+    const dst: [number, number] = [conn.getDestination().getPortPosX(), conn.getDestination().getPortPosY()];
     let dist = this.getDistance(src, dst);
     const srcOffset = this.getOffset(conn.getSource(), dist);
     const dstOffset = this.getOffset(conn.getDestination(), dist);
@@ -355,7 +355,7 @@ export class SVGPolylineGenerator {
     if (p.getOperator() === this.outerOperator) {
       ori = (ori + 2) % 4;
     }
-    const offset = [Math.max(distance[0] / 3, 1), Math.max(distance[1] / 3, 1)];
+    const offset = [Math.max(distance[0] / 3, 3), Math.max(distance[1] / 3, 3)];
     if (ori === 0) {
       // to north
       return [0, -offset[1]];
