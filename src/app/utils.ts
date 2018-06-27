@@ -312,11 +312,13 @@ export class SVGPolylineGenerator {
   private points: Array<Array<number>> = [];
 
   private constructor(private outerOperator, private conn: Connection) {
+    const s = conn.getSource();
+    const d = conn.getDestination();
     const src: [number, number] = [conn.getSource().getPortPosX(), conn.getSource().getPortPosY()];
     const dst: [number, number] = [conn.getDestination().getPortPosX(), conn.getDestination().getPortPosY()];
     let dist = this.getDistance(src, dst);
-    const srcOffset = this.getOffset(conn.getSource(), dist);
-    const dstOffset = this.getOffset(conn.getDestination(), dist);
+    const srcOffset = this.getOffsetPoint(conn.getSource(), dist);
+    const dstOffset = this.getOffsetPoint(conn.getDestination(), dist);
     const start: [number, number] = [src[0] + srcOffset[0], src[1] + srcOffset[1]];
     const end: [number, number] = [dst[0] + dstOffset[0], dst[1] + dstOffset[1]];
     dist = this.getDistance(start, end);
@@ -325,15 +327,21 @@ export class SVGPolylineGenerator {
       start[1] + (end[1] - start[1]) / 2,
 
     ];
-    this.points.push(src, start);
 
-    if (dist[1] < 0 && conn.getSource().isOut() && conn.getDestination().isIn()) {
-      this.points.push([mid[0], start[1]], [mid[0], end[1]]);
-    } else {
-      this.points.push([end[0], start[1]]);
+    const sOri = s.getOrientation();
+    const dOri = d.getOrientation();
+
+    this.points.push(src);
+
+    if (sOri === dOri) {
+      if (sOri === 0 || sOri === 2) {
+        this.points.push(start, [end[0], start[1]], end);
+      } else {
+        this.points.push(start, [end[0], start[1]], end);
+      }
     }
 
-    this.points.push(end, dst);
+    this.points.push(dst);
   }
 
 
@@ -350,24 +358,31 @@ export class SVGPolylineGenerator {
     ];
   }
 
-  private getOffset(p: Port, distance): [number, number] {
+  private calcOffset(dist: number): number {
+    return Math.max(4 * Math.sqrt(Math.abs(dist)), 10);
+  }
+
+  private getOffsetPoint(p: Port, distance): [number, number] {
     let ori = p.getOrientation();
     if (p.getOperator() === this.outerOperator) {
       ori = (ori + 2) % 4;
     }
-    const offset = [Math.max(distance[0] / 3, 3), Math.max(distance[1] / 3, 3)];
+
+    const padding = (p.getParentPort() && p.getParentPort().isMap()) ? p.getPosX() : 0;
+    const offset = [this.calcOffset(distance[0]), this.calcOffset(distance[1])];
+
     if (ori === 0) {
       // to north
       return [0, -offset[1]];
     } else if (ori === 1) {
       // to west
-      return [-offset[0], 0];
+      return [-offset[0] + padding, 0];
     } else if (ori === 3) {
       // to east
       return [offset[0], 0];
     } else {
       // to south
-      return [0, offset[1]];
+      return [0, offset[1] + padding];
     }
   }
 }
