@@ -93,28 +93,26 @@ svg {
     stroke-width: 10px;
     stroke-opacity: .35;
 
-    &.sl-svg-port-type {
-      &.primitive {
-        fill: #7156FB;
-      }
-      &.number {
-        fill: #40A1DE;
-      }
-      &.string {
-        fill: #46B5E8;
-      }
-      &.boolean {
-        fill: #3CCC90;
-      }
-      &.binary {
-        fill: #FBEB56;
-      }
-      &.trigger {
-        fill: #9ab;
-      }
-      &.generic {
-        fill: #9e008e;
-      }
+    &.primitive {
+      fill: #7156FB;
+    }
+    &.number {
+      fill: #40A1DE;
+    }
+    &.string {
+      fill: #46B5E8;
+    }
+    &.boolean {
+      fill: #3CCC90;
+    }
+    &.binary {
+      fill: #FBEB56;
+    }
+    &.trigger {
+      fill: #9ab;
+    }
+    &.generic {
+      fill: #9e008e;
     }
   }
   .sl-svg-port-label {
