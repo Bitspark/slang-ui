@@ -1,7 +1,7 @@
 import {Component, HostListener, OnInit} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 import {OperatorService} from '../services/operator.service';
-import {Composable, Connection, OperatorDef, OperatorInstance, Port, Transformable} from '../classes/operator';
+import {Composable, Connection, OperatorDef, OperatorInstance, Orientation, Port, Transformable} from '../classes/operator';
 import {safeDump, safeLoad} from 'js-yaml';
 import {
   buildRefString,
@@ -498,53 +498,41 @@ export class OperatorComponent implements OnInit {
   }
 
   public getPortLabelX(port: Port): number {
-    const ori = port.getOrientation();
-    if (ori === 0) {
-      // to north
-      return 10;
-    } else if (ori === 1) {
-      // to west
-      return 25;
-    } else if (ori === 3) {
-      // to east
-      return -25;
-    } else {
-      // to south
-      return 10;
+    switch (port.getOrientation().value()) {
+      case Orientation.north:
+        return 10;
+      case Orientation.west:
+        return 25;
+      case Orientation.south:
+        return 10;
+      case Orientation.east:
+        return -25;
     }
   }
 
   public getPortLabelY(port: Port): number {
-    const ori = port.getOrientation();
-    if (ori === 0) {
-      // to north
-      return 20;
-    } else if (ori === 1) {
-      // to west
-      return -10;
-    } else if (ori === 3) {
-      // to east
-      return -10;
-    } else {
-      // to south
-      return -20;
+    switch (port.getOrientation().value()) {
+      case Orientation.north:
+        return 20;
+      case Orientation.west:
+        return -10;
+      case Orientation.south:
+        return -20;
+      case Orientation.east:
+        return -10;
     }
   }
 
   public getPortLabelAnchor(port: Port): string {
-    const ori = port.getOrientation();
-    if (ori === 0) {
-      // to north
-      return 'end';
-    } else if (ori === 3) {
-      // to west
-      return 'end';
-    } else if (ori === 1) {
-      // to east
-      return 'begin';
-    } else {
-      // to south
-      return 'begin';
+    switch (port.getOrientation().value()) {
+      case Orientation.north:
+        return 'end';
+      case Orientation.west:
+        return 'end';
+      case Orientation.south:
+        return 'begin';
+      case Orientation.east:
+        return 'begin';
     }
   }
 

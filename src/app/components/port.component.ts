@@ -21,7 +21,7 @@ export class PortComponent {
     const cssClass = {};
     cssClass['selected'] = this.isSelected();
     cssClass[Type[this.port.getType()]] = true;
-    cssClass[['north', 'west', 'south', 'east'][this.port.getOrientation()]] = true;
+    cssClass[this.port.getOrientation().name()] = true;
     cssClass['in'] = this.port.isIn();
     cssClass['out'] = this.port.isOut();
     return cssClass;

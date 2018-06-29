@@ -14,6 +14,82 @@ export enum Type {
   map,
 }
 
+export class Orientation {
+  public static north = 0;
+  public static west = 1;
+  public static south = 2;
+  public static east = 3;
+
+  constructor(private ori: number) {
+  }
+
+  public static fromMat3(m: Mat3): Orientation {
+    let ori = -1;
+    if (m.at(5) > 0.1) {
+      ori = 0; // north
+    }
+    if (m.at(2) > 0.1) {
+      ori = 1; // east
+    }
+    if (m.at(5) < -0.1) {
+      ori = 2; // south
+    }
+    if (m.at(2) < -0.1) {
+      ori = 3; // west
+    }
+    return new Orientation(ori);
+  }
+
+  public name(): string {
+    switch (this.ori) {
+      case Orientation.north:
+        return 'north';
+      case Orientation.west:
+        return 'west';
+      case Orientation.south:
+        return 'south';
+      case Orientation.east:
+        return 'east';
+    }
+  }
+
+  public value(): number {
+    return this.ori;
+  }
+
+  public isSame(o: Orientation): boolean {
+    return this.ori === o.ori;
+  }
+
+  public isOpposite(o: Orientation): boolean {
+    return !this.isSame(o) && (this.isVertically() && o.isVertically() || this.isHorizontally() && o.isHorizontally());
+  }
+
+  public isHorizontally(): boolean {
+    return this.ori === Orientation.west || this.ori === Orientation.east;
+  }
+
+  public isVertically(): boolean {
+    return this.ori === Orientation.north || this.ori === Orientation.south;
+  }
+
+  public isNorth(): boolean {
+    return this.ori === Orientation.north;
+  }
+
+  public isWest(): boolean {
+    return this.ori === Orientation.west;
+  }
+
+  public isSouth(): boolean {
+    return this.ori === Orientation.south;
+  }
+
+  public isEast(): boolean {
+    return this.ori === Orientation.east;
+  }
+}
+
 export class OperatorDef {
 
   private readonly name: string;
@@ -314,26 +390,13 @@ export class Composable extends Transformable {
     return this.getCenterMat3().at(5);
   }
 
-  public getOrientation(): number {
+  public getOrientation(): Orientation {
     const mat = this.getAbsMat3();
     const vec = new Mat3([
       0, 0, 0,
       0, 0, 1,
       0, 0, 0]);
-    const orientation = vec.multiply(mat);
-    if (orientation.at(5) > 0.1) {
-      return 0; // north
-    }
-    if (orientation.at(2) > 0.1) {
-      return 1; // east
-    }
-    if (orientation.at(5) < -0.1) {
-      return 2; // south
-    }
-    if (orientation.at(2) < -0.1) {
-      return 3; // west
-    }
-    return -1;
+    return Orientation.fromMat3(vec.multiply(mat));
   }
 
 }

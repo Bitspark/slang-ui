@@ -1,4 +1,4 @@
-import {Connection, OperatorDef, OperatorInstance, Port, Transformable} from './classes/operator';
+import {Connection, OperatorDef, OperatorInstance, Orientation, Port, Transformable} from './classes/operator';
 
 function expandExpressionPart(exprPart: string, props: any, propDefs: any): Array<string> {
   const vals = [];
@@ -337,31 +337,29 @@ export class SVGPolylineGenerator {
     const sOri = s.getOrientation();
     const dOri = d.getOrientation();
 
-    const [toN, toW, toS, toE] = [0, 1, 2, 3];
-
     this.points.push(src);
 
-    if (sOri === dOri) {
-      if (sOri === toN || sOri === toS) {
+    if (sOri.isSame(dOri)) {
+      if (sOri.isVertically()) {
         this.points.push(start, [end[0], start[1]], end);
       } else {
         this.points.push(start, [end[0], start[1]], end);
       }
-    } else if (sOri === toS && dOri === toN) {
+    } else if (sOri.isOpposite(dOri)) {
       if (dist[1] < 0) {
         this.points.push(start, [mid[0], start[1]], [mid[0], end[1]], end);
       } else {
         this.points.push(start, [end[0], start[1]], end);
       }
-    } else if ((sOri + 1) % 4 === dOri) {
+    } else if ((sOri.value() + 1) % 4 === dOri.value()) {
       // direction from source to destination
       let normDistX, normDistY;
-      switch (sOri) {
-        case toE:
+      switch (sOri.value()) {
+        case Orientation.east:
           normDistX = dist[0];
           normDistY = dist[1];
           break;
-        case toS:
+        case Orientation.south:
           normDistX = -dist[1];
           normDistY = dist[0];
           break;
@@ -414,19 +412,19 @@ export class SVGPolylineGenerator {
   private getOffsetPoint(p: Port, distance): [number, number] {
     let ori = p.getOrientation();
     if (p.getOperator() === this.outerOperator) {
-      ori = (ori + 2) % 4;
+      ori = new Orientation((ori.value() + 2) % 4);
     }
 
     const padding = (p.getParentPort() && p.getParentPort().isMap()) ? p.getPosX() : 0;
     const offset = [this.calcOffset(distance[0]), this.calcOffset(distance[1])];
 
-    if (ori === 0) {
+    if (ori.isNorth()) {
       // to north
       return [0, -offset[1]];
-    } else if (ori === 1) {
+    } else if (ori.isWest()) {
       // to west
       return [-offset[0] + padding, 0];
-    } else if (ori === 3) {
+    } else if (ori.isEast()) {
       // to east
       return [offset[0], 0];
     } else {
