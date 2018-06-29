@@ -57,7 +57,7 @@ export class OperatorComponent implements OnInit {
   public inputValue: any = {};
   public debugging = false;
   public running = false;
-  public runningHandle = '';
+  public runningHandle = 0;
   public debuggingLog: Array<string> = [];
   public debuggingReponses: Array<any> = [];
   public operatorEndpoint = '';
@@ -605,13 +605,18 @@ export class OperatorComponent implements OnInit {
   }
 
   public stopOperator() {
-    this.http.delete('http://localhost:5149/run/', {
-      handle: this.runningHandle
+    this.http.request('delete', 'http://localhost:5149/run/', {
+      body: {
+        handle: this.runningHandle
+      }
     }).toPromise()
       .then(data => {
         if (data['status'] === 'success') {
           this.running = false;
-          this.runningHandle = '';
+          this.runningHandle = 0;
+        } else {
+          const error = data['error'];
+          this.debugLog(`Error ${error.code} occurred: ${error.msg}`);
         }
       });
   }
