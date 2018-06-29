@@ -314,31 +314,80 @@ export class SVGPolylineGenerator {
   private constructor(private outerOperator, private conn: Connection) {
     const s = conn.getSource();
     const d = conn.getDestination();
-    const src: [number, number] = [conn.getSource().getPortPosX(), conn.getSource().getPortPosY()];
-    const dst: [number, number] = [conn.getDestination().getPortPosX(), conn.getDestination().getPortPosY()];
+    const src: [number, number] = [s.getPortPosX(), s.getPortPosY()];
+    const dst: [number, number] = [d.getPortPosX(), d.getPortPosY()];
     let dist = this.getDistance(src, dst);
-    const srcOffset = this.getOffsetPoint(conn.getSource(), dist);
-    const dstOffset = this.getOffsetPoint(conn.getDestination(), dist);
+    const srcOffset = this.getOffsetPoint(s, dist);
+    const dstOffset = this.getOffsetPoint(d, dist);
     const start: [number, number] = [src[0] + srcOffset[0], src[1] + srcOffset[1]];
     const end: [number, number] = [dst[0] + dstOffset[0], dst[1] + dstOffset[1]];
     dist = this.getDistance(start, end);
+    const p = (s.getParentPort() && s.getParentPort().isMap()) ? s.getPosX() : 0;
     const mid = [
-      start[0] + (end[0] - start[0]) / 2,
-      start[1] + (end[1] - start[1]) / 2,
-
+      (start[0] + (end[0] - start[0]) / 2) + p,
+      (start[1] + (end[1] - start[1]) / 2) + p,
     ];
+
+    /*********
+     *
+     *  IMPLEMENT ORIENTATION ABSTRACTION
+     *
+     */
 
     const sOri = s.getOrientation();
     const dOri = d.getOrientation();
 
+    const [toN, toW, toS, toE] = [0, 1, 2, 3];
+
     this.points.push(src);
 
     if (sOri === dOri) {
-      if (sOri === 0 || sOri === 2) {
+      if (sOri === toN || sOri === toS) {
         this.points.push(start, [end[0], start[1]], end);
       } else {
         this.points.push(start, [end[0], start[1]], end);
       }
+    } else if (sOri === toS && dOri === toN) {
+      if (dist[1] < 0) {
+        this.points.push(start, [mid[0], start[1]], [mid[0], end[1]], end);
+      } else {
+        this.points.push(start, [end[0], start[1]], end);
+      }
+    } else if ((sOri + 1) % 4 === dOri) {
+      // direction from source to destination
+      let normDistX, normDistY;
+      switch (sOri) {
+        case toE:
+          normDistX = dist[0];
+          normDistY = dist[1];
+          break;
+        case toS:
+          normDistX = -dist[1];
+          normDistY = dist[0];
+          break;
+      }
+
+      this.points.push(start);
+
+      if (normDistX > 0) {
+        if (normDistY > 0) {
+          // south-east
+          this.points.push([end[0], start[1]]);
+        } else {
+          // north-east
+          this.points.push([mid[0], start[1]], [mid[0], end[1]]);
+        }
+      } else {
+        if (normDistY > 0) {
+          // south-west
+          this.points.push([start[0], mid[1]], [end[0], mid[1]]);
+        } else {
+          // north-west
+          this.points.push([start[0], end[1]], [end[0], end[1]]);
+        }
+      }
+
+      this.points.push(end);
     }
 
     this.points.push(dst);
@@ -359,7 +408,7 @@ export class SVGPolylineGenerator {
   }
 
   private calcOffset(dist: number): number {
-    return Math.max(4 * Math.sqrt(Math.abs(dist)), 10);
+    return Math.max(3 * Math.sqrt(Math.abs(dist)), 10);
   }
 
   private getOffsetPoint(p: Port, distance): [number, number] {
