@@ -215,23 +215,39 @@ export class Transformable {
     return this;
   }
 
+  private transformNormalized(trans: Mat3): Transformable {
+    const tlX = this.getWidth() / 2;
+    const tlY = this.getHeight() / 2;
+    // Invert transformation
+    const mat = this.mat.copy();
+    const invmat = this.mat.copy().inverse();
+    this.mat.multiply(invmat);
+    // Translate to center
+    this.translate([-tlX, -tlY]);
+    // Apply actual transformation
+    this.mat.multiply(trans);
+    // Invert translate to center
+    this.translate([tlX, tlY]);
+    // Invert inversion matrix
+    this.mat.multiply(mat);
+    return this;
+  }
+
   public scale(vec: [number, number]): Transformable {
-    this.mat.multiply(new Mat3([
+    return this.transformNormalized(new Mat3([
       vec[0], 0, 0,
       0, vec[1], 0,
       0, 0, 1
     ]));
-    return this;
   }
 
   public rotate(angle: number): Transformable {
-    const rot = Mat2.identity.copy().rotate(-angle).all();
-    this.mat.multiply(new Mat3([
+    const rot = Mat2.identity.copy().rotate(angle).all();
+    return this.transformNormalized(new Mat3([
       rot[0], rot[1], 0,
       rot[2], rot[3], 0,
       0, 0, 1
     ]));
-    return this;
   }
 
   public resize(vec: [number, number]): Transformable {
@@ -361,9 +377,10 @@ export class OperatorInstance extends Composable {
           const dlg = new Delegate(this, dlgName, this, dlgDef);
           dlgHeight += dlg.getWidth();
           dlg
-            .scale([-1, 1])
             .rotate(-Math.PI / 2)
-            .translate([width, dlg.getWidth()]);
+            .translate([width, dlg.getWidth() / 2])
+            .scale([1, -1])
+            .translate([-dlg.getWidth() / 2 - 7, 0]);
           this.delegates.set(dlgName, dlg);
           dlgHeight += OperatorInstance.style.dlgM;
         }
@@ -376,7 +393,7 @@ export class OperatorInstance extends Composable {
     this.mainOut.scale([1, -1]).translate([0, height]);
 
     this.mainIn.translate([0, -7]);
-    this.mainOut.translate([0, 14]);
+    this.mainOut.translate([0, -7]);
     this.mainIn.justifyHorizontally();
     this.mainOut.justifyHorizontally();
     this.distributeDelegatesVertically();
