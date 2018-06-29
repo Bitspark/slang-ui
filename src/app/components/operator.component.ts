@@ -16,67 +16,6 @@ import 'codemirror/mode/yaml/yaml.js';
 import {TypeDefFormComponent} from './type-def-form.component';
 import {HttpClient} from '@angular/common/http';
 
-class MouseMoueTracker {
-  private static lastX: number;
-  private static lastY: number;
-
-  private moving: boolean;
-  private actionType = '';
-
-  constructor(private mouseAction: (t: MouseMoueTracker, event: any, actionPhase: string) => void) {
-  }
-
-  public static getLastX(): number {
-    return this.lastX;
-  }
-
-  public static getLastY(): number {
-    return this.lastY;
-  }
-
-  public setResizing() {
-    this.actionType = 'resize';
-  }
-
-  public setDragging() {
-    this.actionType = 'drag';
-  }
-
-  public isResizing() {
-    return this.actionType === 'resize';
-  }
-
-  public isDragging() {
-    return this.actionType === 'drag';
-  }
-
-  public start(event: any) {
-    this.moving = true;
-    this.mouseAction(this, event, 'start');
-    MouseMoueTracker.lastX = event.screenX;
-    MouseMoueTracker.lastY = event.screenY;
-  }
-
-  public stop(event: any) {
-    this.moving = false;
-    this.mouseAction(this, event, 'stop');
-    MouseMoueTracker.lastX = event.screenX;
-    MouseMoueTracker.lastY = event.screenY;
-    this.actionType = '';
-  }
-
-  public track(event: any) {
-    if (event.buttons === 0) {
-      this.moving = false;
-    }
-    if (this.moving) {
-      this.mouseAction(this, event, 'ongoing');
-      MouseMoueTracker.lastX = event.screenX;
-      MouseMoueTracker.lastY = event.screenY;
-    }
-  }
-}
-
 @Component({
   templateUrl: './operator.component.html',
   styleUrls: ['./operator.component.scss']
@@ -118,12 +57,13 @@ export class OperatorComponent implements OnInit {
   public inputValue: any = {};
   public debugging = false;
   public running = false;
+  public runningHandle = '';
   public debuggingLog: Array<string> = [];
   public debuggingReponses: Array<any> = [];
   public operatorEndpoint = '';
 
   // Dragging
-  public mouseTracker = new MouseMoueTracker((t, event, phase) => {
+  public mouseTracker = new MouseMoveTracker((t, event, phase) => {
     if (!this.selectedEntity.entity || typeof this.selectedEntity.entity.translate !== 'function') {
       return;
     }
@@ -134,8 +74,8 @@ export class OperatorComponent implements OnInit {
       return;
     }
 
-    const xDiff = event.screenX - MouseMoueTracker.getLastX();
-    const yDiff = event.screenY - MouseMoueTracker.getLastY();
+    const xDiff = event.screenX - MouseMoveTracker.getLastX();
+    const yDiff = event.screenY - MouseMoveTracker.getLastY();
 
     if (t.isDragging()) {
       this.selectedEntity.entity.translate([xDiff / this.scale, yDiff / this.scale]);
@@ -646,9 +586,10 @@ export class OperatorComponent implements OnInit {
     }).toPromise()
       .then(data => {
         if (data['status'] === 'success') {
-          this.operatorEndpoint =  data['url'];
+          this.operatorEndpoint = data['url'];
           this.debugLog('Operator is running at ' + this.operatorEndpoint);
           this.running = true;
+          this.runningHandle = data['handle'];
         } else {
           const error = data['error'];
           this.debugLog(`Error ${error.code} occurred: ${error.msg}`);
@@ -664,11 +605,80 @@ export class OperatorComponent implements OnInit {
   }
 
   public stopOperator() {
-    this.running = false;
+    this.http.delete('http://localhost:5149/run/', {
+      handle: this.runningHandle
+    }).toPromise()
+      .then(data => {
+        if (data['status'] === 'success') {
+          this.running = false;
+          this.runningHandle = '';
+        }
+      });
   }
 
   public closeDebugPanel() {
     this.debugging = false;
   }
 
+}
+
+class MouseMoveTracker {
+  private static lastX: number;
+  private static lastY: number;
+
+  private moving: boolean;
+  private actionType = '';
+
+  constructor(private mouseAction: (t: MouseMoveTracker, event: any, actionPhase: string) => void) {
+  }
+
+  public static getLastX(): number {
+    return this.lastX;
+  }
+
+  public static getLastY(): number {
+    return this.lastY;
+  }
+
+  public setResizing() {
+    this.actionType = 'resize';
+  }
+
+  public setDragging() {
+    this.actionType = 'drag';
+  }
+
+  public isResizing() {
+    return this.actionType === 'resize';
+  }
+
+  public isDragging() {
+    return this.actionType === 'drag';
+  }
+
+  public start(event: any) {
+    this.moving = true;
+    this.mouseAction(this, event, 'start');
+    MouseMoveTracker.lastX = event.screenX;
+    MouseMoveTracker.lastY = event.screenY;
+  }
+
+  public stop(event: any) {
+    this.moving = false;
+    this.mouseAction(this, event, 'stop');
+    MouseMoveTracker.lastX = event.screenX;
+    MouseMoveTracker.lastY = event.screenY;
+    this.actionType = '';
+  }
+
+  public track(event: any) {
+    if (event.buttons === 0) {
+      this.moving = false;
+    }
+    if (this.moving) {
+      this.mouseAction(this, event, 'ongoing');
+      MouseMoveTracker.lastX = event.screenX;
+      MouseMoveTracker.lastY = event.screenY;
+    }
+  }
 }
