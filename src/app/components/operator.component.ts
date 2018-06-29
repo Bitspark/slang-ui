@@ -327,6 +327,30 @@ export class OperatorComponent implements OnInit {
     return `translate(${comp.getAbsX()},${comp.getAbsY()})`;
   }
 
+  public rotateRight() {
+    if (this.isInstanceSelected()) {
+      this.selectedEntity.entity.rotate(-Math.PI / 2);
+    }
+  }
+
+  public rotateLeft() {
+    if (this.isInstanceSelected()) {
+      this.selectedEntity.entity.rotate(Math.PI / 2);
+    }
+  }
+
+  public mirrorVertically() {
+    if (this.isInstanceSelected()) {
+      this.selectedEntity.entity.scale([1, -1]);
+    }
+  }
+
+  public mirrorHorizontally() {
+    if (this.isInstanceSelected()) {
+      this.selectedEntity.entity.scale([-1, 1]);
+    }
+  }
+
   public connectionPoints(conn: Connection): string {
     return SVGPolylineGenerator.generatePoints(this.operator, conn);
   }
