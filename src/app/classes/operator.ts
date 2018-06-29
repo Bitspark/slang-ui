@@ -286,8 +286,16 @@ export class Composable extends Transformable {
     return this.parent;
   }
 
-  protected getAbsMat3() {
+  protected getAbsMat3(): Mat3 {
     return !!this.parent ? this.mat.copy().multiply(this.parent.getAbsMat3()) : this.mat.copy();
+  }
+
+  private getCenterMat3(): Mat3 {
+    return (new Mat3([
+      0, 0, this.getWidth() / 2,
+      0, 0, this.getHeight() / 2,
+      0, 0, 1
+    ]).multiply(this.getAbsMat3()));
   }
 
   public getAbsX(): number {
@@ -296,6 +304,14 @@ export class Composable extends Transformable {
 
   public getAbsY(): number {
     return this.getAbsMat3().at(5);
+  }
+
+  public getCenterX(): number {
+    return this.getCenterMat3().at(2);
+  }
+
+  public getCenterY(): number {
+    return this.getCenterMat3().at(5);
   }
 
   public getOrientation(): number {

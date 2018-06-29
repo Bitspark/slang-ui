@@ -644,4 +644,23 @@ export class OperatorComponent implements OnInit {
   public isUIModeYAML(): boolean {
     return this.uiMode === 'yaml';
   }
+
+
+  public text(ins: OperatorInstance): string {
+    const fqn = ins.getFullyQualifiedName();
+    const props = ins.getProperties();
+
+    if (fqn === 'slang.const') {
+      return !!props ? JSON.stringify(props['value']) : '?';
+    } else if (fqn === 'slang.eval') {
+      return !!props ? props['expression'] : '?';
+    }
+
+    return ins.getName();
+  }
+
+  public fqn(ins: OperatorInstance): string {
+    const fqn = ins.getFullyQualifiedName().split('.');
+    return fqn[fqn.length - 1];
+  }
 }
