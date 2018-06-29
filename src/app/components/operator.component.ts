@@ -657,7 +657,7 @@ export class OperatorComponent implements OnInit {
   }
 
   public sendInputValue(obj: any) {
-    this.http.post(this.operatorEndpoint, obj).toPromise()
+    this.http.post(this.operatorEndpoint, JSON.stringify(obj)).toPromise()
       .then(data => {
         this.debuggingReponses.push(data);
       });
