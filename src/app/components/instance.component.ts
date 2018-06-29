@@ -45,17 +45,25 @@ export class InstanceComponent {
     return 'rect';
   }
 
+  private abbreviate(str: string): string {
+    const maxLength = 15;
+    if (str.length < maxLength) {
+      return str;
+    }
+    return str.substr(0, maxLength - 3) + '...';
+  }
+
   public text(): string {
     const fqn = this.instance.getFullyQualifiedName();
     const props = this.instance.getProperties();
 
     if (fqn === 'slang.const') {
-      return !!props ? JSON.stringify(props['value']) : '?';
+      return !!props ? this.abbreviate(JSON.stringify(props['value'])) : '?';
     } else if (fqn === 'slang.eval') {
-      return !!props ? props['expression'] : '?';
+      return !!props ? this.abbreviate(props['expression']) : '?';
     }
 
-    return this.instance.getName();
+    return this.abbreviate(this.instance.getName());
   }
 
   public fqn(): string {
