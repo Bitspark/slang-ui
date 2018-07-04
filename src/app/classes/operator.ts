@@ -278,8 +278,14 @@ export class Transformable {
   protected dim: [number, number];
   protected mat: Mat3;
 
-  constructor() {
-    this.mat = Mat3.identity.copy();
+  constructor(t?: Transformable) {
+    if (t) {
+      this.mat = t.mat.copy();
+      this.dim = [t.dim[0], t.dim[1]];
+    } else {
+      this.mat = Mat3.identity.copy();
+      // currently this.dim must stay undefined and will be later set in OperatorInstance.updateOperator
+    }
   }
 
   public translate(vec: [number, number]): Transformable {
@@ -392,11 +398,7 @@ export class Composable extends Transformable {
 
   public getOrientation(): Orientation {
     const mat = this.getAbsMat3();
-    const vec = new Mat3([
-      0, 0, 0,
-      0, 0, 1,
-      0, 0, 0]);
-    return Orientation.fromMat3(vec.multiply(mat));
+    return Orientation.fromMat3(Mat3.fromVec2([0, 1]).multiply(mat));
   }
 
 }
