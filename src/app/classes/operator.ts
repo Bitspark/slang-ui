@@ -16,9 +16,9 @@ export enum Type {
 
 export class Orientation {
   public static north = 0;
-  public static west = 1;
+  public static east = 1;
   public static south = 2;
-  public static east = 3;
+  public static west = 3;
 
   constructor(private ori: number) {
   }
@@ -318,7 +318,7 @@ export class Transformable {
   }
 
   public rotate(angle: number): Transformable {
-    const rot = Mat2.identity.copy().rotate(angle).all();
+    const rot = Mat2.identity.copy().rotate(-angle).all();
     return this.transformNormalized(new Mat3([
       rot[0], rot[1], 0,
       rot[2], rot[3], 0,
@@ -354,8 +354,8 @@ export class Transformable {
 }
 
 export class Composable extends Transformable {
-  constructor(private parent: Composable) {
-    super();
+  constructor(private parent: Composable, t?: Transformable) {
+    super(t);
   }
 
   public getParent(): Composable {
