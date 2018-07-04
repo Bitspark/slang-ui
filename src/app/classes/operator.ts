@@ -403,8 +403,8 @@ export class Composable extends Transformable {
 
 export class OperatorInstance extends Composable {
   private static style = {
-    opMinWidth: 100,
-    opMinHeight: 100,
+    opMinWidth: 150,
+    opMinHeight: 150,
     dlgP: 10,
     dlgM: 5
   };

@@ -18,7 +18,8 @@ svg {
     }
 
     fill: $light-gray;
-    font-size: 1em;
+    font-size: 1.4em;
+    font-weight: lighter;
 
     &.selected {
       fill: $svg-selected;
