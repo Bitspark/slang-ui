@@ -57,7 +57,7 @@ export class OperatorComponent implements OnInit {
   public inputValue: any = {};
   public debugState = null;
   public running = false;
-  public runningHandle = 0;
+  public runningHandle = '';
   public debuggingLog: Array<string> = [];
   public debuggingReponses: Array<any> = [];
   public debuggingGens = {};
@@ -657,7 +657,7 @@ export class OperatorComponent implements OnInit {
       .then(data => {
         if (data['status'] === 'success') {
           this.running = false;
-          this.runningHandle = 0;
+          this.runningHandle = '';
         } else {
           const error = data['error'];
           this.debugLog(`Error ${error.code} occurred: ${error.msg}`);
