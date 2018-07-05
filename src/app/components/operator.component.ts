@@ -55,11 +55,16 @@ export class OperatorComponent implements OnInit {
 
   // Executing
   public inputValue: any = {};
-  public debugging = false;
+  public debugState = null;
   public running = false;
   public runningHandle = 0;
   public debuggingLog: Array<string> = [];
   public debuggingReponses: Array<any> = [];
+  public debuggingGens = {};
+  public debuggingPropDefs = {};
+  public debuggingInPort = {};
+  public debuggingOutPort = {};
+  public debuggingProps = {};
   public operatorEndpoint = '';
 
   // Dragging
@@ -520,6 +525,10 @@ export class OperatorComponent implements OnInit {
     insOpDef.generics[genName] = TypeDefFormComponent.newDefaultTypeDef('primitive');
   }
 
+  public specifyGeneric(gens, name) {
+    gens[name] = TypeDefFormComponent.newDefaultTypeDef('primitive');
+  }
+
   public isPropertySpecified(ins: OperatorInstance, prop: { name: string, def: any }): boolean {
     const props = this.getProperties(ins);
     return props && typeof props[prop.name] !== 'undefined';
@@ -555,6 +564,10 @@ export class OperatorComponent implements OnInit {
     insOpDef.properties[prop.name] = createDefaultValue(prop.def);
   }
 
+  public specifyProperty(props, name, def) {
+    props[name] = createDefaultValue(def);
+  }
+
   public setUIMode(mode: string): string {
     this.uiMode = mode.toLowerCase();
     return this.uiMode;
@@ -574,15 +587,46 @@ export class OperatorComponent implements OnInit {
     this.debuggingLog.push(msg);
   }
 
+  public startDebugging() {
+    this.refreshDebugVariables();
+    if (this.operator.getGenericNames().size > 0 || this.operator.getPropertyDefs().size > 0) {
+      this.specifyOperator();
+    } else {
+      this.runOperator();
+    }
+  }
+
+  public specifyOperator() {
+    this.debugState = 'specifying';
+  }
+
+  public refreshDebugVariables() {
+    this.debuggingPropDefs = JSON.parse(JSON.stringify(this.propertyDefs));
+    for (const propName in this.debuggingPropDefs) {
+      if (this.debuggingPropDefs.hasOwnProperty(propName)) {
+        OperatorDef.specifyTypeDef(this.debuggingPropDefs[propName], this.debuggingGens, {}, {});
+        this.debuggingProps[propName] = createDefaultValue(this.debuggingPropDefs[propName]);
+      }
+    }
+
+    this.debuggingInPort = JSON.parse(JSON.stringify(this.mainSrvPort.in));
+    OperatorDef.specifyTypeDef(this.debuggingInPort, this.debuggingGens, {}, {});
+
+    this.debuggingOutPort = JSON.parse(JSON.stringify(this.mainSrvPort.out));
+    OperatorDef.specifyTypeDef(this.debuggingOutPort, this.debuggingGens, {}, {});
+  }
+
   public runOperator() {
-    this.debugging = true;
-    this.inputValue = createDefaultValue(this.mainSrvPort.in);
+    this.debugState = 'debugging';
+    this.inputValue = createDefaultValue(this.debuggingInPort);
 
     this.debugLog('Request daemon to start operator...');
 
     this.http.post('http://localhost:5149/run/', {
       cwd: this.operators.getWorkingDir(),
-      fqn: this.operatorName
+      fqn: this.operatorName,
+      gens: this.debuggingGens,
+      props: this.debuggingProps
     }).toPromise()
       .then(data => {
         if (data['status'] === 'success') {
@@ -622,7 +666,7 @@ export class OperatorComponent implements OnInit {
   }
 
   public closeDebugPanel() {
-    this.debugging = false;
+    this.debugState = null;
   }
 
 }
