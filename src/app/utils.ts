@@ -417,9 +417,9 @@ export class SVGPolylineGenerator {
       dst.getOrientation().rotatedBy((dst.getOperator() === this.outerOperator) ? 2 : 0));
     dOrigin.translate(this.normTrl.neg()).rotate(-this.normRot90Deg);
 
-    const padding = new Vec2([50, 50]);
-    const start = this.calcOffset(sOrigin, padding);
-    const end = this.calcOffset(dOrigin, padding);
+    const padding = new Vec2([30, 30]);
+    const start = this.calcOffset(sOrigin, padding, (src.getParentPort() && src.getParentPort().isMap()) ? src.getPosX() : 0);
+    const end = this.calcOffset(dOrigin, padding, (dst.getParentPort() && dst.getParentPort().isMap()) ? dst.getPosX() : 0);
     const mid = start.plus(end.minus(start).div(2));
     const dist = end.minus(start);
 
@@ -467,7 +467,7 @@ export class SVGPolylineGenerator {
         this.addPoints([end, dOrigin]);
         return;
       } else if (o.isNorth()) {
-        if (Math.abs(dist.x) <= 100) {
+        if (Math.abs(dist.x) <= 50) {
           /*
              .---.
              V   |
@@ -475,7 +475,7 @@ export class SVGPolylineGenerator {
              .---'
              O
            */
-          const p = new Vec2([Math.sign(dist.x) * 200, 0]);
+          const p = new Vec2([Math.sign(dist.x) * 50, 0]);
           this.addPoints([Vec2.combine(p, start), Vec2.combine(p, end)]);
           this.addPoints([end, dOrigin]);
         } else {
@@ -492,7 +492,7 @@ export class SVGPolylineGenerator {
       }
     } else {
       if (o.isNorth()) {
-        if (Math.abs(dist.x) <= 100) {
+        if (Math.abs(dist.x) <= 50) {
           /*
              .---.
              O   |
@@ -500,7 +500,7 @@ export class SVGPolylineGenerator {
              V
              O
            */
-          const p = new Vec2([Math.sign(dist.x) * 100, 0]);
+          const p = new Vec2([Math.sign(dist.x) * 50, 0]);
           this.addPoints([Vec2.combine(p, start), Vec2.combine(p, end)]);
           this.addPoints([end, dOrigin]);
         } else {
@@ -519,13 +519,13 @@ export class SVGPolylineGenerator {
     /* connection via 2 additional lines */
     if (dist.y > 0) {
       if (o.isHorizontally()) {
-        if (Math.abs(dist.x) <= 100) {
+        if (Math.abs(dist.x) <= 50) {
           /*
              .--.   .--.
              O  |   |  O
              O<-'   `->O
            */
-          const p = new Vec2([(o.isWest()) ? -100 : 100, 0]);
+          const p = new Vec2([(o.isWest()) ? -50 : 50, 0]);
           this.addPoints([Vec2.combine(p, start), Vec2.combine(p, end)]);
           this.addPoints([end, dOrigin]);
           return;
@@ -538,8 +538,8 @@ export class SVGPolylineGenerator {
               |   O       |  O  .---'
               '->O    O<--'     O
            */
-          if (Math.abs(dist.y) <= 100) {
-            const c = end.y - 100;
+          if (Math.abs(dist.y) <= 50) {
+            const c = end.y - 50;
             const p = new Vec2([c, c]);
             this.addPoints([Vec2.combine(start, p), Vec2.combine(end, p)]);
             this.addPoints([end, dOrigin]);
@@ -553,13 +553,13 @@ export class SVGPolylineGenerator {
       }
     } else {
       if (o.isHorizontally()) {
-        if (Math.abs(dist.y) <= 100) {
+        if (Math.abs(dist.y) <= 50) {
           /*
              .--.   .--.
              O  |   |  O
              O<-'   `->O
            */
-          const c = end.y - 100;
+          const c = end.y - 50;
           const p = new Vec2([c, c]);
           this.addPoints([Vec2.combine(start, p), Vec2.combine(end, p)]);
           this.addPoints([end, dOrigin]);
@@ -584,14 +584,14 @@ export class SVGPolylineGenerator {
     /* connection via 3 additional lines */
     if (dist.y > 0) {
       if (o.isSouth()) {
-        if (Math.abs(dist.x) <= 200) {
+        if (Math.abs(dist.x) <= 50) {
           /*
               .--.
               |  *
               |  O
               '--'
            */
-          const p = new Vec2([Math.sign(dist.x) * 100 + dist.x, 0]);
+          const p = new Vec2([Math.sign(dist.x) * 50 + dist.x, 0]);
           this.addPoints([Vec2.combine(p, start), Vec2.combine(p, end)]);
           this.addPoints([end, dOrigin]);
           return;
@@ -620,22 +620,24 @@ export class SVGPolylineGenerator {
     path.forEach(p => this.points.push(Vec2.copy(p).rotate(this.normRot90Deg).translate(this.normTrl)));
   }
 
-  private calcOffset(p: Vec2, padding: Vec2): Vec2 {
+  private calcOffset(p: Vec2, padding: Vec2, margin?: number): Vec2 {
     const ori = p.orient();
+    const offsetX = padding.x + margin;
+    const offsetY = padding.y + margin;
 
     let offset;
     if (ori.isNorth()) {
       // to north
-      offset = new Vec2([0, -padding.y]);
+      offset = new Vec2([0, -offsetY]);
     } else if (ori.isSouth()) {
       // to south
-      offset = new Vec2([0, padding.y]);
+      offset = new Vec2([0, offsetY]);
     } else if (ori.isWest()) {
       // to west
-      offset = new Vec2([-padding.x, 0]);
+      offset = new Vec2([-offsetX, 0]);
     } else {
       // to east
-      offset = new Vec2([padding.x, 0]);
+      offset = new Vec2([offsetX, 0]);
     }
     return p.plus(offset);
   }
