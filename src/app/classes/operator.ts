@@ -483,10 +483,11 @@ export class OperatorInstance extends Composable {
           const dlg = new Delegate(this, dlgName, this, dlgDef);
           dlgHeight += dlg.getWidth();
           dlg
-            .rotate(Math.PI / 2)
+            .rotate(-Math.PI / 2)
             .translate([width, dlg.getWidth() / 2])
             .scale([1, -1])
-            .translate([-dlg.getWidth() / 2 - 7, 0]);
+            .translate([-dlg.getWidth() / 2 - 7, 0])
+          ;
           this.delegates.set(dlgName, dlg);
           dlgHeight += OperatorInstance.style.dlgM;
         }
