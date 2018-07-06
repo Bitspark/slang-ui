@@ -133,7 +133,9 @@
                           [attr.points]="connectionPoints(conn)"></svg:polyline>
 
             <!-- Text/Labels -->
-            <svg:g *ngFor="let port of getPorts()" (click)="selectPort(port)" [attr.transform]="translate(port)">
+            <svg:g *ngFor="let port of getPorts()" (click)="selectPort(port)" [attr.transform]="translatePort(port)">
+              <!--<circle r="2" fill="#00ff00"></circle>-->
+              <!--<circle r="2" fill="red" [attr.cx]="getPortLabelX(port)" [attr.cy]="getPortLabelY(port)"></circle>-->
               <!--<circle [attr.cx]="getPortLabelX(port)-1" [attr.cy]="getPortLabelY(port)-1" r="2"/>-->
               <svg:text [attr.text-anchor]="getPortLabelAnchor(port)" alignment-baseline="middle"
                         [attr.transform]="transformLabel(port)"

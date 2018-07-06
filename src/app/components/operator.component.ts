@@ -327,6 +327,10 @@ export class OperatorComponent implements OnInit {
     return `translate(${comp.getAbsX()},${comp.getAbsY()})`;
   }
 
+  public translatePort(port: Port): string {
+    return `translate(${port.getCenterX()},${port.getCenterY()})`;
+  }
+
   public rotateRight() {
     if (this.isInstanceSelected()) {
       this.selectedEntity.entity.rotate(Math.PI / 2);
@@ -500,26 +504,26 @@ export class OperatorComponent implements OnInit {
   public getPortLabelX(port: Port): number {
     switch (port.getOrientation().value()) {
       case Orientation.north:
-        return 10;
+        return 0;
       case Orientation.west:
-        return 25;
+        return 15;
       case Orientation.south:
-        return 10;
+        return 0;
       case Orientation.east:
-        return -25;
+        return -15;
     }
   }
 
   public getPortLabelY(port: Port): number {
     switch (port.getOrientation().value()) {
       case Orientation.north:
-        return 20;
+        return 15;
       case Orientation.west:
-        return -10;
+        return 0;
       case Orientation.south:
-        return -20;
+        return -15;
       case Orientation.east:
-        return -10;
+        return 0;
     }
   }
 
@@ -528,11 +532,11 @@ export class OperatorComponent implements OnInit {
       case Orientation.north:
         return 'end';
       case Orientation.west:
-        return 'end';
+        return 'begin';
       case Orientation.south:
         return 'begin';
       case Orientation.east:
-        return 'begin';
+        return 'end';
     }
   }
 
