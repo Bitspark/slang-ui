@@ -1,5 +1,5 @@
-import {Composable, Connection, OperatorDef, OperatorInstance, Orientation, Port, Transformable} from './classes/operator';
-import {Mat3} from './classes/matrix';
+import {Connection, OperatorDef, OperatorInstance, Port, Transformable} from './classes/operator';
+import {Vec2} from './classes/vector';
 
 function expandExpressionPart(exprPart: string, props: any, propDefs: any): Array<string> {
   const vals = [];
@@ -309,94 +309,7 @@ export function buildRefString(info: { instance: string, delegate: string, servi
   }
 }
 
-class Vec2 {
-  public x = 0;
-  public y = 0;
-  private o = new Orientation(Orientation.north);
-
-  constructor(p: [number, number], o?: Orientation) {
-    this.x = p[0];
-    this.y = p[1];
-    if (o) {
-      this.o = o;
-    }
-  }
-
-  public static combine(v1: Vec2, v2: Vec2): Vec2 {
-    return new Vec2([v1.x, v2.y], v1.o);
-  }
-
-  public static copy(v: Vec2): Vec2 {
-    return new Vec2([v.x, v.y], v.o);
-  }
-
-  public static null(): Vec2 {
-    return new Vec2([0, 0], new Orientation(Orientation.north));
-  }
-
-  public translate(t: Vec2): Vec2 {
-    this.x += t.x;
-    this.y += t.y;
-    return this;
-  }
-
-  public rotate(rotBy90deg: number): Vec2 {
-    rotBy90deg = (4 + rotBy90deg) % 4;
-    let x = this.x;
-    let y = this.y;
-    // rotation to right
-    for (let i = 0; i < rotBy90deg; i++) {
-      [x, y] = [-y, x];
-    }
-
-    this.x = x;
-    this.y = y;
-    this.o = new Orientation(this.o.value() + rotBy90deg);
-
-    return this;
-  }
-
-  public scale(s: number): Vec2 {
-    this.x *= s;
-    this.y *= s;
-    return this;
-  }
-
-  public flip(): Vec2 {
-    [this.x, this.y] = [this.y, this.x];
-    return this;
-  }
-
-  public minus(v: Vec2): Vec2 {
-    return new Vec2([this.x - v.x, this.y - v.y], this.o);
-  }
-
-  public plus(v: Vec2): Vec2 {
-    return new Vec2([this.x + v.x, this.y + v.y], this.o);
-  }
-
-  public mult(k: number): Vec2 {
-    return new Vec2([this.x * k, this.y * k], this.o);
-  }
-
-  public div(k: number): Vec2 {
-    return this.mult(1 / k);
-  }
-
-  public neg(): Vec2 {
-    return new Vec2([-this.x, -this.y], this.o);
-  }
-
-  public xy(): [number, number] {
-    return [this.x, this.y];
-  }
-
-  public orient(): Orientation {
-    return this.o;
-  }
-}
-
-export class SVGPolylineGenerator {
+export class SVGConnectionLineGenerator {
   private points: Array<Vec2> = [];
   private normTrl: Vec2;
   private normRot90Deg: number;
@@ -609,25 +522,19 @@ export class SVGPolylineGenerator {
     }
   }
 
-  private static roundOneCorner(p1: [number, number], corner: [number, number], p2: [number, number]):
-    { lineEnd: [number, number], curveControl: [number, number], curveEnd: [number, number] } {
-    let radius = 25;
+  private static roundOneCorner(p1: Vec2, corner: Vec2, p2: Vec2):
+    { lineEnd: Vec2, curveControl: Vec2, curveEnd: Vec2 } {
 
-    const cornerToP1 = this.lineToVector(corner, p1);
-    const cornerToP2 = this.lineToVector(corner, p2);
+    const cornerToP1 = p1.minus(corner);
+    const cornerToP2 = p2.minus(corner);
     const [cornerToP1Unit, mag1] = this.vectorToUnitVector(cornerToP1);
     const [cornerToP2Unit, mag2] = this.vectorToUnitVector(cornerToP2);
 
-    radius = Math.min(radius, mag1 / 2, mag2 / 2);
+    const radius = Math.min(25, mag1 / 2, mag2 / 2);
 
-    const curveP1 = [
-      corner[0] + cornerToP1Unit[0] * radius,
-      corner[1] + cornerToP1Unit[1] * radius
-    ] as [number, number];
-    const curveP2 = [
-      corner[0] + cornerToP2Unit[0] * radius,
-      corner[1] + cornerToP2Unit[1] * radius
-    ] as [number, number];
+    const curveP1 = cornerToP1Unit.mult(radius).plus(corner);
+    const curveP2 = cornerToP2Unit.mult(radius).plus(corner);
+
     return {
       lineEnd: curveP1,
       curveControl: corner,
@@ -635,48 +542,35 @@ export class SVGPolylineGenerator {
     };
   }
 
-  private static lineToVector(p1: [number, number], p2: [number, number]): [number, number] {
-    return [
-      p2[0] - p1[0],
-      p2[1] - p1[1]
-    ];
-  }
-
-  private static vectorToUnitVector(v: [number, number]): [[number, number], number] {
-    let magnitude = v[0] * v[0] + v[1] * v[1];
-    magnitude = Math.sqrt(magnitude);
-    return [
-      [
-        v[0] / magnitude,
-        v[1] / magnitude
-      ],
-      magnitude
-    ];
+  private static vectorToUnitVector(v: Vec2): [Vec2, number] {
+    const magnitude = Math.sqrt(v.x * v.x + v.y * v.y);
+    return [v.div(magnitude), magnitude];
   }
 
   private static printPath(path) {
+
     let svgPath = '';
-    svgPath += 'L ' + path.lineEnd[0].toFixed(1) + ',' + path.lineEnd[1].toFixed(1) + ' ';
-    svgPath += 'Q ' + path.curveControl[0].toFixed(1) + ',' + path.curveControl[1].toFixed(1)
-      + ' ' + path.curveEnd[0].toFixed(1) + ',' + path.curveEnd[1].toFixed(1);
+    svgPath += `L ${path.lineEnd.x.toFixed(1)},${path.lineEnd.y.toFixed(1)} ` +
+      `Q ${path.curveControl.x.toFixed(1)},${path.curveControl.y.toFixed(1)} ` +
+      `${path.curveEnd.x.toFixed(1)},${path.curveEnd.y.toFixed(1)}`;
     return svgPath;
   }
 
-  public static generatePoints(op: OperatorInstance, conn: Connection): string {
-    const svgPolyLine = new SVGPolylineGenerator(op, conn);
+  public static generateCornedPath(op: OperatorInstance, conn: Connection): string {
+    const svgPolyLine = new SVGConnectionLineGenerator(op, conn);
     return svgPolyLine.points.reduce((pointStr: string, point: Vec2) => {
       return pointStr + `${point.x},${point.y} `;
     }, '');
   }
 
-  public static generateRoundPoints(op: OperatorInstance, conn: Connection): string {
-    const svgPolyLine = new SVGPolylineGenerator(op, conn);
+  public static generateRoundPath(op: OperatorInstance, conn: Connection): string {
+    const svgPolyLine = new SVGConnectionLineGenerator(op, conn);
     const points = svgPolyLine.points;
     let svgPath = `M ${points[0].x} ${points[0].y} `;
     for (let i = 0; i + 2 < points.length; i++) {
-      const p1 = [points[i].x, points[i].y] as [number, number];
-      const p2 = [points[i + 1].x, points[i + 1].y] as [number, number];
-      const p3 = [points[i + 2].x, points[i + 2].y] as [number, number];
+      const p1 = points[i];
+      const p2 = points[i + 1];
+      const p3 = points[i + 2];
       svgPath += this.printPath(this.roundOneCorner(p1, p2, p3)) + ' ';
     }
     svgPath += `L ${points[points.length - 1].x} ${points[points.length - 1].y}`;

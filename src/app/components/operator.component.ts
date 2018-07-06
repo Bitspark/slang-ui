@@ -1,19 +1,20 @@
 import {Component, HostListener, OnInit} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 import {OperatorService} from '../services/operator.service';
-import {Composable, Connection, OperatorDef, OperatorInstance, Orientation, Port, Transformable} from '../classes/operator';
+import {Composable, Connection, OperatorDef, OperatorInstance, Port, Transformable} from '../classes/operator';
 import {safeDump, safeLoad} from 'js-yaml';
 import {
   compareOperatorDefs,
   createDefaultValue,
   generateSvgTransform,
   normalizeConnections,
-  stringifyConnections, SVGPolylineGenerator
+  stringifyConnections, SVGConnectionLineGenerator
 } from '../utils';
 import {ApiService} from '../services/api.service';
 import {VisualService} from '../services/visual.service';
 import 'codemirror/mode/yaml/yaml.js';
 import {TypeDefFormComponent} from './type-def-form.component';
+import {Orientation} from '../classes/vector';
 
 class MouseMoueTracker {
   private static lastX: number;
@@ -354,7 +355,7 @@ export class OperatorComponent implements OnInit {
   }
 
   public connectionPoints(conn: Connection): string {
-    return SVGPolylineGenerator.generateRoundPoints(this.operator, conn);
+    return SVGConnectionLineGenerator.generateRoundPath(this.operator, conn);
   }
 
   public visualInstances(): Array<OperatorInstance> {

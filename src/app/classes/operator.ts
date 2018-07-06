@@ -1,6 +1,7 @@
 import {buildRefString, connectDeep, expandProperties, parseRefString} from '../utils';
 import {OperatorService} from '../services/operator.service';
 import {Mat2, Mat3} from './matrix';
+import {Orientation} from './vector';
 
 export enum Type {
   number,
@@ -12,88 +13,6 @@ export enum Type {
   generic,
   stream,
   map,
-}
-
-export class Orientation {
-  public static north = 0;
-  public static east = 1;
-  public static south = 2;
-  public static west = 3;
-  private ori: number;
-
-  constructor(o: number) {
-    this.ori = o % 4;
-  }
-
-  public static fromMat3(m: Mat3): Orientation {
-    let ori = -1;
-    if (m.at(5) > 0.1) {
-      ori = 0; // north
-    }
-    if (m.at(2) > 0.1) {
-      ori = 3; // west
-    }
-    if (m.at(5) < -0.1) {
-      ori = 2; // south
-    }
-    if (m.at(2) < -0.1) {
-      ori = 1; // east
-    }
-    return new Orientation(ori);
-  }
-
-  public rotatedBy(rot90DegCount: number): Orientation {
-    return new Orientation(this.ori + 4 + rot90DegCount);
-  }
-
-  public name(): string {
-    switch (this.ori) {
-      case Orientation.north:
-        return 'north';
-      case Orientation.west:
-        return 'west';
-      case Orientation.south:
-        return 'south';
-      case Orientation.east:
-        return 'east';
-    }
-  }
-
-  public value(): number {
-    return this.ori;
-  }
-
-  public isSame(o: Orientation): boolean {
-    return this.ori === o.ori;
-  }
-
-  public isOpposite(o: Orientation): boolean {
-    return !this.isSame(o) && (this.isVertically() && o.isVertically() || this.isHorizontally() && o.isHorizontally());
-  }
-
-  public isHorizontally(): boolean {
-    return this.ori === Orientation.west || this.ori === Orientation.east;
-  }
-
-  public isVertically(): boolean {
-    return this.ori === Orientation.north || this.ori === Orientation.south;
-  }
-
-  public isNorth(): boolean {
-    return this.ori === Orientation.north;
-  }
-
-  public isWest(): boolean {
-    return this.ori === Orientation.west;
-  }
-
-  public isSouth(): boolean {
-    return this.ori === Orientation.south;
-  }
-
-  public isEast(): boolean {
-    return this.ori === Orientation.east;
-  }
 }
 
 export class OperatorDef {
