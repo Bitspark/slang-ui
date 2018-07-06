@@ -69,10 +69,6 @@ export class OperatorComponent implements OnInit {
 
   // Dragging
   public mouseTracker = new MouseMoveTracker((t, event, phase) => {
-    if (!this.selectedEntity.entity || typeof this.selectedEntity.entity.translate !== 'function') {
-      return;
-    }
-
     const update = phase === 'ongoing';
 
     if (!update) {
@@ -83,8 +79,14 @@ export class OperatorComponent implements OnInit {
     const yDiff = event.screenY - MouseMoveTracker.getLastY();
 
     if (t.isDragging()) {
+      if (!this.selectedEntity.entity || typeof this.selectedEntity.entity.translate !== 'function') {
+        return;
+      }
       this.selectedEntity.entity.translate([xDiff / this.scale, yDiff / this.scale]);
     } else if (t.isResizing()) {
+      if (!this.operator) {
+        return;
+      }
       this.operator.resize([xDiff / this.scale, yDiff / this.scale]);
       this.refresh();
     }
