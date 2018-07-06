@@ -42,6 +42,10 @@ export class Orientation {
     return new Orientation(ori);
   }
 
+  public rotatedBy(rot90DegCount: number): Orientation {
+    return new Orientation(this.ori + 4 + rot90DegCount);
+  }
+
   public name(): string {
     switch (this.ori) {
       case Orientation.north:

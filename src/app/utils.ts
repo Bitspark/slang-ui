@@ -335,26 +335,36 @@ class Vec2 {
   }
 
   public translate(t: Vec2): Vec2 {
-    return this.plus(t);
+    this.x += t.x;
+    this.y += t.y;
+    return this;
   }
 
   public rotate(rotBy90deg: number): Vec2 {
-    if (rotBy90deg < 0) {
-      rotBy90deg = 4 + rotBy90deg;
-    }
-    rotBy90deg %= 4;
-    const o = new Orientation(this.o.value() + rotBy90deg);
+    rotBy90deg = (4 + rotBy90deg) % 4;
     let x = this.x;
     let y = this.y;
     // rotation to right
     for (let i = 0; i < rotBy90deg; i++) {
       [x, y] = [-y, x];
     }
-    return new Vec2([x, y], o);
+
+    this.x = x;
+    this.y = y;
+    this.o = new Orientation(this.o.value() + rotBy90deg);
+
+    return this;
   }
 
   public scale(s: number): Vec2 {
-    return this.mult(s);
+    this.x *= s;
+    this.y *= s;
+    return this;
+  }
+
+  public flip(): Vec2 {
+    [this.x, this.y] = [this.y, this.x];
+    return this;
   }
 
   public minus(v: Vec2): Vec2 {
@@ -375,10 +385,6 @@ class Vec2 {
 
   public neg(): Vec2 {
     return new Vec2([-this.x, -this.y], this.o);
-  }
-
-  public flip(): Vec2 {
-    return new Vec2([this.y, this.x], this.o);
   }
 
   public xy(): [number, number] {
@@ -407,14 +413,9 @@ export class SVGPolylineGenerator {
     }
 
     const sOrigin = Vec2.null();
-    let dOrigin;
-
-    if (dst.getOperator() === this.outerOperator) {
-      dOrigin = new Vec2(dst.getCenter(), new Orientation(dst.getOrientation().value() + 2)).translate(this.normTrl.neg()).rotate(-this.normRot90Deg);
-    } else {
-      dOrigin = new Vec2(dst.getCenter(), dst.getOrientation()).translate(this.normTrl.neg()).rotate(-this.normRot90Deg);
-    }
-
+    const dOrigin = new Vec2(dst.getCenter(),
+      dst.getOrientation().rotatedBy((dst.getOperator() === this.outerOperator) ? 2 : 0));
+    dOrigin.translate(this.normTrl.neg()).rotate(-this.normRot90Deg);
 
     const padding = new Vec2([50, 50]);
     const start = this.calcOffset(sOrigin, padding);
@@ -616,10 +617,10 @@ export class SVGPolylineGenerator {
   }
 
   private addPoints(path: Array<Vec2>) {
-    path.forEach(p => this.points.push(p.rotate(this.normRot90Deg).translate(this.normTrl)));
+    path.forEach(p => this.points.push(Vec2.copy(p).rotate(this.normRot90Deg).translate(this.normTrl)));
   }
 
-  private calcOffset(p: Vec2, padding: Vec2, isOuterPort?: boolean): Vec2 {
+  private calcOffset(p: Vec2, padding: Vec2): Vec2 {
     const ori = p.orient();
 
     let offset;
