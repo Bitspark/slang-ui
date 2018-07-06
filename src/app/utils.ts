@@ -609,11 +609,78 @@ export class SVGPolylineGenerator {
     }
   }
 
-  public static generatePoints(op, conn): string {
+  private static roundOneCorner(p1: [number, number], corner: [number, number], p2: [number, number]):
+    { lineEnd: [number, number], curveControl: [number, number], curveEnd: [number, number] } {
+    let radius = 25;
+
+    const cornerToP1 = this.lineToVector(corner, p1);
+    const cornerToP2 = this.lineToVector(corner, p2);
+    const [cornerToP1Unit, mag1] = this.vectorToUnitVector(cornerToP1);
+    const [cornerToP2Unit, mag2] = this.vectorToUnitVector(cornerToP2);
+
+    radius = Math.min(radius, mag1 / 2, mag2 / 2);
+
+    const curveP1 = [
+      corner[0] + cornerToP1Unit[0] * radius,
+      corner[1] + cornerToP1Unit[1] * radius
+    ] as [number, number];
+    const curveP2 = [
+      corner[0] + cornerToP2Unit[0] * radius,
+      corner[1] + cornerToP2Unit[1] * radius
+    ] as [number, number];
+    return {
+      lineEnd: curveP1,
+      curveControl: corner,
+      curveEnd: curveP2
+    };
+  }
+
+  private static lineToVector(p1: [number, number], p2: [number, number]): [number, number] {
+    return [
+      p2[0] - p1[0],
+      p2[1] - p1[1]
+    ];
+  }
+
+  private static vectorToUnitVector(v: [number, number]): [[number, number], number] {
+    let magnitude = v[0] * v[0] + v[1] * v[1];
+    magnitude = Math.sqrt(magnitude);
+    return [
+      [
+        v[0] / magnitude,
+        v[1] / magnitude
+      ],
+      magnitude
+    ];
+  }
+
+  private static printPath(path) {
+    let svgPath = '';
+    svgPath += 'L ' + path.lineEnd[0].toFixed(1) + ',' + path.lineEnd[1].toFixed(1) + ' ';
+    svgPath += 'Q ' + path.curveControl[0].toFixed(1) + ',' + path.curveControl[1].toFixed(1)
+      + ' ' + path.curveEnd[0].toFixed(1) + ',' + path.curveEnd[1].toFixed(1);
+    return svgPath;
+  }
+
+  public static generatePoints(op: OperatorInstance, conn: Connection): string {
     const svgPolyLine = new SVGPolylineGenerator(op, conn);
     return svgPolyLine.points.reduce((pointStr: string, point: Vec2) => {
       return pointStr + `${point.x},${point.y} `;
     }, '');
+  }
+
+  public static generateRoundPoints(op: OperatorInstance, conn: Connection): string {
+    const svgPolyLine = new SVGPolylineGenerator(op, conn);
+    const points = svgPolyLine.points;
+    let svgPath = `M ${points[0].x} ${points[0].y} `;
+    for (let i = 0; i + 2 < points.length; i++) {
+      const p1 = [points[i].x, points[i].y] as [number, number];
+      const p2 = [points[i + 1].x, points[i + 1].y] as [number, number];
+      const p3 = [points[i + 2].x, points[i + 2].y] as [number, number];
+      svgPath += this.printPath(this.roundOneCorner(p1, p2, p3)) + ' ';
+    }
+    svgPath += `L ${points[points.length - 1].x} ${points[points.length - 1].y}`;
+    return svgPath;
   }
 
   private addPoints(path: Array<Vec2>) {

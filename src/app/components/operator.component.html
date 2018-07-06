@@ -121,16 +121,16 @@
 
 
             <!-- Visible Connections -->
-            <svg:polyline *ngFor="let conn of visualConnections()"
-                          class="sl-svg-conn"
-                          [ngClass]="{selected: isSelected(conn)}"
-                          [attr.points]="connectionPoints(conn)"></svg:polyline>
+            <svg:path *ngFor="let conn of visualConnections()"
+                      class="sl-svg-conn"
+                      [ngClass]="{selected: isSelected(conn)}"
+                      [attr.d]="connectionPoints(conn)"></svg:path>
 
             <!-- Clickable Invisible Connections -->
-            <svg:polyline *ngFor="let conn of visualConnections()"
-                          class="sl-svg-conn-click-overlay"
-                          (click)="selectConnection(conn)"
-                          [attr.points]="connectionPoints(conn)"></svg:polyline>
+            <svg:path *ngFor="let conn of visualConnections()"
+                      class="sl-svg-conn-click-overlay"
+                      (click)="selectConnection(conn)"
+                      [attr.d]="connectionPoints(conn)"></svg:path>
 
             <!-- Text/Labels -->
             <svg:g *ngFor="let port of getPorts()" (click)="selectPort(port)" [attr.transform]="translatePort(port)">

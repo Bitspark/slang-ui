@@ -39,6 +39,8 @@ svg {
     fill: none;
     stroke: $light-gray;
     stroke-width: 4px;
+    stroke-linejoin: round;
+    stroke-linecap: round;
     &.selected {
       stroke: $svg-selected;
     }

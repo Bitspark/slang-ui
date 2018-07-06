@@ -4,12 +4,10 @@ import {OperatorService} from '../services/operator.service';
 import {Composable, Connection, OperatorDef, OperatorInstance, Orientation, Port, Transformable} from '../classes/operator';
 import {safeDump, safeLoad} from 'js-yaml';
 import {
-  buildRefString,
   compareOperatorDefs,
   createDefaultValue,
   generateSvgTransform,
   normalizeConnections,
-  parseRefString,
   stringifyConnections, SVGPolylineGenerator
 } from '../utils';
 import {ApiService} from '../services/api.service';
@@ -356,7 +354,7 @@ export class OperatorComponent implements OnInit {
   }
 
   public connectionPoints(conn: Connection): string {
-    return SVGPolylineGenerator.generatePoints(this.operator, conn);
+    return SVGPolylineGenerator.generateRoundPoints(this.operator, conn);
   }
 
   public visualInstances(): Array<OperatorInstance> {
