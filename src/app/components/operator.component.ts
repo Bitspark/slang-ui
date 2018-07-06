@@ -329,13 +329,13 @@ export class OperatorComponent implements OnInit {
 
   public rotateRight() {
     if (this.isInstanceSelected()) {
-      this.selectedEntity.entity.rotate(-Math.PI / 2);
+      this.selectedEntity.entity.rotate(Math.PI / 2);
     }
   }
 
   public rotateLeft() {
     if (this.isInstanceSelected()) {
-      this.selectedEntity.entity.rotate(Math.PI / 2);
+      this.selectedEntity.entity.rotate(-Math.PI / 2);
     }
   }
 

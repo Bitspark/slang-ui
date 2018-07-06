@@ -19,8 +19,10 @@ export class Orientation {
   public static east = 1;
   public static south = 2;
   public static west = 3;
+  private ori: number;
 
-  constructor(private ori: number) {
+  constructor(o: number) {
+    this.ori = o % 4;
   }
 
   public static fromMat3(m: Mat3): Orientation {
@@ -29,13 +31,13 @@ export class Orientation {
       ori = 0; // north
     }
     if (m.at(2) > 0.1) {
-      ori = 1; // east
+      ori = 3; // west
     }
     if (m.at(5) < -0.1) {
       ori = 2; // south
     }
     if (m.at(2) < -0.1) {
-      ori = 3; // west
+      ori = 1; // east
     }
     return new Orientation(ori);
   }
@@ -288,6 +290,13 @@ export class Transformable {
     }
   }
 
+  public static fromMat3(m: Mat3): Transformable {
+    const t = new Transformable();
+    t.mat = m;
+    t.dim = [0, 0];
+    return t;
+  }
+
   public translate(vec: [number, number]): Transformable {
     this.mat.multiply(new Mat3([
       1, 0, vec[0],
@@ -324,7 +333,7 @@ export class Transformable {
   }
 
   public rotate(angle: number): Transformable {
-    const rot = Mat2.identity.copy().rotate(-angle).all();
+    const rot = Mat2.identity.copy().rotate(angle).all();
     return this.transformNormalized(new Mat3([
       rot[0], rot[1], 0,
       rot[2], rot[3], 0,
@@ -344,6 +353,10 @@ export class Transformable {
 
   public getHeight(): number {
     return this.dim[1];
+  }
+
+  public getPos(): [number, number] {
+    return [this.getPosX(), this.getPosY()];
   }
 
   public getPosX(): number {
@@ -380,12 +393,20 @@ export class Composable extends Transformable {
     ]).multiply(this.getAbsMat3()));
   }
 
+  public getAbs(): [number, number] {
+    return [this.getAbsX(), this.getAbsY()];
+  }
+
   public getAbsX(): number {
     return this.getAbsMat3().at(2);
   }
 
   public getAbsY(): number {
     return this.getAbsMat3().at(5);
+  }
+
+  public getCenter(): [number, number] {
+    return [this.getCenterX(), this.getCenterY()];
   }
 
   public getCenterX(): number {
@@ -458,7 +479,7 @@ export class OperatorInstance extends Composable {
           const dlg = new Delegate(this, dlgName, this, dlgDef);
           dlgHeight += dlg.getWidth();
           dlg
-            .rotate(-Math.PI / 2)
+            .rotate(Math.PI / 2)
             .translate([width, dlg.getWidth() / 2])
             .scale([1, -1])
             .translate([-dlg.getWidth() / 2 - 7, 0]);

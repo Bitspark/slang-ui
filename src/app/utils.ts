@@ -1,4 +1,5 @@
-import {Connection, OperatorDef, OperatorInstance, Orientation, Port, Transformable} from './classes/operator';
+import {Composable, Connection, OperatorDef, OperatorInstance, Orientation, Port, Transformable} from './classes/operator';
+import {Mat3} from './classes/matrix';
 
 function expandExpressionPart(exprPart: string, props: any, propDefs: any): Array<string> {
   const vals = [];
@@ -308,128 +309,333 @@ export function buildRefString(info: { instance: string, delegate: string, servi
   }
 }
 
-export class SVGPolylineGenerator {
-  private points: Array<Array<number>> = [];
+class Vec2 {
+  public x = 0;
+  public y = 0;
+  private o = new Orientation(Orientation.north);
 
-  private constructor(private outerOperator, private conn: Connection) {
-    const s = conn.getSource();
-    const d = conn.getDestination();
-    const src: [number, number] = [s.getPortPosX(), s.getPortPosY()];
-    const dst: [number, number] = [d.getPortPosX(), d.getPortPosY()];
-    let dist = this.getDistance(src, dst);
-    const srcOffset = this.getOffsetPoint(s, dist);
-    const dstOffset = this.getOffsetPoint(d, dist);
-    const start: [number, number] = [src[0] + srcOffset[0], src[1] + srcOffset[1]];
-    const end: [number, number] = [dst[0] + dstOffset[0], dst[1] + dstOffset[1]];
-    dist = this.getDistance(start, end);
-    const p = (s.getParentPort() && s.getParentPort().isMap()) ? s.getPosX() : 0;
-    const mid = [
-      (start[0] + (end[0] - start[0]) / 2) + p,
-      (start[1] + (end[1] - start[1]) / 2) + p,
-    ];
-
-    /*********
-     *
-     *  IMPLEMENT ORIENTATION ABSTRACTION
-     *
-     */
-
-    const sOri = s.getOrientation();
-    const dOri = d.getOrientation();
-
-    this.points.push(src);
-
-    if (sOri.isSame(dOri)) {
-      if (sOri.isVertically()) {
-        this.points.push(start, [end[0], start[1]], end);
-      } else {
-        this.points.push(start, [end[0], start[1]], end);
-      }
-    } else if (sOri.isOpposite(dOri)) {
-      if (dist[1] < 0) {
-        this.points.push(start, [mid[0], start[1]], [mid[0], end[1]], end);
-      } else {
-        this.points.push(start, [end[0], start[1]], end);
-      }
-    } else if ((sOri.value() + 1) % 4 === dOri.value()) {
-      // direction from source to destination
-      let normDistX, normDistY;
-      switch (sOri.value()) {
-        case Orientation.east:
-          normDistX = dist[0];
-          normDistY = dist[1];
-          break;
-        case Orientation.south:
-          normDistX = -dist[1];
-          normDistY = dist[0];
-          break;
-      }
-
-      this.points.push(start);
-
-      if (normDistX > 0) {
-        if (normDistY > 0) {
-          // south-east
-          this.points.push([end[0], start[1]]);
-        } else {
-          // north-east
-          this.points.push([mid[0], start[1]], [mid[0], end[1]]);
-        }
-      } else {
-        if (normDistY > 0) {
-          // south-west
-          this.points.push([start[0], mid[1]], [end[0], mid[1]]);
-        } else {
-          // north-west
-          this.points.push([start[0], end[1]], [end[0], end[1]]);
-        }
-      }
-
-      this.points.push(end);
+  constructor(p: [number, number], o?: Orientation) {
+    this.x = p[0];
+    this.y = p[1];
+    if (o) {
+      this.o = o;
     }
-
-    this.points.push(dst);
   }
 
+  public static combine(v1: Vec2, v2: Vec2): Vec2 {
+    return new Vec2([v1.x, v2.y], v1.o);
+  }
+
+  public static copy(v: Vec2): Vec2 {
+    return new Vec2([v.x, v.y], v.o);
+  }
+
+  public static null(): Vec2 {
+    return new Vec2([0, 0], new Orientation(Orientation.north));
+  }
+
+  public translate(t: Vec2): Vec2 {
+    return this.plus(t);
+  }
+
+  public rotate(rotBy90deg: number): Vec2 {
+    if (rotBy90deg < 0) {
+      rotBy90deg = 4 + rotBy90deg;
+    }
+    rotBy90deg %= 4;
+    const o = new Orientation(this.o.value() + rotBy90deg);
+    let x = this.x;
+    let y = this.y;
+    // rotation to right
+    for (let i = 0; i < rotBy90deg; i++) {
+      [x, y] = [-y, x];
+    }
+    return new Vec2([x, y], o);
+  }
+
+  public scale(s: number): Vec2 {
+    return this.mult(s);
+  }
+
+  public minus(v: Vec2): Vec2 {
+    return new Vec2([this.x - v.x, this.y - v.y], this.o);
+  }
+
+  public plus(v: Vec2): Vec2 {
+    return new Vec2([this.x + v.x, this.y + v.y], this.o);
+  }
+
+  public mult(k: number): Vec2 {
+    return new Vec2([this.x * k, this.y * k], this.o);
+  }
+
+  public div(k: number): Vec2 {
+    return this.mult(1 / k);
+  }
+
+  public neg(): Vec2 {
+    return new Vec2([-this.x, -this.y], this.o);
+  }
+
+  public flip(): Vec2 {
+    return new Vec2([this.y, this.x], this.o);
+  }
+
+  public xy(): [number, number] {
+    return [this.x, this.y];
+  }
+
+  public orient(): Orientation {
+    return this.o;
+  }
+}
+
+export class SVGPolylineGenerator {
+  private points: Array<Vec2> = [];
+  private normTrl: Vec2;
+  private normRot90Deg: number;
+
+  private constructor(private outerOperator, private conn: Connection) {
+    const src = conn.getSource();
+    const dst = conn.getDestination();
+
+    this.normTrl = new Vec2(src.getCenter());
+    this.normRot90Deg = src.getOrientation().value();
+
+    if (src.getOperator() === this.outerOperator) {
+      this.normRot90Deg = (this.normRot90Deg + 2) % 4;
+    }
+
+    const sOrigin = Vec2.null();
+    let dOrigin;
+
+    if (dst.getOperator() === this.outerOperator) {
+      dOrigin = new Vec2(dst.getCenter(), new Orientation(dst.getOrientation().value() + 2)).translate(this.normTrl.neg()).rotate(-this.normRot90Deg);
+    } else {
+      dOrigin = new Vec2(dst.getCenter(), dst.getOrientation()).translate(this.normTrl.neg()).rotate(-this.normRot90Deg);
+    }
+
+
+    const padding = new Vec2([50, 50]);
+    const start = this.calcOffset(sOrigin, padding);
+    const end = this.calcOffset(dOrigin, padding);
+    const mid = start.plus(end.minus(start).div(2));
+    const dist = end.minus(start);
+
+    this.addPoints([sOrigin, start]);
+
+    const o = dOrigin.orient();
+
+    /* direct connection */
+    if (dist.y <= 0) {
+      // Upper half
+      if (o.isWest() && dist.x >= 0) {
+        // Upper right
+        /*
+            .--->O
+            |
+            O
+         */
+        this.addPoints([Vec2.combine(start, end)]);
+        this.addPoints([end, dOrigin]);
+        return;
+      } else if (o.isEast() && dist.x <= 0) {
+        // Upper left
+        /*
+            O<---.
+                 |
+                 O
+         */
+        this.addPoints([Vec2.combine(start, end)]);
+        this.addPoints([end, dOrigin]);
+        return;
+      }
+      // Upper half
+    }
+
+    /* connection via 1 additional line */
+    if (dist.y <= 0) {
+      if (o.isSouth()) {
+        /*
+            O         O
+            A         A
+            '--.   .--•
+               O   O
+         */
+        this.addPoints([Vec2.combine(end, start)]);
+        this.addPoints([end, dOrigin]);
+        return;
+      } else if (o.isNorth()) {
+        if (Math.abs(dist.x) <= 100) {
+          /*
+             .---.
+             V   |
+             O   |
+             .---'
+             O
+           */
+          const p = new Vec2([Math.sign(dist.x) * 200, 0]);
+          this.addPoints([Vec2.combine(p, start), Vec2.combine(p, end)]);
+          this.addPoints([end, dOrigin]);
+        } else {
+          /*
+             .---.   .---.
+             |   V   V   |
+             |   O   O   |
+             O           O
+           */
+          this.addPoints([Vec2.combine(start, end)]);
+          this.addPoints([end, dOrigin]);
+          return;
+        }
+      }
+    } else {
+      if (o.isNorth()) {
+        if (Math.abs(dist.x) <= 100) {
+          /*
+             .---.
+             O   |
+             .---'
+             V
+             O
+           */
+          const p = new Vec2([Math.sign(dist.x) * 100, 0]);
+          this.addPoints([Vec2.combine(p, start), Vec2.combine(p, end)]);
+          this.addPoints([end, dOrigin]);
+        } else {
+          /*
+             .---.   .---.
+             O   V   V   O
+                 O   O
+           */
+          this.addPoints([Vec2.combine(end, start)]);
+          this.addPoints([end, dOrigin]);
+          return;
+        }
+      }
+    }
+
+    /* connection via 2 additional lines */
+    if (dist.y > 0) {
+      if (o.isHorizontally()) {
+        if (Math.abs(dist.x) <= 100) {
+          /*
+             .--.   .--.
+             O  |   |  O
+             O<-'   `->O
+           */
+          const p = new Vec2([(o.isWest()) ? -100 : 100, 0]);
+          this.addPoints([Vec2.combine(p, start), Vec2.combine(p, end)]);
+          this.addPoints([end, dOrigin]);
+          return;
+        } else {
+          /*
+              .--.       .---.  .->O
+              O  |       O   |  '---.
+                 `-->O    O<-'      O
+              .---.       .--.   O<-.
+              |   O       |  O  .---'
+              '->O    O<--'     O
+           */
+          if (Math.abs(dist.y) <= 100) {
+            const c = end.y - 100;
+            const p = new Vec2([c, c]);
+            this.addPoints([Vec2.combine(start, p), Vec2.combine(end, p)]);
+            this.addPoints([end, dOrigin]);
+            return;
+          } else {
+            this.addPoints([Vec2.combine(end, start)]);
+            this.addPoints([end, dOrigin]);
+            return;
+          }
+        }
+      }
+    } else {
+      if (o.isHorizontally()) {
+        if (Math.abs(dist.y) <= 100) {
+          /*
+             .--.   .--.
+             O  |   |  O
+             O<-'   `->O
+           */
+          const c = end.y - 100;
+          const p = new Vec2([c, c]);
+          this.addPoints([Vec2.combine(start, p), Vec2.combine(end, p)]);
+          this.addPoints([end, dOrigin]);
+          return;
+        } else {
+          /*
+              .--.       .---.  .->O
+              O  |       O   |  '---.
+                 `-->O    O<-'      O
+              .---.       .--.   O<-.
+              |   O       |  O  .---'
+              '->O    O<--'     O
+           */
+          this.addPoints([Vec2.combine(end, start)]);
+          this.addPoints([end, dOrigin]);
+          return;
+        }
+      }
+    }
+
+
+    /* connection via 3 additional lines */
+    if (dist.y > 0) {
+      if (o.isSouth()) {
+        if (Math.abs(dist.x) <= 200) {
+          /*
+              .--.
+              |  *
+              |  O
+              '--'
+           */
+          const p = new Vec2([Math.sign(dist.x) * 100 + dist.x, 0]);
+          this.addPoints([Vec2.combine(p, start), Vec2.combine(p, end)]);
+          this.addPoints([end, dOrigin]);
+          return;
+        } else {
+          /*
+              .--.
+              *  |  O
+                 '--'
+           */
+          this.addPoints([Vec2.combine(mid, start), Vec2.combine(mid, end)]);
+          this.addPoints([end, dOrigin]);
+          return;
+        }
+      }
+    }
+  }
 
   public static generatePoints(op, conn): string {
-    return new SVGPolylineGenerator(op, conn).points.reduce((pointStr: string, point: [number, number]) => {
-      return pointStr + `${point[0]},${point[1]} `;
+    const svgPolyLine = new SVGPolylineGenerator(op, conn);
+    return svgPolyLine.points.reduce((pointStr: string, point: Vec2) => {
+      return pointStr + `${point.x},${point.y} `;
     }, '');
   }
 
-  private getDistance(src: [number, number], dst: [number, number]): [number, number] {
-    return [
-      dst[0] - src[0],
-      dst[1] - src[1],
-    ];
+  private addPoints(path: Array<Vec2>) {
+    path.forEach(p => this.points.push(p.rotate(this.normRot90Deg).translate(this.normTrl)));
   }
 
-  private calcOffset(dist: number): number {
-    return Math.max(3 * Math.sqrt(Math.abs(dist)), 10);
-  }
+  private calcOffset(p: Vec2, padding: Vec2, isOuterPort?: boolean): Vec2 {
+    const ori = p.orient();
 
-  private getOffsetPoint(p: Port, distance): [number, number] {
-    let ori = p.getOrientation();
-    if (p.getOperator() === this.outerOperator) {
-      ori = new Orientation((ori.value() + 2) % 4);
-    }
-
-    const padding = (p.getParentPort() && p.getParentPort().isMap()) ? p.getPosX() : 0;
-    const offset = [this.calcOffset(distance[0]), this.calcOffset(distance[1])];
-
+    let offset;
     if (ori.isNorth()) {
       // to north
-      return [0, -offset[1]];
+      offset = new Vec2([0, -padding.y]);
+    } else if (ori.isSouth()) {
+      // to south
+      offset = new Vec2([0, padding.y]);
     } else if (ori.isWest()) {
       // to west
-      return [-offset[0] + padding, 0];
-    } else if (ori.isEast()) {
-      // to east
-      return [offset[0], 0];
+      offset = new Vec2([-padding.x, 0]);
     } else {
-      // to south
-      return [0, offset[1] + padding];
+      // to east
+      offset = new Vec2([padding.x, 0]);
     }
+    return p.plus(offset);
   }
 }
