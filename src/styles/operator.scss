@@ -38,7 +38,7 @@ svg {
   .sl-svg-conn {
     fill: none;
     stroke: $light-gray;
-    stroke-width: 2px;
+    stroke-width: 4px;
     &.selected {
       stroke: $svg-selected;
     }
