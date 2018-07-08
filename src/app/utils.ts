@@ -556,7 +556,7 @@ export class SVGConnectionLineGenerator {
     return svgPath;
   }
 
-  public static generateCornedPath(op: OperatorInstance, conn: Connection): string {
+  public static generateCorneredPath(op: OperatorInstance, conn: Connection): string {
     const svgPolyLine = new SVGConnectionLineGenerator(op, conn);
     return svgPolyLine.points.reduce((pointStr: string, point: Vec2) => {
       return pointStr + `${point.x},${point.y} `;
