@@ -3,13 +3,14 @@ $body-color: $light;
 $primary: $orange;
 $list-group-bg: transparentize($body-color, .95);
 $list-group-border-color: transparentize($body-color, .90);
+$pane-border-color: $dark-tone;
 
 $svg-bg: transparentize(white, .9);
 $svg-selected: $yellow;
 $svg-text: $light-gray;
 $svg-conn: $light-gray;
 $svg-op-stroke: $light-gray;
-$svg-op-fill-surr: lighten(desaturate($body-bg, 14%), 12%);;
+$svg-op-fill-surr: lighten(desaturate($body-bg, 14%), 12%);
 $svg-op-fill-elem: #3E4A54;
 $svg-op-fill-lib: lighten($blue, 10%);
 $svg-op-fill-loc: #4C5773;

@@ -34,7 +34,7 @@ svg {
   .sl-svg-conn {
     fill: none;
     stroke: $svg-conn;
-    stroke-width: 4px;
+    stroke-width: 6px;
     stroke-linejoin: round;
     stroke-linecap: round;
     &.selected {
@@ -53,7 +53,7 @@ svg {
     ry: 20px;
     stroke: $svg-op-stroke;
     stroke-width: 14px;
-    stroke-opacity: .35;
+    stroke-opacity: .55;
 
     &.selected {
       stroke: $svg-selected;
@@ -79,21 +79,21 @@ svg {
 
   .sl-svg-op-resize {
     r: 8px;
-    fill: $light-gray;
-    fill-opacity: .50;
+    fill: $medium;
+    fill-opacity: .25;
     -webkit-transition: r 200ms ease-in-out;
     -moz-transition: r 200ms ease-in-out;
     transition: r 200ms ease-in-out;
     &:hover {
       r: 12px;
-      fill-opacity: .95;
+      fill-opacity: .75;
       cursor: nwse-resize;
     }
   }
 
   .sl-svg-port {
-    stroke-width: 10px;
-    stroke-opacity: .35;
+    stroke-width: 8px;
+    stroke-opacity: .55;
 
     &.primitive {
       fill: #7156FB;

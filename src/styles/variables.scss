@@ -13,10 +13,13 @@ $cyan: #268aac;
 $orange: #F57D23;
 $yellow: #FFD559;
 $purple: #6050bc;
-$light: #efefee;
-$dark: #142a37;
+$light: #eeeeec;
+$light-tone: #d4edff;
+$medium: #586e7b;
 $dark-tone: #1d3648;
-$dark-gray: #333;
+$dark: #142a37;
 $light-gray: #ccc;
+$gray: #888;
+$dark-gray: #333;
 
-@import "dark";
+@import "light";

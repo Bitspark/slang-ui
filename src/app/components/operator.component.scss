@@ -41,7 +41,7 @@
 }
 
 .sl-ui-sidebar {
-  background-color: $dark-tone;
+  background-color: $pane-border-color;
   padding: $spacer;
   height: calc(100vh - 36px);
   .sl-ui-scrollable {
@@ -70,7 +70,7 @@
 
   #sl-main-bottom {
     height: 300px;
-    background: $dark-tone;
+    background: $pane-border-color;
     overflow: hidden;
     padding: 8px 0 8px 0;
     display: flex;

@@ -1,4 +1,4 @@
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
   <a class="navbar-brand" routerLink="/"><i class="fas fa-arrow-left"></i></a>
   <div class="navbar-text sl-operator-name">{{operatorName}}</div>
   <div class="btn-group btn-group-sm ml-3">
@@ -87,14 +87,13 @@
 
             <!-- Instances without Ports -->
             <svg:g *ngFor="let ins of visualInstances()">
+              <!-- [ngClass]="{selected: isSelected(ins)}" -->
               <svg:text text-anchor="middle"
-                        [ngClass]="{selected: isSelected(ins)}"
                         [attr.x]="ins.getCenterX()" [attr.y]="ins.getCenterY()"
                         (mousedown)="selectInstance(ins)">
                 {{text(ins)}}
               </svg:text>
               <svg:text text-anchor="middle"
-                        [ngClass]="{selected: isSelected(ins)}"
                         [attr.x]="ins.getCenterX()" [attr.y]="ins.getCenterY() + 20"
                         (mousedown)="selectInstance(ins)">
                 ({{fqn(ins)}})
@@ -142,11 +141,8 @@
               </svg:circle>
             </svg:g>
 
-            <!-- Text/Labels -->
+            <!-- Port Text/Labels -->
             <svg:g *ngFor="let port of getPorts()" (click)="selectPort(port)" [attr.transform]="translatePort(port)">
-              <!--<circle r="2" fill="#00ff00"></circle>-->
-              <!--<circle r="2" fill="red" [attr.cx]="getPortLabelX(port)" [attr.cy]="getPortLabelY(port)"></circle>-->
-              <!--<circle [attr.cx]="getPortLabelX(port)-1" [attr.cy]="getPortLabelY(port)-1" r="2"/>-->
               <svg:text [attr.text-anchor]="getPortLabelAnchor(port)" alignment-baseline="middle"
                         [attr.transform]="transformLabel(port)"
                         [attr.x]="getPortLabelX(port)" [attr.y]="getPortLabelY(port)"
