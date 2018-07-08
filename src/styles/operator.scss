@@ -18,7 +18,8 @@ svg {
     }
 
     fill: $light-gray;
-    font-size: 1em;
+    font-size: 1.4em;
+    font-weight: lighter;
 
     &.selected {
       fill: $svg-selected;
@@ -35,11 +36,18 @@ svg {
   }
 
   .sl-svg-conn {
+    fill: none;
     stroke: $light-gray;
-    stroke-width: 2px;
+    stroke-width: 4px;
+    stroke-linejoin: round;
+    stroke-linecap: round;
+    &.selected {
+      stroke: $svg-selected;
+    }
   }
 
   .sl-svg-conn-click-overlay {
+    fill: none;
     stroke: transparent;
     stroke-width: 14px;
   }
@@ -91,28 +99,26 @@ svg {
     stroke-width: 10px;
     stroke-opacity: .35;
 
-    &.sl-svg-port-type {
-      &.primitive {
-        fill: #7156FB;
-      }
-      &.number {
-        fill: #40A1DE;
-      }
-      &.string {
-        fill: #46B5E8;
-      }
-      &.boolean {
-        fill: #3CCC90;
-      }
-      &.binary {
-        fill: #FBEB56;
-      }
-      &.trigger {
-        fill: #9ab;
-      }
-      &.generic {
-        fill: #9e008e;
-      }
+    &.primitive {
+      fill: #7156FB;
+    }
+    &.number {
+      fill: #40A1DE;
+    }
+    &.string {
+      fill: #46B5E8;
+    }
+    &.boolean {
+      fill: #3CCC90;
+    }
+    &.binary {
+      fill: #FBEB56;
+    }
+    &.trigger {
+      fill: #9ab;
+    }
+    &.generic {
+      fill: #9e008e;
     }
   }
   .sl-svg-port-label {

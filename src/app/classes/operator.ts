@@ -1,6 +1,7 @@
 import {buildRefString, connectDeep, expandProperties, parseRefString} from '../utils';
 import {OperatorService} from '../services/operator.service';
 import {Mat2, Mat3} from './matrix';
+import {Orientation} from './vector';
 
 export enum Type {
   number,
@@ -202,8 +203,21 @@ export class Transformable {
   protected dim: [number, number];
   protected mat: Mat3;
 
-  constructor() {
-    this.mat = Mat3.identity.copy();
+  constructor(t?: Transformable) {
+    if (t) {
+      this.mat = t.mat.copy();
+      this.dim = [t.dim[0], t.dim[1]];
+    } else {
+      this.mat = Mat3.identity.copy();
+      // currently this.dim must stay undefined and will be later set in OperatorInstance.updateOperator
+    }
+  }
+
+  public static fromMat3(m: Mat3): Transformable {
+    const t = new Transformable();
+    t.mat = m;
+    t.dim = [0, 0];
+    return t;
   }
 
   public translate(vec: [number, number]): Transformable {
@@ -215,23 +229,39 @@ export class Transformable {
     return this;
   }
 
+  private transformNormalized(trans: Mat3): Transformable {
+    const tlX = this.getWidth() / 2;
+    const tlY = this.getHeight() / 2;
+    // Invert transformation
+    const mat = this.mat.copy();
+    const invmat = this.mat.copy().inverse();
+    this.mat.multiply(invmat);
+    // Translate to center
+    this.translate([-tlX, -tlY]);
+    // Apply actual transformation
+    this.mat.multiply(trans);
+    // Invert translate to center
+    this.translate([tlX, tlY]);
+    // Invert inversion matrix
+    this.mat.multiply(mat);
+    return this;
+  }
+
   public scale(vec: [number, number]): Transformable {
-    this.mat.multiply(new Mat3([
+    return this.transformNormalized(new Mat3([
       vec[0], 0, 0,
       0, vec[1], 0,
       0, 0, 1
     ]));
-    return this;
   }
 
   public rotate(angle: number): Transformable {
-    const rot = Mat2.identity.copy().rotate(-angle).all();
-    this.mat.multiply(new Mat3([
+    const rot = Mat2.identity.copy().rotate(angle).all();
+    return this.transformNormalized(new Mat3([
       rot[0], rot[1], 0,
       rot[2], rot[3], 0,
       0, 0, 1
     ]));
-    return this;
   }
 
   public resize(vec: [number, number]): Transformable {
@@ -248,6 +278,10 @@ export class Transformable {
     return this.dim[1];
   }
 
+  public getPos(): [number, number] {
+    return [this.getPosX(), this.getPosY()];
+  }
+
   public getPosX(): number {
     return this.mat.at(2);
   }
@@ -262,16 +296,28 @@ export class Transformable {
 }
 
 export class Composable extends Transformable {
-  constructor(private parent: Composable) {
-    super();
+  constructor(private parent: Composable, t?: Transformable) {
+    super(t);
   }
 
   public getParent(): Composable {
     return this.parent;
   }
 
-  protected getAbsMat3() {
+  protected getAbsMat3(): Mat3 {
     return !!this.parent ? this.mat.copy().multiply(this.parent.getAbsMat3()) : this.mat.copy();
+  }
+
+  private getCenterMat3(): Mat3 {
+    return (new Mat3([
+      0, 0, this.getWidth() / 2,
+      0, 0, this.getHeight() / 2,
+      0, 0, 1
+    ]).multiply(this.getAbsMat3()));
+  }
+
+  public getAbs(): [number, number] {
+    return [this.getAbsX(), this.getAbsY()];
   }
 
   public getAbsX(): number {
@@ -282,34 +328,29 @@ export class Composable extends Transformable {
     return this.getAbsMat3().at(5);
   }
 
-  public getOrientation(): number {
+  public getCenter(): [number, number] {
+    return [this.getCenterX(), this.getCenterY()];
+  }
+
+  public getCenterX(): number {
+    return this.getCenterMat3().at(2);
+  }
+
+  public getCenterY(): number {
+    return this.getCenterMat3().at(5);
+  }
+
+  public getOrientation(): Orientation {
     const mat = this.getAbsMat3();
-    const vec = new Mat3([
-      0, 0, 0,
-      0, 0, 1,
-      0, 0, 0]);
-    const orientation = vec.multiply(mat);
-    if (orientation.at(5) > 0.1) {
-      return 0; // north
-    }
-    if (orientation.at(2) > 0.1) {
-      return 1; // east
-    }
-    if (orientation.at(5) < -0.1) {
-      return 2; // south
-    }
-    if (orientation.at(2) < -0.1) {
-      return 3; // west
-    }
-    return -1;
+    return Orientation.fromMat3(Mat3.fromVec2([0, 1]).multiply(mat));
   }
 
 }
 
 export class OperatorInstance extends Composable {
   private static style = {
-    opMinWidth: 100,
-    opMinHeight: 100,
+    opMinWidth: 150,
+    opMinHeight: 150,
     dlgP: 10,
     dlgM: 5
   };
@@ -361,9 +402,11 @@ export class OperatorInstance extends Composable {
           const dlg = new Delegate(this, dlgName, this, dlgDef);
           dlgHeight += dlg.getWidth();
           dlg
-            .scale([-1, 1])
             .rotate(-Math.PI / 2)
-            .translate([width, dlg.getWidth()]);
+            .translate([width, dlg.getWidth() / 2])
+            .scale([1, -1])
+            .translate([-dlg.getWidth() / 2 - 7, 0])
+          ;
           this.delegates.set(dlgName, dlg);
           dlgHeight += OperatorInstance.style.dlgM;
         }
@@ -376,7 +419,7 @@ export class OperatorInstance extends Composable {
     this.mainOut.scale([1, -1]).translate([0, height]);
 
     this.mainIn.translate([0, -7]);
-    this.mainOut.translate([0, 14]);
+    this.mainOut.translate([0, -7]);
     this.mainIn.justifyHorizontally();
     this.mainOut.justifyHorizontally();
     this.distributeDelegatesVertically();

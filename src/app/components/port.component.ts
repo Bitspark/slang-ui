@@ -20,8 +20,10 @@ export class PortComponent {
   public getCSSClass(): any {
     const cssClass = {};
     cssClass['selected'] = this.isSelected();
-    cssClass['sl-svg-port-type'] = true;
     cssClass[Type[this.port.getType()]] = true;
+    cssClass[this.port.getOrientation().name()] = true;
+    cssClass['in'] = this.port.isIn();
+    cssClass['out'] = this.port.isOut();
     return cssClass;
   }
 

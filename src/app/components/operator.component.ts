@@ -4,18 +4,17 @@ import {OperatorService} from '../services/operator.service';
 import {Composable, Connection, OperatorDef, OperatorInstance, Port, Transformable} from '../classes/operator';
 import {safeDump, safeLoad} from 'js-yaml';
 import {
-  buildRefString,
   compareOperatorDefs,
   createDefaultValue,
   generateSvgTransform,
   normalizeConnections,
-  parseRefString,
-  stringifyConnections
+  stringifyConnections, SVGConnectionLineGenerator
 } from '../utils';
 import {ApiService} from '../services/api.service';
 import {VisualService} from '../services/visual.service';
 import 'codemirror/mode/yaml/yaml.js';
 import {TypeDefFormComponent} from './type-def-form.component';
+import {Orientation} from '../classes/vector';
 
 class MouseMoueTracker {
   private static lastX: number;
@@ -327,6 +326,38 @@ export class OperatorComponent implements OnInit {
     return `translate(${comp.getAbsX()},${comp.getAbsY()})`;
   }
 
+  public translatePort(port: Port): string {
+    return `translate(${port.getCenterX()},${port.getCenterY()})`;
+  }
+
+  public rotateRight() {
+    if (this.isInstanceSelected()) {
+      this.selectedEntity.entity.rotate(Math.PI / 2);
+    }
+  }
+
+  public rotateLeft() {
+    if (this.isInstanceSelected()) {
+      this.selectedEntity.entity.rotate(-Math.PI / 2);
+    }
+  }
+
+  public mirrorVertically() {
+    if (this.isInstanceSelected()) {
+      this.selectedEntity.entity.scale([1, -1]);
+    }
+  }
+
+  public mirrorHorizontally() {
+    if (this.isInstanceSelected()) {
+      this.selectedEntity.entity.scale([-1, 1]);
+    }
+  }
+
+  public connectionPoints(conn: Connection): string {
+    return SVGConnectionLineGenerator.generateRoundPath(this.operator, conn);
+  }
+
   public visualInstances(): Array<OperatorInstance> {
     if (!this.operator) {
       return [];
@@ -470,53 +501,41 @@ export class OperatorComponent implements OnInit {
   }
 
   public getPortLabelX(port: Port): number {
-    const ori = port.getOrientation();
-    if (ori === 0) {
-      // to north
-      return 10;
-    } else if (ori === 1) {
-      // to west
-      return 25;
-    } else if (ori === 3) {
-      // to east
-      return -25;
-    } else {
-      // to south
-      return 10;
+    switch (port.getOrientation().value()) {
+      case Orientation.north:
+        return 0;
+      case Orientation.west:
+        return 15;
+      case Orientation.south:
+        return 0;
+      case Orientation.east:
+        return -15;
     }
   }
 
   public getPortLabelY(port: Port): number {
-    const ori = port.getOrientation();
-    if (ori === 0) {
-      // to north
-      return 20;
-    } else if (ori === 1) {
-      // to west
-      return -10;
-    } else if (ori === 3) {
-      // to east
-      return -10;
-    } else {
-      // to south
-      return -20;
+    switch (port.getOrientation().value()) {
+      case Orientation.north:
+        return 15;
+      case Orientation.west:
+        return 0;
+      case Orientation.south:
+        return -15;
+      case Orientation.east:
+        return 0;
     }
   }
 
   public getPortLabelAnchor(port: Port): string {
-    const ori = port.getOrientation();
-    if (ori === 0) {
-      // to north
-      return 'end';
-    } else if (ori === 3) {
-      // to west
-      return 'end';
-    } else if (ori === 1) {
-      // to east
-      return 'begin';
-    } else {
-      // to south
-      return 'begin';
+    switch (port.getOrientation().value()) {
+      case Orientation.north:
+        return 'end';
+      case Orientation.west:
+        return 'begin';
+      case Orientation.south:
+        return 'begin';
+      case Orientation.east:
+        return 'end';
     }
   }
 
@@ -615,5 +634,24 @@ export class OperatorComponent implements OnInit {
 
   public isUIModeYAML(): boolean {
     return this.uiMode === 'yaml';
+  }
+
+
+  public text(ins: OperatorInstance): string {
+    const fqn = ins.getFullyQualifiedName();
+    const props = ins.getProperties();
+
+    if (fqn === 'slang.const') {
+      return !!props ? JSON.stringify(props['value']) : '?';
+    } else if (fqn === 'slang.eval') {
+      return !!props ? props['expression'] : '?';
+    }
+
+    return ins.getName();
+  }
+
+  public fqn(ins: OperatorInstance): string {
+    const fqn = ins.getFullyQualifiedName().split('.');
+    return fqn[fqn.length - 1];
   }
 }

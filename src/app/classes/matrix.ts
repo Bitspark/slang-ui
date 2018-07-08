@@ -211,6 +211,13 @@ export class Mat3 {
     }
   }
 
+  public static fromVec2(v: [number, number]): Mat3 {
+    return new Mat3([
+      0, 0, v[0],
+      0, 0, v[1],
+      0, 0, 0
+    ]);
+  }
 
   public static product(m1: Mat3, m2: Mat3, result: Mat3 = null): Mat3 {
     const a00 = m1.at(0), a01 = m1.at(1), a02 = m1.at(2),
@@ -253,7 +260,6 @@ export class Mat3 {
       ]);
     }
   }
-
 
   at(index: number): number {
     return this.values[index];
