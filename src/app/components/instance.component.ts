@@ -9,6 +9,8 @@ import {generateSvgTransform} from '../utils';
 })
 export class InstanceComponent {
   @Input()
+  public aspect: string;
+  @Input()
   public selectedEntity: any = {entity: null};
   @Input()
   public instance: OperatorInstance;

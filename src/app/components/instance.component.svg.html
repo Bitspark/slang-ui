@@ -1,27 +1,31 @@
 <svg:g xmlns:svg="http://www.w3.org/2000/svg" [attr.transform]="transform(instance)">
-  <svg:rect *ngIf="form() === 'rect'"
-            class="sl-svg-op sl-svg-op-ins"
-            [ngClass]="getCSSClass()"
-            x="0" y="0" [attr.width]="instance.getWidth()" [attr.height]="instance.getHeight()"
-            (mousedown)="selectInstance.emit(instance)"
-            paint-order="stroke fill"
-  ></svg:rect>
-  <svg:circle *ngIf="form() === 'circle'"
+  <svg:g *ngIf="aspect === 'operator'">
+    <svg:rect *ngIf="form() === 'rect'"
               class="sl-svg-op sl-svg-op-ins"
               [ngClass]="getCSSClass()"
-              [attr.cx]="radius()" [attr.cy]="radius()" [attr.r]="radius()"
+              x="0" y="0" [attr.width]="instance.getWidth()" [attr.height]="instance.getHeight()"
               (mousedown)="selectInstance.emit(instance)"
               paint-order="stroke fill"
-  ></svg:circle>
+    ></svg:rect>
+    <svg:circle *ngIf="form() === 'circle'"
+                class="sl-svg-op sl-svg-op-ins"
+                [ngClass]="getCSSClass()"
+                [attr.cx]="radius()" [attr.cy]="radius()" [attr.r]="radius()"
+                (mousedown)="selectInstance.emit(instance)"
+                paint-order="stroke fill"
+    ></svg:circle>
+  </svg:g>
 
-  <svg:g *ngFor="let dlg of instance.getDelegates()" [attr.transform]="transform(dlg)">
-    <svg:g [attr.transform]="transform(dlg.getIn())" app-port [port]="dlg.getIn()"
+  <svg:g *ngIf="aspect === 'port'">
+    <svg:g *ngFor="let dlg of instance.getDelegates()" [attr.transform]="transform(dlg)">
+      <svg:g [attr.transform]="transform(dlg.getIn())" app-port [port]="dlg.getIn()"
+             (select)="selectPort.emit($event)" [selectedEntity]="selectedEntity"></svg:g>
+      <svg:g [attr.transform]="transform(dlg.getOut())" app-port [port]="dlg.getOut()"
+             (select)="selectPort.emit($event)" [selectedEntity]="selectedEntity"></svg:g>
+    </svg:g>
+    <svg:g [attr.transform]="transform(instance.getMainIn())" app-port [port]="instance.getMainIn()"
            (select)="selectPort.emit($event)" [selectedEntity]="selectedEntity"></svg:g>
-    <svg:g [attr.transform]="transform(dlg.getOut())" app-port [port]="dlg.getOut()"
+    <svg:g [attr.transform]="transform(instance.getMainOut())" app-port [port]="instance.getMainOut()"
            (select)="selectPort.emit($event)" [selectedEntity]="selectedEntity"></svg:g>
   </svg:g>
-  <svg:g [attr.transform]="transform(instance.getMainIn())" app-port [port]="instance.getMainIn()"
-         (select)="selectPort.emit($event)" [selectedEntity]="selectedEntity"></svg:g>
-  <svg:g [attr.transform]="transform(instance.getMainOut())" app-port [port]="instance.getMainOut()"
-         (select)="selectPort.emit($event)" [selectedEntity]="selectedEntity"></svg:g>
 </svg:g>
