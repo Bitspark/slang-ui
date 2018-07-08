@@ -199,6 +199,8 @@ export function createDefaultValue(typeDef: any): any {
       return '';
     case 'number':
       return 0;
+    case 'binary':
+      return 'base64:';
     case 'boolean':
       return false;
     case 'trigger':

@@ -164,6 +164,9 @@ export class OperatorDef {
       for (const propName in def.properties) {
         if (def.properties.hasOwnProperty(propName)) {
           this.propertyDefs.set(propName, def.properties[propName]);
+          if (OperatorDef.isGeneric(def.properties[propName])) {
+            this.genericNames.add(def.properties[propName].generic);
+          }
         }
       }
     }
