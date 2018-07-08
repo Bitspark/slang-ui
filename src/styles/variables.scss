@@ -1,10 +1,11 @@
-@import url('https://fonts.googleapis.com/css?family=Share+Tech+Mono|Chau+Philomene+One|Roboto');
+@import url('https://fonts.googleapis.com/css?family=Share+Tech+Mono|Roboto+Condensed');
 
-$font-mono: 'Share+Tech+Mono', monospace;
-$font-title: 'Chau Philomene One', sans-serif;
-$font-text: 'Roboto', sans-serif;
+$font-mono: 'Share Tech Mono', monospace;
+$font-title: 'Roboto Condensed', sans-serif;
+$font-text: 'Roboto Condensed', sans-serif;
 
-$font-size-base: 0.85rem;
+$font-size-base: 0.95rem;
+$font-weight-normal: medium;
 $spacer: 0.5rem;
 
 //$blue: #123c94;
