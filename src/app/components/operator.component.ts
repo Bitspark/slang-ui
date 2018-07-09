@@ -15,6 +15,7 @@ import {VisualService} from '../services/visual.service';
 import 'codemirror/mode/yaml/yaml.js';
 import {TypeDefFormComponent} from './type-def-form.component';
 import {Orientation} from '../classes/vector';
+import {HttpClient} from '@angular/common/http';
 
 class MouseMoueTracker {
   private static lastX: number;
@@ -114,24 +115,40 @@ export class OperatorComponent implements OnInit {
 
   private insPropDefs = new Map<string, Array<{ name: string, def: any }>>();
 
-  // Dragging
-  public mouseTracker = new MouseMoueTracker((t, event, phase) => {
-    if (!this.selectedEntity.entity || typeof this.selectedEntity.entity.translate !== 'function') {
-      return;
-    }
+  // Executing
+  public inputValue: any = {};
+  public debugState = null;
+  public running = false;
+  public runningHandle = '';
+  public debuggingLog: Array<string> = [];
+  public debuggingReponses: Array<any> = [];
+  public debuggingGens = {};
+  public debuggingPropDefs = {};
+  public debuggingInPort = {};
+  public debuggingOutPort = {};
+  public debuggingProps = {};
+  public operatorEndpoint = '';
 
+  // Dragging
+  public mouseTracker = new MouseMoveTracker((t, event, phase) => {
     const update = phase === 'ongoing';
 
     if (!update) {
       return;
     }
 
-    const xDiff = event.screenX - MouseMoueTracker.getLastX();
-    const yDiff = event.screenY - MouseMoueTracker.getLastY();
+    const xDiff = event.screenX - MouseMoveTracker.getLastX();
+    const yDiff = event.screenY - MouseMoveTracker.getLastY();
 
     if (t.isDragging()) {
+      if (!this.selectedEntity.entity || typeof this.selectedEntity.entity.translate !== 'function') {
+        return;
+      }
       this.selectedEntity.entity.translate([xDiff / this.scale, yDiff / this.scale]);
     } else if (t.isResizing()) {
+      if (!this.operator) {
+        return;
+      }
       this.operator.resize([xDiff / this.scale, yDiff / this.scale]);
       this.refresh();
     }
@@ -164,7 +181,11 @@ export class OperatorComponent implements OnInit {
     }
   }
 
-  constructor(private route: ActivatedRoute, public operators: OperatorService, public visuals: VisualService, public api: ApiService) {
+  constructor(private route: ActivatedRoute,
+              private http: HttpClient,
+              public operators: OperatorService,
+              public visuals: VisualService,
+              public api: ApiService) {
   }
 
   ngOnInit() {
@@ -261,7 +282,7 @@ export class OperatorComponent implements OnInit {
   }
 
   public stringify(val: any): string {
-    return JSON.stringify(val);
+    return JSON.stringify(val, undefined, 2);
   }
 
   // YAML
@@ -588,6 +609,10 @@ export class OperatorComponent implements OnInit {
     insOpDef.generics[genName] = TypeDefFormComponent.newDefaultTypeDef('primitive');
   }
 
+  public specifyGeneric(gens, name) {
+    gens[name] = TypeDefFormComponent.newDefaultTypeDef('primitive');
+  }
+
   public isPropertySpecified(ins: OperatorInstance, prop: { name: string, def: any }): boolean {
     const props = this.getProperties(ins);
     return props && typeof props[prop.name] !== 'undefined';
@@ -623,6 +648,10 @@ export class OperatorComponent implements OnInit {
     insOpDef.properties[prop.name] = createDefaultValue(prop.def);
   }
 
+  public specifyProperty(props, name, def) {
+    props[name] = createDefaultValue(def);
+  }
+
   public setUIMode(mode: string): string {
     this.uiMode = mode.toLowerCase();
     return this.uiMode;
@@ -653,5 +682,155 @@ export class OperatorComponent implements OnInit {
   public fqn(ins: OperatorInstance): string {
     const fqn = ins.getFullyQualifiedName().split('.');
     return fqn[fqn.length - 1];
+  }
+
+  // Executing
+
+  public debugLog(msg: string) {
+    this.debuggingLog.push(msg);
+  }
+
+  public startDebugging() {
+    this.refreshDebugVariables();
+    if (this.operator.getGenericNames().size > 0 || this.operator.getPropertyDefs().size > 0) {
+      this.specifyOperator();
+    } else {
+      this.runOperator();
+    }
+  }
+
+  public specifyOperator() {
+    this.debugState = 'specifying';
+  }
+
+  public refreshDebugVariables() {
+    this.debuggingPropDefs = JSON.parse(JSON.stringify(this.propertyDefs));
+    for (const propName in this.debuggingPropDefs) {
+      if (this.debuggingPropDefs.hasOwnProperty(propName)) {
+        OperatorDef.specifyTypeDef(this.debuggingPropDefs[propName], this.debuggingGens, {}, {});
+        this.debuggingProps[propName] = createDefaultValue(this.debuggingPropDefs[propName]);
+      }
+    }
+
+    this.debuggingInPort = JSON.parse(JSON.stringify(this.mainSrvPort.in));
+    OperatorDef.specifyTypeDef(this.debuggingInPort, this.debuggingGens, {}, {});
+
+    this.debuggingOutPort = JSON.parse(JSON.stringify(this.mainSrvPort.out));
+    OperatorDef.specifyTypeDef(this.debuggingOutPort, this.debuggingGens, {}, {});
+  }
+
+  public runOperator() {
+    this.debugState = 'debugging';
+    this.inputValue = createDefaultValue(this.debuggingInPort);
+
+    this.debugLog('Request daemon to start operator...');
+
+    this.http.post('http://localhost:5149/run/', {
+      cwd: this.operators.getWorkingDir(),
+      fqn: this.operatorName,
+      gens: this.debuggingGens,
+      props: this.debuggingProps
+    }).toPromise()
+      .then(data => {
+        if (data['status'] === 'success') {
+          this.operatorEndpoint = data['url'];
+          this.debugLog('Operator is running at ' + this.operatorEndpoint);
+          this.running = true;
+          this.runningHandle = data['handle'];
+        } else {
+          const error = data['error'];
+          this.debugLog(`Error ${error.code} occurred: ${error.msg}`);
+        }
+      });
+  }
+
+  public sendInputValue(obj: any) {
+    this.http.post(this.operatorEndpoint, JSON.stringify(obj)).toPromise()
+      .then(data => {
+        this.debuggingReponses.push(data);
+      });
+  }
+
+  public stopOperator() {
+    this.http.request('delete', 'http://localhost:5149/run/', {
+      body: {
+        handle: this.runningHandle
+      }
+    }).toPromise()
+      .then(data => {
+        if (data['status'] === 'success') {
+          this.running = false;
+          this.runningHandle = '';
+        } else {
+          const error = data['error'];
+          this.debugLog(`Error ${error.code} occurred: ${error.msg}`);
+        }
+      });
+  }
+
+  public closeDebugPanel() {
+    this.debugState = null;
+  }
+
+}
+
+class MouseMoveTracker {
+  private static lastX: number;
+  private static lastY: number;
+
+  private moving: boolean;
+  private actionType = '';
+
+  constructor(private mouseAction: (t: MouseMoveTracker, event: any, actionPhase: string) => void) {
+  }
+
+  public static getLastX(): number {
+    return this.lastX;
+  }
+
+  public static getLastY(): number {
+    return this.lastY;
+  }
+
+  public setResizing() {
+    this.actionType = 'resize';
+  }
+
+  public setDragging() {
+    this.actionType = 'drag';
+  }
+
+  public isResizing() {
+    return this.actionType === 'resize';
+  }
+
+  public isDragging() {
+    return this.actionType === 'drag';
+  }
+
+  public start(event: any) {
+    this.moving = true;
+    this.mouseAction(this, event, 'start');
+    MouseMoveTracker.lastX = event.screenX;
+    MouseMoveTracker.lastY = event.screenY;
+  }
+
+  public stop(event: any) {
+    this.moving = false;
+    this.mouseAction(this, event, 'stop');
+    MouseMoveTracker.lastX = event.screenX;
+    MouseMoveTracker.lastY = event.screenY;
+    this.actionType = '';
+  }
+
+  public track(event: any) {
+    if (event.buttons === 0) {
+      this.moving = false;
+    }
+    if (this.moving) {
+      this.mouseAction(this, event, 'ongoing');
+      MouseMoveTracker.lastX = event.screenX;
+      MouseMoveTracker.lastY = event.screenY;
+    }
   }
 }

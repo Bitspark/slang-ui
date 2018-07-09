@@ -1,11 +1,7 @@
 @import "variables";
 
-$svg-op-elem: #3E4A54;
-$svg-op-lib: lighten($svg-op-elem, 10%);
-$svg-op-loc: #4C5773;
-
 svg {
-  background-color: transparentize($white, .9);
+  background-color: $svg-bg;
 
   text {
     /* override browser default */
@@ -17,7 +13,7 @@ svg {
       background: none;
     }
 
-    fill: $light-gray;
+    fill: $svg-text;
     font-size: 1.4em;
     font-weight: lighter;
 
@@ -37,8 +33,8 @@ svg {
 
   .sl-svg-conn {
     fill: none;
-    stroke: $light-gray;
-    stroke-width: 4px;
+    stroke: $svg-conn;
+    stroke-width: 6px;
     stroke-linejoin: round;
     stroke-linecap: round;
     &.selected {
@@ -55,27 +51,27 @@ svg {
   .sl-svg-op {
     rx: 20px;
     ry: 20px;
-    stroke: $light-gray;
+    stroke: $svg-op-stroke;
     stroke-width: 14px;
-    stroke-opacity: .35;
+    stroke-opacity: .55;
 
     &.selected {
       stroke: $svg-selected;
     }
     &.sl-svg-op-surr {
-      fill: $svg-bg;
+      fill: $svg-op-fill-surr;
       //stroke-dasharray: 6 3;
     }
     &.sl-svg-op-ins {
       &.sl-svg-op-type {
         &.elementary {
-          fill: $svg-op-elem
+          fill: $svg-op-fill-elem
         }
         &.library {
-          fill: $svg-op-lib;
+          fill: $svg-op-fill-lib;
         }
         &.local {
-          fill: $svg-op-loc;
+          fill: $svg-op-fill-loc;
         }
       }
     }
@@ -83,21 +79,21 @@ svg {
 
   .sl-svg-op-resize {
     r: 8px;
-    fill: $light-gray;
-    fill-opacity: .50;
+    fill: $medium;
+    fill-opacity: .25;
     -webkit-transition: r 200ms ease-in-out;
     -moz-transition: r 200ms ease-in-out;
     transition: r 200ms ease-in-out;
     &:hover {
       r: 12px;
-      fill-opacity: .95;
+      fill-opacity: .75;
       cursor: nwse-resize;
     }
   }
 
   .sl-svg-port {
-    stroke-width: 10px;
-    stroke-opacity: .35;
+    stroke-width: 8px;
+    stroke-opacity: .55;
 
     &.primitive {
       fill: #7156FB;

@@ -199,6 +199,8 @@ export function createDefaultValue(typeDef: any): any {
       return '';
     case 'number':
       return 0;
+    case 'binary':
+      return 'base64:';
     case 'boolean':
       return false;
     case 'trigger':
@@ -330,7 +332,7 @@ export class SVGConnectionLineGenerator {
       dst.getOrientation().rotatedBy((dst.getOperator() === this.outerOperator) ? 2 : 0));
     dOrigin.translate(this.normTrl.neg()).rotate(-this.normRot90Deg);
 
-    const padding = new Vec2([30, 30]);
+    const padding = new Vec2([20, 20]);
     const start = this.calcOffset(sOrigin, padding, (src.getParentPort() && src.getParentPort().isMap()) ? src.getPosX() : 0);
     const end = this.calcOffset(dOrigin, padding, (dst.getParentPort() && dst.getParentPort().isMap()) ? dst.getPosX() : 0);
     const mid = start.plus(end.minus(start).div(2));

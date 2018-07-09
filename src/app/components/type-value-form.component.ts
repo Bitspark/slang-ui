@@ -78,4 +78,16 @@ export class TypeValueFormComponent implements OnInit, OnChanges {
     this.typeValue.splice(i, 1);
   }
 
+  public selectFile(event) {
+    const file = event.srcElement.files[0];
+    const reader = new FileReader();
+    const that = this;
+    reader.onload = function() {
+      const data = reader.result;
+      const base64 = data.substr(data.indexOf(',') + 1);
+      that.typeValue = 'base64:' + base64;
+    };
+    reader.readAsDataURL(file);
+  }
+
 }

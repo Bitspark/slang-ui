@@ -1,4 +1,4 @@
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
   <a class="navbar-brand" routerLink="/"><i class="fas fa-arrow-left"></i></a>
   <div class="navbar-text sl-operator-name">{{operatorName}}</div>
   <div class="btn-group btn-group-sm ml-3">
@@ -6,10 +6,16 @@
     <button class="btn btn-outline-secondary" (click)="save()"><i class="fas fa-save"></i></button>
   </div>
   <div class="btn-group btn-group-sm btn-group-toggle ml-3">
-    <button type="button" class="btn-outline-secondary" ngbButton (click)="setUIMode('visual')"
+    <button type="button" class="btn btn-outline-secondary" ngbButton (click)="setUIMode('visual')"
             [ngClass]="{'active': isUIModeVisual()}"><i class="fas fa-project-diagram"></i></button>
-    <button type="button" class="btn-outline-secondary" ngbButton (click)="setUIMode('yaml')"
+    <button type="button" class="btn btn-outline-secondary" ngbButton (click)="setUIMode('yaml')"
             [ngClass]="{'active': isUIModeYAML()}"><i class="fas fa-code"></i></button>
+  </div>
+  <div class="btn-group btn-group-sm btn-group-toggle ml-3">
+    <button type="button" class="btn btn-outline-secondary" (click)="startDebugging()"
+            [ngClass]="{'active': running}"><i class="fas fa-play"></i></button>
+    <button type="button" class="btn btn-outline-secondary" (click)="stopOperator()"
+            [ngClass]="{'active': !running}"><i class="fas fa-stop"></i></button>
   </div>
 </nav>
 
@@ -32,7 +38,7 @@
         <div class="sl-ui-scrollable">
 
           <div class="sl-operator-list">
-            <h3>Local operators</h3>
+            <h4>Local operators</h4>
             <ul class="list-group">
               <li class="list-group-item"
                   *ngFor="let op of getLocals(filterString)">
@@ -43,7 +49,7 @@
           </div>
 
           <div class="sl-operator-list">
-            <h3>Global operators</h3>
+            <h4>Global operators</h4>
             <ul class="list-group">
               <li class="list-group-item"
                   *ngFor="let op of getGlobals(filterString)">
@@ -52,11 +58,10 @@
               </li>
             </ul>
           </div>
-
         </div>
       </div>
       <div class="sl-ui-mainbar col">
-        <div id="sl-svg-container">
+        <div id="sl-svg-container" [ngClass]="{'large': !debugState}">
 
           <svg [attr.width]="50000*scale" [attr.height]="50000*scale"
                viewBox="0 0 50000 50000"
@@ -73,52 +78,27 @@
                         paint-order="stroke fill"
                         (mousedown)="selectInstance(operator)">
               </svg:rect>
-              <!-- Surrounding operator resizer -->
-              <svg:circle [attr.cx]="operator.getWidth() - 20" [attr.cy]="operator.getHeight() - 20"
-                          class="sl-svg-op-resize"
-                          (mousedown)="mouseTracker.setResizing()">
-              </svg:circle>
-
-              <!-- Delegates -->
-              <svg:g *ngFor="let dlg of operator.getDelegates()" [attr.transform]="transform(dlg)">
-                <svg:g [attr.transform]="transform(dlg.getIn())" app-port [port]="dlg.getIn()"
-                       (select)="selectPort($event)"
-                       [selectedEntity]="selectedEntity"></svg:g>
-                <svg:g [attr.transform]="transform(dlg.getOut())" app-port [port]="dlg.getOut()"
-                       (select)="selectPort($event)" [selectedEntity]="selectedEntity"></svg:g>
-              </svg:g>
-
-              <!-- Services -->
-              <svg:g>
-                <svg:g [attr.transform]="transform(operator.getMainIn())" app-port [port]="operator.getMainIn()"
-                       (select)="selectPort($event)" [selectedEntity]="selectedEntity"></svg:g>
-                <svg:g [attr.transform]="transform(operator.getMainOut())" app-port [port]="operator.getMainOut()"
-                       (select)="selectPort($event)" [selectedEntity]="selectedEntity"></svg:g>
-              </svg:g>
-
+              <!-- Instances -->
               <svg:g app-instance *ngFor="let ins of visualInstances()"
-                     [instance]="ins" [selectedEntity]="selectedEntity"
+                     [instance]="ins" [aspect]="'operator'" [selectedEntity]="selectedEntity"
                      (selectPort)="selectPort($event)" (selectInstance)="selectInstance($event)">
               </svg:g>
-
-
             </svg:g>
 
+            <!-- Instances without Ports -->
             <svg:g *ngFor="let ins of visualInstances()">
+              <!-- [ngClass]="{selected: isSelected(ins)}" -->
               <svg:text text-anchor="middle"
-                        [ngClass]="{selected: isSelected(ins)}"
                         [attr.x]="ins.getCenterX()" [attr.y]="ins.getCenterY()"
                         (mousedown)="selectInstance(ins)">
                 {{text(ins)}}
               </svg:text>
               <svg:text text-anchor="middle"
-                        [ngClass]="{selected: isSelected(ins)}"
                         [attr.x]="ins.getCenterX()" [attr.y]="ins.getCenterY() + 20"
                         (mousedown)="selectInstance(ins)">
                 ({{fqn(ins)}})
               </svg:text>
             </svg:g>
-
 
             <!-- Visible Connections -->
             <svg:path *ngFor="let conn of visualConnections()"
@@ -132,11 +112,37 @@
                       (click)="selectConnection(conn)"
                       [attr.d]="connectionPoints(conn)"></svg:path>
 
-            <!-- Text/Labels -->
+            <!-- Ports -->
+            <svg:g [attr.transform]="transform(operator)">
+              <!-- Delegates -->
+              <svg:g *ngFor="let dlg of operator.getDelegates()" [attr.transform]="transform(dlg)">
+                <svg:g [attr.transform]="transform(dlg.getIn())" app-port [port]="dlg.getIn()"
+                       (select)="selectPort($event)"
+                       [selectedEntity]="selectedEntity"></svg:g>
+                <svg:g [attr.transform]="transform(dlg.getOut())" app-port [port]="dlg.getOut()"
+                       (select)="selectPort($event)" [selectedEntity]="selectedEntity"></svg:g>
+              </svg:g>
+              <!-- Services -->
+              <svg:g>
+                <svg:g [attr.transform]="transform(operator.getMainIn())" app-port [port]="operator.getMainIn()"
+                       (select)="selectPort($event)" [selectedEntity]="selectedEntity"></svg:g>
+                <svg:g [attr.transform]="transform(operator.getMainOut())" app-port [port]="operator.getMainOut()"
+                       (select)="selectPort($event)" [selectedEntity]="selectedEntity"></svg:g>
+              </svg:g>
+              <!-- Instance ports -->
+              <svg:g app-instance *ngFor="let ins of visualInstances()"
+                     [instance]="ins" [aspect]="'port'" [selectedEntity]="selectedEntity"
+                     (selectPort)="selectPort($event)" (selectInstance)="selectInstance($event)">
+              </svg:g>
+              <!-- Surrounding operator resizer -->
+              <svg:circle [attr.cx]="operator.getWidth() - 20" [attr.cy]="operator.getHeight() - 20"
+                          class="sl-svg-op-resize"
+                          (mousedown)="mouseTracker.setResizing()">
+              </svg:circle>
+            </svg:g>
+
+            <!-- Port Text/Labels -->
             <svg:g *ngFor="let port of getPorts()" (click)="selectPort(port)" [attr.transform]="translatePort(port)">
-              <!--<circle r="2" fill="#00ff00"></circle>-->
-              <!--<circle r="2" fill="red" [attr.cx]="getPortLabelX(port)" [attr.cy]="getPortLabelY(port)"></circle>-->
-              <!--<circle [attr.cx]="getPortLabelX(port)-1" [attr.cy]="getPortLabelY(port)-1" r="2"/>-->
               <svg:text [attr.text-anchor]="getPortLabelAnchor(port)" alignment-baseline="middle"
                         [attr.transform]="transformLabel(port)"
                         [attr.x]="getPortLabelX(port)" [attr.y]="getPortLabelY(port)"
@@ -147,6 +153,60 @@
             </svg:g>
 
           </svg>
+        </div>
+        <div id="sl-main-bottom" *ngIf="!!debugState">
+          <div>
+            <div *ngIf="debugState === 'debugging'">
+              <h4><i class="fas fa-arrow-up"></i> Input</h4>
+              <app-type-value-form [(typeValue)]="inputValue" [typeDef]="debuggingInPort"></app-type-value-form>
+              <div>
+                <button [disabled]="!running" (click)="sendInputValue(inputValue)">Send</button>
+              </div>
+              <h6>Preview object</h6>
+              <pre class="preview-object">{{ stringify(inputValue) }}</pre>
+            </div>
+            <div *ngIf="debugState === 'specifying'">
+              <h4><i class="fas fa-plug"></i> Generics</h4>
+              <div class="sl-form-box" *ngFor="let genName of genericNames(operator)">
+                <h6>{{ genName }}</h6>
+                <app-type-def-form *ngIf="debuggingGens[genName]" [(typeDef)]="debuggingGens[genName]"
+                                   (typeDefChange)="refreshDebugVariables()">
+                </app-type-def-form>
+                <button *ngIf="!debuggingGens[genName]" (click)="specifyGeneric(debuggingGens, genName)">
+                  Specify
+                </button>
+              </div>
+            </div>
+          </div>
+          <div>
+            <div *ngIf="debugState === 'debugging'">
+              <h4><i class="fas fa-arrow-down"></i> Output</h4>
+              <pre class="response" *ngFor="let resp of debuggingReponses">{{ stringify(resp) }}</pre>
+            </div>
+            <div *ngIf="debugState === 'specifying'">
+              <h4><i class="fas fa-stream"></i> Properties</h4>
+              <div class="sl-form-box" *ngFor="let propName of getPropertyNames()">
+                <h6>{{propName}}</h6>
+                <app-type-value-form *ngIf="debuggingPropDefs[propName] !== undefined"
+                                     [typeDef]="debuggingPropDefs[propName]"
+                                     [(typeValue)]="debuggingProps[propName]">
+                </app-type-value-form>
+                <button *ngIf="debuggingPropDefs[propName] === undefined"
+                        (click)="specifyProperty(debuggingProps, propName, debuggingPropDefs[propName])">Specify
+                </button>
+              </div>
+            </div>
+          </div>
+          <div>
+            <div *ngIf="debugState === 'debugging'">
+              <h4><i class="fas fa-bug"></i> Debugging</h4>
+              <a class="close-pane" (click)="closeDebugPanel()"><i class="far fa-times-circle"></i></a>
+              <p *ngFor="let msg of debuggingLog">{{ msg }}</p>
+            </div>
+            <div *ngIf="debugState === 'specifying'">
+              <button (click)="runOperator()">start operator</button>
+            </div>
+          </div>
         </div>
       </div>
       <div id="sl-instance-sidebar" class="sl-ui-sidebar col-2">

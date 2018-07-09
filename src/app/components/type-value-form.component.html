@@ -11,6 +11,9 @@
   <div *ngIf="typeDef.type === 'string'">
     <input [(ngModel)]="typeValue" type="text" title="value" />
   </div>
+  <div *ngIf="typeDef.type === 'binary'">
+    <input class="upload" type="file" (change)="selectFile($event)" />
+  </div>
   <div *ngIf="typeDef.type === 'boolean'">
     <label><input [(ngModel)]="typeValue" type="checkbox" title="value" [id]="" />{{ typeValue }}</label>
   </div>
