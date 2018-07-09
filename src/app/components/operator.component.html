@@ -1,6 +1,8 @@
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
-  <a class="navbar-brand" routerLink="/"><i class="fas fa-arrow-left"></i></a>
-  <div class="navbar-text sl-operator-name">{{operatorName}}</div>
+<nav class="navbar navbar-expand-xl navbar-dark bg-dark">
+  <div id="sl-navbar-op-viewed">
+    <a class="sl-navbar-go-back" routerLink="/"> <i class="fas fa-arrow-left"></i></a>
+    <div class="navbar-text sl-operator-name">{{operatorName}}</div>
+  </div>
   <div class="btn-group btn-group-sm ml-3">
     <button class="btn btn-outline-secondary"><i class="fas fa-pen-square"></i></button>
     <button class="btn btn-outline-secondary" (click)="save()"><i class="fas fa-save"></i></button>

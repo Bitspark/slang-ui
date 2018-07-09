@@ -49,8 +49,8 @@ svg {
   }
 
   .sl-svg-op {
-    rx: 20px;
-    ry: 20px;
+    rx: $op-border-radius;
+    ry: $op-border-radius;
     stroke: $svg-op-stroke;
     stroke-width: 14px;
     stroke-opacity: .55;
