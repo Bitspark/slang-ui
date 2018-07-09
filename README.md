@@ -11,5 +11,5 @@ Slang is a visual flow-based programming language and programming system. It con
 ## Links
 
 - [TrySlang website](http://tryslang.com)
-- [Slang UI repository](https://github.com/Bitspark/slang-ui)
+- [Slang daemon repository](https://github.com/Bitspark/slang)
 - [Bitspark website](https://bitspark.de)
