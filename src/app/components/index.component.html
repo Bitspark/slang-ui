@@ -38,33 +38,5 @@
       </div>
     </div>
     <div class="col"></div>
-    <div class="col-3">
-      <div class="sl-operator-list">
-        <h4>Library operators</h4>
-        <ul class="list-group list-group-flush">
-          <li class="list-group-item d-flex justify-content-between align-items-center"
-              *ngFor="let op of getLibraries()">
-            <span>
-              <button class="btn btn-link"></button>
-              <span class="sl-operator-name">{{ op.getName() }}</span>
-            </span>
-          </li>
-        </ul>
-      </div>
-    </div>
-    <div class="col-3">
-      <div class="sl-operator-list">
-        <h4>Elementary operators</h4>
-        <ul class="sl-operator-list list-group list-group-flush">
-          <li class="list-group-item d-flex justify-content-between align-items-center"
-              *ngFor="let op of getElementaries()">
-            <span>
-              <button class="btn btn-link"></button>
-              <span class="sl-operator-name">{{ op.getName() }}</span>
-            </span>
-          </li>
-        </ul>
-      </div>
-    </div>
   </div>
 </div>
