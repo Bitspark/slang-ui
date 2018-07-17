@@ -88,15 +88,10 @@
             <!-- Instances without Ports -->
             <svg:g *ngFor="let ins of visualInstances()">
               <!-- [ngClass]="{selected: isSelected(ins)}" -->
-              <svg:text text-anchor="middle"
+              <svg:text text-anchor="middle" alignment-baseline="middle"
                         [attr.x]="ins.getCenterX()" [attr.y]="ins.getCenterY()"
                         (mousedown)="selectInstance(ins)">
                 {{text(ins)}}
-              </svg:text>
-              <svg:text text-anchor="middle"
-                        [attr.x]="ins.getCenterX()" [attr.y]="ins.getCenterY() + 20"
-                        (mousedown)="selectInstance(ins)">
-                ({{fqn(ins)}})
               </svg:text>
             </svg:g>
 

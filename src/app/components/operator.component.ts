@@ -671,12 +671,13 @@ export class OperatorComponent implements OnInit {
     const props = ins.getProperties();
 
     if (fqn === 'slang.const') {
-      return !!props ? JSON.stringify(props['value']) : '?';
+      return !!props ? JSON.stringify(props['value']) : 'const?';
     } else if (fqn === 'slang.eval') {
-      return !!props ? props['expression'] : '?';
+      return !!props ? props['expression'] : 'eval?';
+    } else {
+      const opName = ins.getFullyQualifiedName().split('.');
+      return opName[opName.length - 1];
     }
-
-    return ins.getName();
   }
 
   public fqn(ins: OperatorInstance): string {
