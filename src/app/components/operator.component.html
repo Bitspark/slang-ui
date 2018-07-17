@@ -1,20 +1,22 @@
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
-  <a class="navbar-brand" routerLink="/"><i class="fas fa-arrow-left"></i></a>
-  <div class="navbar-text sl-operator-name">{{operatorName}}</div>
+<nav class="navbar navbar-expand-xl navbar-dark bg-dark">
+  <div id="sl-navbar-op-viewed">
+    <a class="sl-navbar-go-back" routerLink="/"> <i class="fas fa-arrow-left"></i></a>
+    <div class="navbar-text sl-operator-name">{{operatorName}}</div>
+  </div>
   <div class="btn-group btn-group-sm ml-3">
-    <button class="btn btn-outline-secondary"><i class="fas fa-pen-square"></i></button>
-    <button class="btn btn-outline-secondary" (click)="save()"><i class="fas fa-save"></i></button>
+    <button class="btn btn-outline-light"><i class="fas fa-pen-square"></i></button>
+    <button class="btn btn-outline-light" (click)="save()"><i class="fas fa-save"></i></button>
   </div>
   <div class="btn-group btn-group-sm btn-group-toggle ml-3">
-    <button type="button" class="btn btn-outline-secondary" ngbButton (click)="setUIMode('visual')"
+    <button type="button" class="btn btn-outline-light" ngbButton (click)="setUIMode('visual')"
             [ngClass]="{'active': isUIModeVisual()}"><i class="fas fa-project-diagram"></i></button>
-    <button type="button" class="btn btn-outline-secondary" ngbButton (click)="setUIMode('yaml')"
+    <button type="button" class="btn btn-outline-light" ngbButton (click)="setUIMode('yaml')"
             [ngClass]="{'active': isUIModeYAML()}"><i class="fas fa-code"></i></button>
   </div>
   <div class="btn-group btn-group-sm btn-group-toggle ml-3">
-    <button type="button" class="btn btn-outline-secondary" (click)="startDebugging()"
+    <button type="button" class="btn btn-outline-light" (click)="startDebugging()"
             [ngClass]="{'active': running}"><i class="fas fa-play"></i></button>
-    <button type="button" class="btn btn-outline-secondary" (click)="stopOperator()"
+    <button type="button" class="btn btn-outline-light" (click)="stopOperator()"
             [ngClass]="{'active': !running}"><i class="fas fa-stop"></i></button>
   </div>
 </nav>

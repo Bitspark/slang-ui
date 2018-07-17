@@ -1,19 +1,16 @@
 $body-bg: $light;
 $body-color: $dark;
 $primary: $orange;
-$list-group-bg: transparentize($body-color, .95);
-$list-group-border-color: transparentize($body-color, .90);
-
 $svg-bg: transparentize($dark, .55);
 $pane-border-color: transparentize($dark, .65);
-$svg-selected: mix($light, $orange);
+$svg-selected: $orange;
 $svg-text: $body-color;
-$svg-conn: $light;
-$svg-op-stroke: darken($light-gray, 5%);
-$svg-op-fill-surr: darken($light, 10%);
-$svg-op-fill-elem: darken($light, 5%);
-$svg-op-fill-lib: darken($light, 5%);
-$svg-op-fill-loc: mix(darken($light, 5%), $cyan, 85%);
+$svg-conn: $white;
+$svg-op-stroke: $light-gray;
+$svg-op-fill-surr: $light;
+$svg-op-fill-elem: $white;
+$svg-op-fill-lib: $white;
+$svg-op-fill-loc: $white;
 
 // YAML Codemirror
 

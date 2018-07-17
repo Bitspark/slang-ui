@@ -49,18 +49,19 @@ svg {
   }
 
   .sl-svg-op {
-    rx: 20px;
-    ry: 20px;
+    rx: $op-border-radius;
+    ry: $op-border-radius;
     stroke: $svg-op-stroke;
     stroke-width: 14px;
     stroke-opacity: .55;
+    fill-opacity: .9;
 
     &.selected {
       stroke: $svg-selected;
     }
     &.sl-svg-op-surr {
       fill: $svg-op-fill-surr;
-      //stroke-dasharray: 6 3;
+      fill-opacity: .85;
     }
     &.sl-svg-op-ins {
       &.sl-svg-op-type {
