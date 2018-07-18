@@ -203,7 +203,7 @@ export class OperatorComponent implements OnInit {
 
   public async save() {
     await this.operators.storeDefinition(this.operatorName, this.operatorDef.getDef());
-    await this.visuals.storeVisual(this.operators.getWorkingDir(), this.operatorName, this.operator.getVisual());
+    await this.visuals.storeVisual(this.operatorName, this.operator.getVisual());
     await this.operators.refresh();
     await this.loadOperator(this.operatorName);
   }
@@ -213,7 +213,7 @@ export class OperatorComponent implements OnInit {
     this.operatorDef = this.operators.getLocal(this.operatorName);
     if (this.operatorDef) {
       const def = this.operatorDef.getDef();
-      const visual = await this.visuals.loadVisual(this.operators.getWorkingDir(), operatorName);
+      const visual = await this.visuals.loadVisual(operatorName);
       let dim: [number, number] = [1200, 1100];
       let pos: [number, number] = [50, 50];
       if (visual && visual.geometry) {
@@ -727,7 +727,6 @@ export class OperatorComponent implements OnInit {
     this.debugLog('Request daemon to start operator...');
 
     this.http.post('http://localhost:5149/run/', {
-      cwd: this.operators.getWorkingDir(),
       fqn: this.operatorName,
       gens: this.debuggingGens,
       props: this.debuggingProps

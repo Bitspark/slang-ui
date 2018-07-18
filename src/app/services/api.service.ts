@@ -9,7 +9,7 @@ export class ApiService {
   constructor(private http: HttpClient) {
   }
 
-  public async get(path: string, getParams: any): Promise<Object> {
+  public async get(path: string, getParams?: any): Promise<Object> {
     return await this.http.get(this.baseUrl + path, {
       params: getParams
     }).toPromise();

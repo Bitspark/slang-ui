@@ -1,27 +1,14 @@
 <div id="sl-main-content" class="container-fluid">
   <div class="row">
-    <div class="col-12">
-      <div class="input-group mb-3 mt-3">
-        <div class="input-group-prepend">
-          <span class="input-group-text">Working directory</span>
-        </div>
-        <input type="text" class="form-control" name="workingDir" id="workingDir" [(ngModel)]="workingDir">
-        <div class="input-group-append">
-          <button class="btn btn-primary" type="button" (click)="refreshOperators()"><i class="fas fa-sync"></i>
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="row">
     <div class="col-3">
       <div class="sl-operator-list">
         <h4>Local operators</h4>
         <div class="input-group mb-3 mt-3">
           <input placeholder="New operator name" type="text" class="form-control" [(ngModel)]="newOperatorName"/>
           <div class="input-group-append">
-            <button class="btn" (click)="newOperator()"><i class="fas fa-plus-square"></i></button>
+            <button class="btn btn-default" (click)="newOperator()"><i class="fas fa-plus-square"></i></button>
+            <button class="btn btn-primary" type="button" (click)="refreshOperators()"><i class="fas fa-sync"></i>
+          </button>
           </div>
         </div>
         <ul class="list-group list-group-flush">
