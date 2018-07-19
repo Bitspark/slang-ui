@@ -8,12 +8,15 @@ $font-size-base: 0.95rem;
 $font-weight-normal: medium;
 $spacer: 0.5rem;
 
+$op-border-radius: 20px;
+
 //$blue: #123c94;
 $blue: #174B8D;
 $cyan: #268aac;
 $orange: #F57D23;
 $yellow: #FFD559;
 $purple: #6050bc;
+$white: #fffffe;
 $light: #eeeeec;
 $light-tone: #d4edff;
 $medium: #586e7b;
@@ -22,5 +25,6 @@ $dark: #142a37;
 $light-gray: #ccc;
 $gray: #888;
 $dark-gray: #333;
+
 
 @import "light";

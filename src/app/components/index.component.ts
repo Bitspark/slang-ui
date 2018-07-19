@@ -12,15 +12,12 @@ import {compareOperatorDefs} from '../utils';
 })
 export class IndexComponent {
 
-  public workingDir = '';
   public newOperatorName = '';
 
   constructor(private router: Router, public operators: OperatorService) {
-    this.workingDir = operators.getWorkingDir();
   }
 
   public async refreshOperators() {
-    this.operators.setWorkingDir(this.workingDir);
     await this.operators.refresh();
   }
 

@@ -7,16 +7,16 @@ export class VisualService {
 
   }
 
-  public loadVisual(cwd: string, opName: string): Promise<any> {
+  public loadVisual(opName: string): Promise<any> {
     return new Promise<any>(async resolve => {
-      const resp = await this.api.get('operator/meta/visual/', {cwd: cwd, fqop: opName});
+      const resp = await this.api.get('operator/meta/visual/', {fqop: opName});
       resolve(resp['data']);
     });
   }
 
-  public async storeVisual(cwd: string, opName: string, visual: any) {
+  public async storeVisual(opName: string, visual: any) {
     return new Promise<void>(async resolve => {
-      await this.api.post('operator/meta/visual/', {cwd: cwd, fqop: opName}, visual);
+      await this.api.post('operator/meta/visual/', {fqop: opName}, visual);
       resolve();
     });
   }

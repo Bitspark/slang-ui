@@ -1,20 +1,22 @@
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
-  <a class="navbar-brand" routerLink="/"><i class="fas fa-arrow-left"></i></a>
-  <div class="navbar-text sl-operator-name">{{operatorName}}</div>
+<nav class="navbar navbar-expand-xl navbar-dark bg-dark">
+  <div id="sl-navbar-op-viewed">
+    <a class="sl-navbar-go-back" routerLink="/"> <i class="fas fa-arrow-left"></i></a>
+    <div class="navbar-text sl-operator-name">{{operatorName}}</div>
+  </div>
   <div class="btn-group btn-group-sm ml-3">
-    <button class="btn btn-outline-secondary"><i class="fas fa-pen-square"></i></button>
-    <button class="btn btn-outline-secondary" (click)="save()"><i class="fas fa-save"></i></button>
+    <button class="btn btn-outline-light"><i class="fas fa-pen-square"></i></button>
+    <button class="btn btn-outline-light" (click)="save()"><i class="fas fa-save"></i></button>
   </div>
   <div class="btn-group btn-group-sm btn-group-toggle ml-3">
-    <button type="button" class="btn btn-outline-secondary" ngbButton (click)="setUIMode('visual')"
+    <button type="button" class="btn btn-outline-light" ngbButton (click)="setUIMode('visual')"
             [ngClass]="{'active': isUIModeVisual()}"><i class="fas fa-project-diagram"></i></button>
-    <button type="button" class="btn btn-outline-secondary" ngbButton (click)="setUIMode('yaml')"
+    <button type="button" class="btn btn-outline-light" ngbButton (click)="setUIMode('yaml')"
             [ngClass]="{'active': isUIModeYAML()}"><i class="fas fa-code"></i></button>
   </div>
   <div class="btn-group btn-group-sm btn-group-toggle ml-3">
-    <button type="button" class="btn btn-outline-secondary" (click)="startDebugging()"
+    <button type="button" class="btn btn-outline-light" (click)="startDebugging()"
             [ngClass]="{'active': running}"><i class="fas fa-play"></i></button>
-    <button type="button" class="btn btn-outline-secondary" (click)="stopOperator()"
+    <button type="button" class="btn btn-outline-light" (click)="stopOperator()"
             [ngClass]="{'active': !running}"><i class="fas fa-stop"></i></button>
   </div>
 </nav>
@@ -85,69 +87,73 @@
               </svg:g>
             </svg:g>
 
-            <!-- Instances without Ports -->
-            <svg:g *ngFor="let ins of visualInstances()">
-              <!-- [ngClass]="{selected: isSelected(ins)}" -->
-              <svg:text text-anchor="middle" alignment-baseline="middle"
-                        [attr.x]="ins.getCenterX()" [attr.y]="ins.getCenterY()"
-                        (mousedown)="selectInstance(ins)">
-                {{text(ins)}}
-              </svg:text>
-            </svg:g>
 
-            <!-- Visible Connections -->
-            <svg:path *ngFor="let conn of visualConnections()"
-                      class="sl-svg-conn"
-                      [ngClass]="{selected: isSelected(conn)}"
-                      [attr.d]="connectionPoints(conn)"></svg:path>
-
-            <!-- Clickable Invisible Connections -->
-            <svg:path *ngFor="let conn of visualConnections()"
-                      class="sl-svg-conn-click-overlay"
-                      (click)="selectConnection(conn)"
-                      [attr.d]="connectionPoints(conn)"></svg:path>
-
-            <!-- Ports -->
-            <svg:g [attr.transform]="transform(operator)">
-              <!-- Delegates -->
-              <svg:g *ngFor="let dlg of operator.getDelegates()" [attr.transform]="transform(dlg)">
-                <svg:g [attr.transform]="transform(dlg.getIn())" app-port [port]="dlg.getIn()"
-                       (select)="selectPort($event)"
-                       [selectedEntity]="selectedEntity"></svg:g>
-                <svg:g [attr.transform]="transform(dlg.getOut())" app-port [port]="dlg.getOut()"
-                       (select)="selectPort($event)" [selectedEntity]="selectedEntity"></svg:g>
+            <svg:g *ngIf="operator">
+              <!-- Instances without Ports -->
+              <svg:g *ngFor="let ins of visualInstances()">
+                <!-- [ngClass]="{selected: isSelected(ins)}" -->
+                <svg:text text-anchor="middle" alignment-baseline="middle"
+                          [attr.x]="ins.getCenterX()" [attr.y]="ins.getCenterY()"
+                          (mousedown)="selectInstance(ins)">
+                  {{text(ins)}}
+                </svg:text>
               </svg:g>
-              <!-- Services -->
-              <svg:g>
-                <svg:g [attr.transform]="transform(operator.getMainIn())" app-port [port]="operator.getMainIn()"
-                       (select)="selectPort($event)" [selectedEntity]="selectedEntity"></svg:g>
-                <svg:g [attr.transform]="transform(operator.getMainOut())" app-port [port]="operator.getMainOut()"
-                       (select)="selectPort($event)" [selectedEntity]="selectedEntity"></svg:g>
-              </svg:g>
-              <!-- Instance ports -->
-              <svg:g app-instance *ngFor="let ins of visualInstances()"
-                     [instance]="ins" [aspect]="'port'" [selectedEntity]="selectedEntity"
-                     (selectPort)="selectPort($event)" (selectInstance)="selectInstance($event)">
-              </svg:g>
-              <!-- Surrounding operator resizer -->
-              <svg:circle [attr.cx]="operator.getWidth() - 20" [attr.cy]="operator.getHeight() - 20"
-                          class="sl-svg-op-resize"
-                          (mousedown)="mouseTracker.setResizing()">
-              </svg:circle>
-            </svg:g>
 
-            <!-- Port Text/Labels -->
-            <svg:g *ngFor="let port of getPorts()" (click)="selectPort(port)" [attr.transform]="translatePort(port)">
-              <svg:text [attr.text-anchor]="getPortLabelAnchor(port)" alignment-baseline="middle"
-                        [attr.transform]="transformLabel(port)"
-                        [attr.x]="getPortLabelX(port)" [attr.y]="getPortLabelY(port)"
-                        class="sl-svg-port-label"
-                        [ngClass]="{selected: isSelected(port)}">
-                {{port.getName()}}
-              </svg:text>
-            </svg:g>
+              <!-- Visible Connections -->
+              <svg:path *ngFor="let conn of visualConnections()"
+                        class="sl-svg-conn"
+                        [ngClass]="{selected: isSelected(conn)}"
+                        [attr.d]="connectionPoints(conn)"></svg:path>
 
+              <!-- Clickable Invisible Connections -->
+              <svg:path *ngFor="let conn of visualConnections()"
+                        class="sl-svg-conn-click-overlay"
+                        (click)="selectConnection(conn)"
+                        [attr.d]="connectionPoints(conn)"></svg:path>
+
+              <!-- Ports -->
+              <svg:g [attr.transform]="transform(operator)">
+                <!-- Delegates -->
+                <svg:g *ngFor="let dlg of operator.getDelegates()" [attr.transform]="transform(dlg)">
+                  <svg:g [attr.transform]="transform(dlg.getIn())" app-port [port]="dlg.getIn()"
+                         (select)="selectPort($event)"
+                         [selectedEntity]="selectedEntity"></svg:g>
+                  <svg:g [attr.transform]="transform(dlg.getOut())" app-port [port]="dlg.getOut()"
+                         (select)="selectPort($event)" [selectedEntity]="selectedEntity"></svg:g>
+                </svg:g>
+                <!-- Services -->
+                <svg:g>
+                  <svg:g [attr.transform]="transform(operator.getMainIn())" app-port [port]="operator.getMainIn()"
+                         (select)="selectPort($event)" [selectedEntity]="selectedEntity"></svg:g>
+                  <svg:g [attr.transform]="transform(operator.getMainOut())" app-port [port]="operator.getMainOut()"
+                         (select)="selectPort($event)" [selectedEntity]="selectedEntity"></svg:g>
+                </svg:g>
+                <!-- Instance ports -->
+                <svg:g app-instance *ngFor="let ins of visualInstances()"
+                       [instance]="ins" [aspect]="'port'" [selectedEntity]="selectedEntity"
+                       (selectPort)="selectPort($event)" (selectInstance)="selectInstance($event)">
+                </svg:g>
+                <!-- Surrounding operator resizer -->
+                <svg:circle [attr.cx]="operator.getWidth() - 20" [attr.cy]="operator.getHeight() - 20"
+                            class="sl-svg-op-resize"
+                            (mousedown)="mouseTracker.setResizing()">
+                </svg:circle>
+              </svg:g>
+
+              <!-- Port Text/Labels -->
+              <svg:g *ngFor="let port of getPorts()" (click)="selectPort(port)" [attr.transform]="translatePort(port)">
+                <svg:text [attr.text-anchor]="getPortLabelAnchor(port)" alignment-baseline="middle"
+                          [attr.transform]="transformLabel(port)"
+                          [attr.x]="getPortLabelX(port)" [attr.y]="getPortLabelY(port)"
+                          class="sl-svg-port-label"
+                          [ngClass]="{selected: isSelected(port)}">
+                  {{port.getName()}}
+                </svg:text>
+              </svg:g>
+
+            </svg:g>
           </svg>
+
         </div>
         <div id="sl-main-bottom" *ngIf="!!debugState">
           <div>
