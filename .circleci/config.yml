@@ -3,7 +3,7 @@ jobs:
   build:
     docker:
       - image: bitspark/slang-ci:latest
-    working_directory: ~/test-ui
+    working_directory: ~/slang-ui
     steps:
       - checkout
       - restore_cache:
@@ -23,17 +23,17 @@ jobs:
           name: Build
           command: ng build --prod --output-path=dist
       - persist_to_workspace:
-          root: ~/test-ui
+          root: ~/slang-ui
           paths:
             - dist
   release:
     docker:
       - image: bitspark/slang-ci:latest
-    working_directory: ~/test-ui
+    working_directory: ~/slang-ui
     steps:
       - checkout
       - attach_workspace:
-          at: ~/test-ui
+          at: ~/slang-ui
       - run:
           name: Package
           command: |
