@@ -9,30 +9,15 @@ export class OperatorService {
   private localOperators = new Set<OperatorDef>();
   private libraryOperators = new Set<OperatorDef>();
   private elementaryOperators = new Set<OperatorDef>();
-  private workingDir: string;
   private loadedEmitter: EventEmitter<boolean>;
 
   constructor(private api: ApiService) {
     this.loadedEmitter = new EventEmitter<boolean>();
-    this.workingDir = localStorage.getItem('workingDir');
-    if (this.workingDir === null) {
-      this.workingDir = '';
-    } else {
-      this.refresh();
-    }
-  }
-
-  public setWorkingDir(workingDir: string) {
-    localStorage.setItem('workingDir', workingDir);
-    this.workingDir = workingDir;
-  }
-
-  public getWorkingDir(): string {
-    return this.workingDir;
+    this.refresh();
   }
 
   public async refresh() {
-    const response = await this.api.get('operator/', {cwd: this.workingDir});
+    const response = await this.api.get('operator/');
 
     this.localOperators = new Set<OperatorDef>();
     this.libraryOperators = new Set<OperatorDef>();
@@ -65,7 +50,7 @@ export class OperatorService {
 
   public async storeDefinition(opName: string, def: any): Promise<void> {
     return new Promise<void>(async resolve => {
-      await this.api.post('operator/def/', {cwd: this.workingDir, fqop: opName}, def);
+      await this.api.post('operator/def/', {fqop: opName}, def);
       resolve();
     });
   }
