@@ -13,6 +13,7 @@ import {compareOperatorDefs} from '../utils';
 export class IndexComponent {
 
   public newOperatorName = '';
+  public filterString = '';
 
   constructor(private router: Router, public operators: OperatorService) {
   }
@@ -38,9 +39,10 @@ export class IndexComponent {
     await this.router.navigate(['operator', operator.getName()]);
   }
 
-  public getLocals(): Array<OperatorDef> {
+  public getLocals(filterString: string): Array<OperatorDef> {
     return Array
       .from(this.operators.getLocals().values())
+      .filter(op => op.getName().toLowerCase().indexOf(filterString.toLowerCase()) !== -1)
       .sort(compareOperatorDefs);
   }
 

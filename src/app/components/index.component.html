@@ -1,29 +1,88 @@
 <div id="sl-main-content" class="container-fluid">
   <div class="row">
-    <div class="col-3">
-      <div class="sl-operator-list">
-        <h4>Local operators</h4>
-        <div class="input-group mb-3 mt-3">
-          <input placeholder="New operator name" type="text" class="form-control" [(ngModel)]="newOperatorName"/>
-          <div class="input-group-append">
-            <button class="btn btn-default" (click)="newOperator()"><i class="fas fa-plus-square"></i></button>
-            <button class="btn btn-primary" type="button" (click)="refreshOperators()"><i class="fas fa-sync"></i>
-          </button>
+    <div class="col-12 sl-header">
+      Slang UI v0.1
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-lg-3 col-md-4 col-sm-6 sl-col sl-operators">
+      <div id="sl-operator-sidebar">
+        <div class="sl-ui-form-box input-group">
+          <div class="input-group-prepend">
+            <div class="input-group-text"><i class="fas fa-search"></i></div>
+          </div>
+          <input placeholder="Search your operators" type="text" class="form-control" [(ngModel)]="filterString"/>
+        </div>
+        <div class="sl-ui-scrollable">
+          <div class="sl-operator-list">
+            <h4>Your operators</h4>
+            <ul class="list-group">
+              <li class="list-group-item"
+                  *ngFor="let op of getLocals(filterString)">
+                <button class="btn btn-link" (click)="openOperator(op)"><i class="fas fa-folder-open"></i></button>
+                <span class="sl-operator-name">{{ op.getName() }}</span>
+              </li>
+            </ul>
           </div>
         </div>
-        <ul class="list-group list-group-flush">
-          <li class="list-group-item d-flex justify-content-between align-items-center"
-              [ngClass]="{'sl-saved': op.isSaved(), 'sl-unsaved': !op.isSaved()}"
-              *ngFor="let op of getLocals()">
-            <span>
-              <button class="btn btn-link" (click)="openOperator(op)"><i class="fas fa-folder-open"></i></button>
-              <span class="sl-operator-name">{{ op.getName() }}</span>
-            </span>
-            <span *ngIf="!op.isSaved()" class="badge badge-info badge-pill"><i class="fas fa-save"></i></span>
-          </li>
-        </ul>
+        <div class="sl-ui-form-box input-group">
+          <input type="text" class="form-control" placeholder="New operator" [(ngModel)]="newOperatorName"/>
+          <button class="btn btn-primary" (click)="newOperator()"><i class="fas fa-plus-square"></i></button>
+        </div>
       </div>
     </div>
-    <div class="col"></div>
+    <div class="col-lg-6 col-md-5 col-sm-6 sl-col sl-info">
+      <h4>Welcome to Slang!</h4>
+      <p>
+        <i class="fas fa-info-circle"></i>
+        This page is served by Slang running on your computer!
+        All operators will be saved on this computer.
+      </p>
+      <h5>Tutorials</h5>
+      <ul>
+        <li>How to build your very first operator</li>
+        <li>How to build a simple web server</li>
+        <li>How to process a CSV file</li>
+      </ul>
+      <h5>Videos</h5>
+      <div class="sl-video">
+        <iframe width="280" height="158" src="https://www.youtube.com/embed/na_kxRwwOjQ?rel=0" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+      </div>
+      <div class="sl-video">
+        <iframe width="280" height="158" src="https://www.youtube.com/embed/JPLpt-s7Qk8?rel=0" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+      </div>
+      <h5>Material</h5>
+      <ul>
+        <li><a href="http://tryslang.com">Slang website</a></li>
+        <li><a href="https://bitspark.de">Bitspark website</a></li>
+        <li><a href="https://www.youtube.com/channel/UCqmLUYR9UJu7qqJLh91Y59Q">Bitspark YouTube channel</a></li>
+      </ul>
+    </div>
+    <div class="col-lg-3 col-md-3 col-sm-12 sl-col sl-feedback">
+      <h4>Support & Feedback</h4>
+      <p>
+        We would love to hear from you! Be it suggestions, questions or remarks - your feedback is always welcome.
+      </p>
+      <h5>Do you have questions or suggestions?</h5>
+      <ul>
+        <li>Slack community</li>
+        <li>Open an issue on GitHub</li>
+      </ul>
+      <h5>Wanna leave us a message?</h5>
+      <div class="form-group">
+        <input placeholder="Your email" class="form-control" type="email" />
+      </div>
+      <div class="form-group">
+        <textarea placeholder="Your message, question or suggestion" class="form-control"></textarea>
+      </div>
+      <div id="sl-info-box">
+        <img id="sl-logo" src="assets/brand/logo_star_inv.png" />
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-12 sl-footer">
+      <a href="http://tryslang.com">Slang</a> created by <a href="https://bitspark.de">Bitspark</a>
+    </div>
   </div>
 </div>
