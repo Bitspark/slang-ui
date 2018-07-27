@@ -2,6 +2,7 @@ import {Component} from '@angular/core';
 import {OperatorService} from '../services/operator.service';
 import {OperatorDef} from '../classes/operator';
 import {Router} from '@angular/router';
+import {HttpClient} from '@angular/common/http';
 import * as initialDef from '../initial-def.json';
 import {compareOperatorDefs} from '../utils';
 
@@ -15,7 +16,12 @@ export class IndexComponent {
   public newOperatorName = '';
   public filterString = '';
 
-  constructor(private router: Router, public operators: OperatorService) {
+  public feedbackURL = 'https://bitspark.de/send-email';
+  public feedbackEmail = '';
+  public feedbackMessage = '';
+  public feedbackThankYou = false;
+
+  constructor(private http: HttpClient, private router: Router, public operators: OperatorService) {
   }
 
   public async refreshOperators() {
@@ -56,6 +62,21 @@ export class IndexComponent {
     return Array
       .from(this.operators.getLibraries().values())
       .sort(compareOperatorDefs);
+  }
+
+  public sendFeedback() {
+    this.http.post(this.feedbackURL, {
+      email: this.feedbackEmail,
+      message: this.feedbackMessage
+    }, {
+      responseType: 'json'
+    }).toPromise().then(response => {
+      if (response) {
+        this.feedbackEmail = '';
+        this.feedbackMessage = '';
+        this.feedbackThankYou = true;
+      }
+    });
   }
 
 }

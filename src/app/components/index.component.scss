@@ -1,65 +1,92 @@
 @import "../../styles/variables.scss";
 
-.sl-col {
-  padding: 15px;
-  height: calc(100vh - 60px);
+#sl-main-box {
+  height: 100vh;
+  width: 100%;
+  border: 2px solid $orange;
+  box-sizing: border-box;
 
-  &.sl-operators {
-    color: $light;
-    background-color: $dark-tone;
+  > div {
+    display: inline-block;
+    height: 100%;
+    vertical-align: top;
   }
 
-  &.sl-info {
-    color: $dark-gray;
-    background-color: $light;
+  #sl-main-content {
+    width: 100%;
+
+    > .row {
+      margin: 0;
+    }
+
+    #sl-main-row {
+      height: 100%;
+      width: 100%;
+
+      .sl-col {
+        height: 100%;
+      }
+
+      #sl-operators-col {
+        padding: 15px;
+        color: $light;
+        background-color: $dark-tone;
+      }
+
+      #sl-info-col {
+        padding: 0;
+        color: $dark-gray;
+        background-color: $light;
+
+        > iframe {
+          border: 0;
+          height: 100%;
+          width: 100%;
+        }
+
+        #sl-feedback-box {
+          color: $light;
+          background-color: $orange;
+          position: absolute;
+          right: 0;
+          bottom: 0;
+          padding: 15px;
+          height: 600px;
+          width: 400px;
+          border-top-left-radius: 20px;
+
+          h4 {
+            margin-bottom: 25px;
+          }
+
+          h5 {
+            margin-top: 20px;
+            margin-bottom: 20px;
+          }
+
+          #sl-info-box {
+            position: absolute;
+            padding: 15px;
+            bottom: 15px;
+            right: 15px;
+            width: 250px;
+            height: 130px;
+
+            #sl-logo {
+              position: absolute;
+              height: 85px;
+              right: 15px;
+              bottom: 5px;
+            }
+          }
+
+          a {
+            color: $white;
+          }
+        }
+      }
+    }
   }
-
-  &.sl-feedback {
-    color: $light;
-    background-color: $orange;
-    position: relative;
-  }
-}
-
-.sl-header {
-  background-color: $orange;
-  color: $light;
-  height: 30px;
-  padding: 5px;
-  text-align: center;
-}
-
-.sl-footer {
-  background-color: $dark-tone;
-  color: $light;
-  height: 30px;
-  padding: 5px;
-  text-align: center;
-
-  a {
-    color: $light;
-  }
-}
-
-#sl-info-box {
-  position: absolute;
-  padding: 15px;
-  bottom: 15px;
-  right: 15px;
-  width: 250px;
-  height: 130px;
-
-  #sl-logo {
-    position: absolute;
-    height: 100px;
-    right: 15px;
-    bottom: 5px;
-  }
-}
-
-.sl-video {
-  margin: 5px;
-  display: inline-block;
 }
 
 // <> COPIED from operator.component.scss
