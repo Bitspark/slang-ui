@@ -21,7 +21,7 @@ jobs:
           key: v1-dependencies-{{ checksum "package.json" }}
       - run:
           name: Build
-          command: ng build --prod --output-path=dist
+          command: ng build --base-href /app/  --prod --output-path=dist
       - persist_to_workspace:
           root: ~/slang-ui
           paths:
