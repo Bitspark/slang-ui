@@ -49,8 +49,8 @@ svg {
   }
 
   .sl-svg-op {
-    rx: $op-border-radius;
-    ry: $op-border-radius;
+    //rx: $op-border-radius;
+    //ry: $op-border-radius;
     stroke: $svg-op-stroke;
     stroke-width: 14px;
     stroke-opacity: .55;
@@ -79,14 +79,14 @@ svg {
   }
 
   .sl-svg-op-resize {
-    r: 8px;
+    //r: 8px;
     fill: $medium;
     fill-opacity: .25;
     -webkit-transition: r 200ms ease-in-out;
     -moz-transition: r 200ms ease-in-out;
     transition: r 200ms ease-in-out;
     &:hover {
-      r: 12px;
+      //r: 12px;
       fill-opacity: .75;
       cursor: nwse-resize;
     }

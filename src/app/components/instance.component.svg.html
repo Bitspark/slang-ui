@@ -1,13 +1,15 @@
 <svg:g xmlns:svg="http://www.w3.org/2000/svg" [attr.transform]="transform(instance)">
   <svg:g *ngIf="aspect === 'operator'">
     <svg:rect *ngIf="form() === 'rect'"
+              x="0" y="0" rx="20" ry="20"
               class="sl-svg-op sl-svg-op-ins"
               [ngClass]="getCSSClass()"
-              x="0" y="0" [attr.width]="instance.getWidth()" [attr.height]="instance.getHeight()"
+              [attr.width]="instance.getWidth()" [attr.height]="instance.getHeight()"
               (mousedown)="selectInstance.emit(instance)"
               paint-order="stroke fill"
     ></svg:rect>
     <svg:circle *ngIf="form() === 'circle'"
+                rx="20" ry="20"
                 class="sl-svg-op sl-svg-op-ins"
                 [ngClass]="getCSSClass()"
                 [attr.cx]="radius()" [attr.cy]="radius()" [attr.r]="radius()"
