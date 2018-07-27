@@ -2,6 +2,7 @@ import {Component} from '@angular/core';
 import {OperatorService} from '../services/operator.service';
 import {OperatorDef} from '../classes/operator';
 import {Router} from '@angular/router';
+import {HttpClient, HttpHeaders, HttpParams} from '@angular/common/http';
 import * as initialDef from '../initial-def.json';
 import {compareOperatorDefs} from '../utils';
 
@@ -13,8 +14,14 @@ import {compareOperatorDefs} from '../utils';
 export class IndexComponent {
 
   public newOperatorName = '';
+  public filterString = '';
 
-  constructor(private router: Router, public operators: OperatorService) {
+  public feedbackURL = 'https://bitspark.de/send-email';
+  public feedbackEmail = '';
+  public feedbackMessage = '';
+  public feedbackThankYou = false;
+
+  constructor(private http: HttpClient, private router: Router, public operators: OperatorService) {
   }
 
   public async refreshOperators() {
@@ -38,9 +45,10 @@ export class IndexComponent {
     await this.router.navigate(['operator', operator.getName()]);
   }
 
-  public getLocals(): Array<OperatorDef> {
+  public getLocals(filterString: string): Array<OperatorDef> {
     return Array
       .from(this.operators.getLocals().values())
+      .filter(op => op.getName().toLowerCase().indexOf(filterString.toLowerCase()) !== -1)
       .sort(compareOperatorDefs);
   }
 
@@ -54,6 +62,23 @@ export class IndexComponent {
     return Array
       .from(this.operators.getLibraries().values())
       .sort(compareOperatorDefs);
+  }
+
+  public sendFeedback() {
+    const body = new HttpParams()
+      .set('email', this.feedbackEmail)
+      .set('message', this.feedbackMessage);
+
+    this.http.post(this.feedbackURL, body.toString(), {
+      headers: new HttpHeaders()
+        .set('Content-Type', 'application/x-www-form-urlencoded')
+    }).toPromise().then(response => {
+      if (response) {
+        this.feedbackEmail = '';
+        this.feedbackMessage = '';
+        this.feedbackThankYou = true;
+      }
+    });
   }
 
 }

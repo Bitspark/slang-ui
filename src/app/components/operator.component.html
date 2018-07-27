@@ -34,11 +34,13 @@
   <div id="sl-visual-ui" *ngIf="isUIModeVisual()">
     <div class="row">
       <div id="sl-operator-sidebar" class="sl-ui-sidebar col-2">
-        <div class="sl-ui-form-box">
+        <div class="input-group sl-ui-form-box">
+          <div class="input-group-prepend">
+            <div class="input-group-text"><i class="fas fa-search"></i></div>
+          </div>
           <input placeholder="Search for operators" type="text" class="form-control" [(ngModel)]="filterString"/>
         </div>
         <div class="sl-ui-scrollable">
-
           <div class="sl-operator-list">
             <h4>Local operators</h4>
             <ul class="list-group">

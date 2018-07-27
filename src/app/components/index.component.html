@@ -1,29 +1,75 @@
-<div id="sl-main-content" class="container-fluid">
-  <div class="row">
-    <div class="col-3">
-      <div class="sl-operator-list">
-        <h4>Local operators</h4>
-        <div class="input-group mb-3 mt-3">
-          <input placeholder="New operator name" type="text" class="form-control" [(ngModel)]="newOperatorName"/>
-          <div class="input-group-append">
-            <button class="btn btn-default" (click)="newOperator()"><i class="fas fa-plus-square"></i></button>
-            <button class="btn btn-primary" type="button" (click)="refreshOperators()"><i class="fas fa-sync"></i>
-          </button>
+<div id="sl-main-box">
+  <div id="sl-main-content">
+    <div class="row" id="sl-main-row">
+      <div class="col-lg-3 col-md-4 col-sm-6 sl-col" id="sl-operators-col">
+        <div id="sl-operator-sidebar">
+          <div class="sl-ui-form-box input-group">
+            <div class="input-group-prepend">
+              <div class="input-group-text"><i class="fas fa-search"></i></div>
+            </div>
+            <input placeholder="Search your operators" type="text" class="form-control" [(ngModel)]="filterString"/>
+          </div>
+          <div class="sl-ui-scrollable">
+            <div class="sl-operator-list">
+              <h4>Your operators</h4>
+              <ul class="list-group">
+                <li class="list-group-item"
+                    *ngFor="let op of getLocals(filterString)">
+                  <button class="btn btn-link" (click)="openOperator(op)"><i class="fas fa-folder-open"></i></button>
+                  <span class="sl-operator-name">{{ op.getName() }}</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+          <div class="sl-ui-form-box input-group">
+            <input type="text" class="form-control" placeholder="New operator" [(ngModel)]="newOperatorName"/>
+            <button class="btn btn-primary" (click)="newOperator()"><i class="fas fa-plus-square"></i></button>
           </div>
         </div>
-        <ul class="list-group list-group-flush">
-          <li class="list-group-item d-flex justify-content-between align-items-center"
-              [ngClass]="{'sl-saved': op.isSaved(), 'sl-unsaved': !op.isSaved()}"
-              *ngFor="let op of getLocals()">
-            <span>
-              <button class="btn btn-link" (click)="openOperator(op)"><i class="fas fa-folder-open"></i></button>
-              <span class="sl-operator-name">{{ op.getName() }}</span>
-            </span>
-            <span *ngIf="!op.isSaved()" class="badge badge-info badge-pill"><i class="fas fa-save"></i></span>
-          </li>
-        </ul>
+      </div>
+      <div class="col-lg-9 col-md-8 col-sm-6 sl-col" id="sl-info-col">
+        <iframe src="http://tryslang.com/slang-app/index-1"></iframe>
+        <div id="sl-feedback-box">
+          <h4><i class="fas fa-comments"></i> Support & Feedback</h4>
+          <p>
+            <i>We would love to hear from you! Be it suggestions, questions or remarks - your feedback is always welcome.</i>
+          </p>
+          <h5><i class="fas fa-users"></i> Do you have questions or suggestions?</h5>
+          <div>
+            <a href="https://join.slack.com/t/tryslang/shared_invite/enQtNDA3NTM1MjAzNDc4LThjM2RhZDYwZjlhM2UyZDQxZjMxYmNmNzlkYmI2NTUxYmQ0MjFlMTMxNDIyMzAzZTdlMTU4ZGZiNzBmOWRjOGU"
+               target="_blank"
+               class="btn btn-primary">
+              Join our <i class="fab fa-slack"></i> Slack community
+              <sup><i class="fas fa-external-link-alt"></i></sup>
+            </a>
+            <a href="https://github.com/Bitspark/slang/issues"
+               target="_blank"
+               class="btn btn-primary">
+              Open an issue on <i class="fab fa-github"></i> GitHub
+              <sup><i class="fas fa-external-link-alt"></i></sup>
+            </a>
+          </div>
+          <h5><i class="fas fa-envelope-open"></i> Wanna leave us a message?</h5>
+          <form [action]="feedbackURL">
+            <div class="form-group">
+              <input name="feedbackEmail" title="Email" [(ngModel)]="feedbackEmail" required="required" placeholder="Your email" class="form-control" type="email" />
+            </div>
+            <div class="form-group">
+              <textarea name="feedbackMessage" title="Message" [(ngModel)]="feedbackMessage" required="required" placeholder="Your message, question or suggestion" class="form-control"></textarea>
+            </div>
+            <div class="form-group">
+              <button (click)="sendFeedback()" [disabled]="!feedbackEmail || !feedbackMessage" type="submit" class="btn btn-light"><i class="fas fa-paper-plane"></i> Send</button>
+            </div>
+          </form>
+          <div *ngIf="feedbackThankYou">
+            Thank you!<br>
+            We really appreciate it <i class="far fa-smile"></i>
+          </div>
+          <div id="sl-info-box">
+            <img id="sl-logo" src="assets/brand/logo_star_inv.png" />
+          </div>
+        </div>
       </div>
     </div>
-    <div class="col"></div>
   </div>
 </div>

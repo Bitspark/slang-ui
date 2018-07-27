@@ -1,8 +1,115 @@
 @import "../../styles/variables.scss";
 
-.sl-operator-list {
-  ul {
-    overflow-y: scroll;
-    max-height: calc(100vh - 80px);
+#sl-main-box {
+  height: 100vh;
+  width: 100%;
+  border: 2px solid $orange;
+  box-sizing: border-box;
+
+  > div {
+    display: inline-block;
+    height: 100%;
+    vertical-align: top;
+  }
+
+  #sl-main-content {
+    width: 100%;
+
+    > .row {
+      margin: 0;
+    }
+
+    #sl-main-row {
+      height: 100%;
+      width: 100%;
+
+      .sl-col {
+        height: 100%;
+      }
+
+      #sl-operators-col {
+        padding: 15px;
+        color: $light;
+        background-color: $dark-tone;
+      }
+
+      #sl-info-col {
+        padding: 0;
+        color: $dark-gray;
+        background-color: $light;
+
+        > iframe {
+          border: 0;
+          height: 100%;
+          width: 100%;
+        }
+
+        #sl-feedback-box {
+          color: $light;
+          background-color: $orange;
+          position: absolute;
+          right: 0;
+          bottom: 0;
+          padding: 15px;
+          height: 600px;
+          width: 371px;
+          border-top-left-radius: 20px;
+
+          h4 {
+            margin-bottom: 25px;
+          }
+
+          h5 {
+            margin-top: 20px;
+            margin-bottom: 20px;
+          }
+
+          #sl-info-box {
+            position: absolute;
+            padding: 15px;
+            bottom: 15px;
+            right: 15px;
+            width: 250px;
+            height: 130px;
+
+            #sl-logo {
+              position: absolute;
+              height: 85px;
+              right: 0;
+              bottom: 0;
+            }
+          }
+
+          a {
+            color: $white;
+          }
+        }
+      }
+    }
   }
 }
+
+// <> COPIED from operator.component.scss
+
+#sl-operator-sidebar {
+  height: 100%;
+
+  .sl-ui-form-box {
+    height: 34px;
+    margin-bottom: $spacer;
+  }
+  .sl-ui-scrollable {
+    height: calc(100% - 68px - 1.0rem);
+    box-sizing: border-box;
+  }
+  .list-group-item {
+    color: $dark-gray;
+  }
+}
+
+.sl-form-box {
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
+
+// </> COPIED from operator.component.scss
