@@ -74,7 +74,9 @@
 
             <svg:g *ngIf="operator" [attr.transform]="transform(operator)">
               <!-- Surrounding operator -->
-              <svg:rect x="0" y="0" [attr.width]="operator.getWidth()" [attr.height]="operator.getHeight()"
+              <svg:rect x="0" y="0" rx="20" ry="20"
+                        [attr.width]="operator.getWidth()"
+                        [attr.height]="operator.getHeight()"
                         class="sl-svg-op sl-svg-op-surr"
                         [ngClass]="{selected: isSelected(operator)}"
                         paint-order="stroke fill"
@@ -136,6 +138,7 @@
                 <!-- Surrounding operator resizer -->
                 <svg:circle [attr.cx]="operator.getWidth() - 20" [attr.cy]="operator.getHeight() - 20"
                             class="sl-svg-op-resize"
+                            r="12px"
                             (mousedown)="mouseTracker.setResizing()">
                 </svg:circle>
               </svg:g>
