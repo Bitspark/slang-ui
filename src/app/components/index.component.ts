@@ -2,7 +2,7 @@ import {Component} from '@angular/core';
 import {OperatorService} from '../services/operator.service';
 import {OperatorDef} from '../classes/operator';
 import {Router} from '@angular/router';
-import {HttpClient} from '@angular/common/http';
+import {HttpClient, HttpHeaders, HttpParams} from '@angular/common/http';
 import * as initialDef from '../initial-def.json';
 import {compareOperatorDefs} from '../utils';
 
@@ -65,11 +65,13 @@ export class IndexComponent {
   }
 
   public sendFeedback() {
-    this.http.post(this.feedbackURL, {
-      email: this.feedbackEmail,
-      message: this.feedbackMessage
-    }, {
-      responseType: 'json'
+    const body = new HttpParams()
+      .set('email', this.feedbackEmail)
+      .set('message', this.feedbackMessage);
+
+    this.http.post(this.feedbackURL, body.toString(), {
+      headers: new HttpHeaders()
+        .set('Content-Type', 'application/x-www-form-urlencoded')
     }).toPromise().then(response => {
       if (response) {
         this.feedbackEmail = '';
