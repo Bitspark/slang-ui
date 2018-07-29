@@ -101,6 +101,8 @@
   .sl-ui-scrollable {
     height: calc(100% - 68px - 1.0rem);
     box-sizing: border-box;
+    margin-bottom: 0.5rem;
+    overflow: auto;
   }
   .list-group-item {
     color: $dark-gray;
