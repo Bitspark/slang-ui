@@ -167,12 +167,12 @@ export class OperatorComponent implements OnInit {
         if (!this.selectedEntity.entity) {
           return;
         }
-        if (this.selectedEntity.entity.constructor.name === OperatorInstance.name) {
+        if (this.selectedEntity.entity instanceof OperatorInstance) {
           this.removeInstance(this.selectedEntity.entity);
           this.selectedEntity.entity = null;
           break;
         }
-        if (this.selectedEntity.entity.constructor.name === Connection.name) {
+        if (this.selectedEntity.entity instanceof Connection) {
           this.removeConnection(this.selectedEntity.entity);
           this.selectedEntity.entity = null;
           break;
@@ -409,7 +409,7 @@ export class OperatorComponent implements OnInit {
 
   public isInstanceSelected() {
     return this.selectedEntity.entity && this.selectedEntity.entity !== this.operator &&
-      this.selectedEntity.entity.constructor.name === OperatorInstance.name;
+      this.selectedEntity.entity instanceof OperatorInstance;
   }
 
   public getSelectedInstanceName(): string {
@@ -436,7 +436,7 @@ export class OperatorComponent implements OnInit {
   }
 
   public selectPort(port1: Port) {
-    if (this.selectedEntity.entity && this.selectedEntity.entity.constructor.name === Port.name) {
+    if (this.selectedEntity.entity && this.selectedEntity.entity instanceof Port) {
       const port2 = this.selectedEntity.entity as Port;
       if (port1.getOperator() === this.operator) {
         if (port2.getOperator() === this.operator) {
