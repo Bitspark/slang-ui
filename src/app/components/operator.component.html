@@ -33,7 +33,7 @@
   <!-- ui-mode visuals -->
   <div id="sl-visual-ui" *ngIf="isUIModeVisual()">
     <div class="row">
-      <div class="col-lg-3 col-md-4 col-sm-6  d-none d-md-block" id="sl-operators-col">
+      <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 sl-col" id="sl-operators-col">
         <app-operator-list [buttonIcon]="'fa-plus'" [operatorList]="getOperatorList()"
                            (operatorSelected)="addInstance($event)"></app-operator-list>
       </div>
