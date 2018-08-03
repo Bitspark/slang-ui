@@ -2,7 +2,6 @@
 @import "~bootstrap/scss/bootstrap";
 @import "operator";
 
-
 /***
  * Overriding bootstrap rules
  */
@@ -32,15 +31,8 @@ h1, h2, h3, h4, h5, h6 {
   font-family: $font-mono;
 }
 
-.sl-operator-list {
-  margin-top: 2*$spacer;
-  li {
-    height: 4*$spacer;
-    padding: 0;
-  }
-  .badge {
-    padding: 8px;
-  }
+#sl-operator-sidebar {
+  height: 100%;
 }
 
 .CodeMirror {

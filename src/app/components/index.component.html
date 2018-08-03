@@ -4,7 +4,7 @@
       <div class="col-lg-3 col-md-4 col-sm-6 sl-col" id="sl-operators-col">
 
         <div id="sl-operator-sidebar">
-          <app-operator-list [buttonIcon]="'fa-folder-open'" [operatorList]="getLocals()"
+          <app-operator-list [buttonIcon]="'fa-arrow-right'" [operatorList]="getLocals()"
                              (operatorSelected)="openOperator($event)"></app-operator-list>
           <div class="sl-ui-form-box input-group">
             <input type="text" class="form-control" placeholder="New operator" [ngClass]="{'border-danger text-danger': creatingOperatorFailed}" [(ngModel)]="newOperatorName"/>

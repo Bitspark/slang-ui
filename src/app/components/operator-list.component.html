@@ -9,9 +9,10 @@
     <ul class="list-group">
       <li class="list-group-item"
           *ngFor="let op of filteredOperatorList()">
-        <button class="btn btn-link" (click)="emitOperatorSelected(op)"><i class="fas" [ngClass]="buttonIcon"></i>
-        </button>
         <span class="sl-operator-name">{{ op.getName() }}</span>
+        <button class="btn btn-sm btn-link" (click)="emitOperatorSelected(op)">
+          <i class="fas" [ngClass]="buttonIcon"></i>
+        </button>
       </li>
     </ul>
   </div>
