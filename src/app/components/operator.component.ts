@@ -202,7 +202,10 @@ export class OperatorComponent implements OnInit {
   // General
 
   public async save() {
-    await this.operators.storeDefinition(this.operatorName, this.operatorDef.getDef());
+    await this.operators.storeDefinition(this.operatorName, this.operatorDef.getDef())
+      .catch(err => {
+        console.log('>>> ERROR:', err);
+      });
     await this.visuals.storeVisual(this.operatorName, this.operator.getVisual());
     await this.operators.refresh();
     await this.loadOperator(this.operatorName);

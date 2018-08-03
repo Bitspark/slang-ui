@@ -14,6 +14,7 @@ import {compareOperatorDefs} from '../utils';
 export class IndexComponent {
 
   public newOperatorName = '';
+  public creatingOperatorFailed = false;
   public filterString = '';
 
   public feedbackURL = 'https://bitspark.de/send-email';
@@ -28,17 +29,23 @@ export class IndexComponent {
     await this.operators.refresh();
   }
 
-  public async newOperator() {
+  public async newOperator(newOperatorName: string) {
     const newOperator = new OperatorDef({
-      name: this.newOperatorName,
+      name: newOperatorName,
       def: JSON.parse(JSON.stringify(initialDef['default'])),
       type: 'local',
       saved: false
     });
-    this.operators.addLocal(newOperator);
-    await this.openOperator(newOperator);
 
-    this.newOperatorName = '';
+    this.creatingOperatorFailed = !await this.save(newOperator);
+    if (!this.creatingOperatorFailed) {
+      this.operators.addLocal(newOperator);
+      await this.openOperator(newOperator);
+    }
+  }
+
+  public async save(opDef: OperatorDef): Promise<boolean> {
+    return await this.operators.storeDefinition(opDef.getName(), opDef.getDef());
   }
 
   public async openOperator(operator: OperatorDef) {

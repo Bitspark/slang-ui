@@ -5,6 +5,8 @@ import {OperatorDef} from '../classes/operator';
 
 @Injectable()
 export class OperatorService {
+  private static pathOperatorDefList = '/operator/';
+  private static pathOperatorDef = '/operator/def/';
 
   private localOperators = new Set<OperatorDef>();
   private libraryOperators = new Set<OperatorDef>();
@@ -17,41 +19,40 @@ export class OperatorService {
   }
 
   public async refresh() {
-    const response = await this.api.get('operator/');
-
+    const response = await this.api.get(OperatorService.pathOperatorDefList);
     this.localOperators = new Set<OperatorDef>();
     this.libraryOperators = new Set<OperatorDef>();
     this.elementaryOperators = new Set<OperatorDef>();
 
-    if (response['status'] === 'success') {
-      for (const operatorData of (response['objects'] as Array<any>)) {
-        operatorData.saved = true;
-        const operator = new OperatorDef(operatorData);
-        switch (operator.getType()) {
-          case 'local':
-            this.localOperators.add(operator);
-            break;
-          case 'lib':
-            this.libraryOperators.add(operator);
-            break;
-          case 'elementary':
-            this.elementaryOperators.add(operator);
-            break;
-          default:
-          // TODO
-        }
+    for (const operatorData of (response['objects'] as Array<any>)) {
+      operatorData.saved = true;
+      const operator = new OperatorDef(operatorData);
+      switch (operator.getType()) {
+        case 'local':
+          this.localOperators.add(operator);
+          break;
+        case 'lib':
+          this.libraryOperators.add(operator);
+          break;
+        case 'elementary':
+          this.elementaryOperators.add(operator);
+          break;
+        default:
+        // TODO
       }
-      this.loadedEmitter.emit(true);
-    } else {
+    }
+    this.loadedEmitter.emit(true);
+    /* } else {
       // TODO
       this.loadedEmitter.emit(false);
-    }
+    }*/
   }
 
-  public async storeDefinition(opName: string, def: any): Promise<void> {
-    return new Promise<void>(async resolve => {
-      await this.api.post('operator/def/', {fqop: opName}, def);
-      resolve();
+  public async storeDefinition(opName: string, def: any): Promise<boolean> {
+    return new Promise<boolean>(async resolve => {
+      await this.api.post(OperatorService.pathOperatorDef, {fqop: opName}, def)
+        .catch(err => resolve(false));
+      resolve(true);
     });
   }
 
