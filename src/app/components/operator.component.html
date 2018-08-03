@@ -267,7 +267,7 @@
               <button class="btn btn-outline-secondary" (click)="mirrorVertically()"><i
                 class="fas fa-arrows-alt-v"></i></button>
             </div>
-
+            <!--
             <h5><label for="instanceName">Rename</label></h5>
             <div class="sl-form-box">
               <input id="instanceName" [(ngModel)]="newInstanceName"/>
@@ -275,6 +275,7 @@
                 rename
               </button>
             </div>
+            -->
             <h5 *ngIf="genericNames(selectedEntity.entity).length > 0">Generics</h5>
             <div class="sl-form-box" *ngFor="let genName of genericNames(selectedEntity.entity)">
               <h6>{{ genName }}</h6>
