@@ -2,8 +2,6 @@
   <div id="sl-main-content">
     <div class="row" id="sl-main-row">
       <div class="col-lg-3 col-md-4 col-sm-6 sl-col" id="sl-operators-col">
-
-        <div id="sl-operator-sidebar">
           <app-operator-list [buttonIcon]="'fa-arrow-right'" [operatorList]="getLocals()"
                              (operatorSelected)="openOperator($event)"></app-operator-list>
           <div class="sl-ui-form-box input-group">
@@ -11,7 +9,6 @@
             <div class="input-group-append">
               <button class="btn btn-primary" (click)="newOperator(newOperatorName.trim())"><i class="fas fa-plus-square"></i></button>
             </div>
-          </div>
         </div>
 
       </div>

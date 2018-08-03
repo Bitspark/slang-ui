@@ -3,13 +3,7 @@ import {ActivatedRoute} from '@angular/router';
 import {OperatorService} from '../services/operator.service';
 import {Composable, Connection, OperatorDef, OperatorInstance, Port, Transformable} from '../classes/operator';
 import {safeDump, safeLoad} from 'js-yaml';
-import {
-  compareOperatorDefs,
-  createDefaultValue,
-  generateSvgTransform,
-  normalizeConnections,
-  stringifyConnections, SVGConnectionLineGenerator
-} from '../utils';
+import {createDefaultValue, generateSvgTransform, normalizeConnections, stringifyConnections, SVGConnectionLineGenerator} from '../utils';
 import {ApiService} from '../services/api.service';
 import {VisualService} from '../services/visual.service';
 import 'codemirror/mode/yaml/yaml.js';
@@ -571,34 +565,12 @@ export class OperatorComponent implements OnInit {
     }
   }
 
-  public getLocals(filterString: string): Array<OperatorDef> {
-    return Array
-      .from(this.operators.getLocals().values())
-      .filter(op => op.getName().toLowerCase().indexOf(filterString.toLowerCase()) !== -1)
-      .sort(compareOperatorDefs);
-  }
-
-  public getGlobals(filterString: string): Array<OperatorDef> {
+  public getOperatorList(): Array<OperatorDef> {
     return []
       .concat(
+        Array.from(this.operators.getLocals().values()),
         Array.from(this.operators.getLibraries().values()),
-        Array.from(this.operators.getElementaries().values()))
-      .filter(op => op.getName().toLowerCase().indexOf(filterString.toLowerCase()) !== -1)
-      .sort(compareOperatorDefs);
-  }
-
-  public getElementaries(filterString: string): Array<OperatorDef> {
-    return Array
-      .from(this.operators.getElementaries().values())
-      .filter(op => op.getName().toLowerCase().indexOf(filterString.toLowerCase()) !== -1)
-      .sort(compareOperatorDefs);
-  }
-
-  public getLibraries(filterString: string): Array<OperatorDef> {
-    return Array
-      .from(this.operators.getLibraries().values())
-      .filter(op => op.getName().toLowerCase().indexOf(filterString.toLowerCase()) !== -1)
-      .sort(compareOperatorDefs);
+        Array.from(this.operators.getElementaries().values()));
   }
 
   public isGenericSpecified(ins: OperatorInstance, genName: string): boolean {

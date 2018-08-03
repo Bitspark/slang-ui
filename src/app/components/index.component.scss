@@ -27,12 +27,6 @@
         height: 100%;
       }
 
-      #sl-operators-col {
-        padding: 15px;
-        color: $light;
-        background-color: $dark-tone;
-      }
-
       #sl-info-col {
         padding: 0;
         color: $dark-gray;
@@ -45,7 +39,7 @@
         }
 
         #sl-feedback-box {
-          color: $light;
+          color: $body-bg;
           background-color: $orange;
           position: absolute;
           right: 0;

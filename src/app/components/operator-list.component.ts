@@ -27,6 +27,18 @@ export class OperatorListComponent implements OnInit {
     this.operatorSelected.emit(op);
   }
 
+  public localOperatorList(): Array<OperatorDef> {
+    return this.filteredOperatorList()
+      .filter(op => op.isLocal())
+      .sort(compareOperatorDefs);
+  }
+
+  public globalOperatorList(): Array<OperatorDef> {
+    return this.filteredOperatorList()
+      .filter(op => op.isLocal())
+      .sort(compareOperatorDefs);
+  }
+
   public filteredOperatorList(): Array<OperatorDef> {
     return Array
       .from(this.operatorList.values())

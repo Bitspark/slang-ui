@@ -31,8 +31,11 @@ h1, h2, h3, h4, h5, h6 {
   font-family: $font-mono;
 }
 
-#sl-operator-sidebar {
-  height: 100%;
+#sl-operators-col {
+  height: calc(100vh);
+  padding: 15px;
+  color: $body-bg;
+  background-color: $dark-tone;
 }
 
 .CodeMirror {
