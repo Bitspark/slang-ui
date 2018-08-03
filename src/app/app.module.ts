@@ -10,6 +10,7 @@ import {AppRoutes} from './app.routes';
 import {AppComponent} from './app.component';
 import {IndexComponent} from './components/index.component';
 import {OperatorComponent} from './components/operator.component';
+import {OperatorListComponent} from './components/operator-list.component';
 import {InstanceComponent} from './components/instance.component';
 import {PortComponent} from './components/port.component';
 import {TypeDefFormComponent} from './components/type-def-form.component';
@@ -24,7 +25,8 @@ import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 
 @NgModule({
   declarations: [
-    AppComponent, IndexComponent, OperatorComponent, InstanceComponent, PortComponent, TypeDefFormComponent, TypeValueFormComponent
+    AppComponent, IndexComponent, TypeDefFormComponent, TypeValueFormComponent,
+    OperatorListComponent, OperatorComponent, InstanceComponent, PortComponent
   ],
   imports: [
     NgbModule.forRoot(),

@@ -1,0 +1,18 @@
+<div class="sl-ui-form-box input-group">
+  <div class="input-group-prepend">
+    <div class="input-group-text"><i class="fas fa-search"></i></div>
+  </div>
+  <input placeholder="Search operators" type="text" class="form-control" [(ngModel)]="filterString"/>
+</div>
+<div class="sl-ui-scrollable">
+  <div class="sl-operator-list">
+    <ul class="list-group">
+      <li class="list-group-item"
+          *ngFor="let op of filteredOperatorList()">
+        <button class="btn btn-link" (click)="emitOperatorSelected(op)"><i class="fas" [ngClass]="buttonIcon"></i>
+        </button>
+        <span class="sl-operator-name">{{ op.getName() }}</span>
+      </li>
+    </ul>
+  </div>
+</div>

@@ -2,33 +2,20 @@
   <div id="sl-main-content">
     <div class="row" id="sl-main-row">
       <div class="col-lg-3 col-md-4 col-sm-6 sl-col" id="sl-operators-col">
+
         <div id="sl-operator-sidebar">
+          <app-operator-list [buttonIcon]="'fa-folder-open'" [operatorList]="getLocals()"
+                             (operatorSelected)="openOperator($event)"></app-operator-list>
           <div class="sl-ui-form-box input-group">
-            <div class="input-group-prepend">
-              <div class="input-group-text"><i class="fas fa-search"></i></div>
+            <input type="text" class="form-control" placeholder="New operator" [ngClass]="{'border-danger text-danger': creatingOperatorFailed}" [(ngModel)]="newOperatorName"/>
+            <div class="input-group-append">
+              <button class="btn btn-primary" (click)="newOperator(newOperatorName.trim())"><i class="fas fa-plus-square"></i></button>
             </div>
-            <input placeholder="Search your operators" type="text" class="form-control" [(ngModel)]="filterString"/>
-          </div>
-          <div class="sl-ui-scrollable">
-            <div class="sl-operator-list">
-              <h4>Your operators</h4>
-              <ul class="list-group">
-                <li class="list-group-item"
-                    *ngFor="let op of getLocals(filterString)">
-                  <button class="btn btn-link" (click)="openOperator(op)"><i class="fas fa-folder-open"></i></button>
-                  <span class="sl-operator-name">{{ op.getName() }}</span>
-                </li>
-              </ul>
-            </div>
-          </div>
-          <div class="sl-ui-form-box input-group">
-            <input type="text" class="form-control" [ngClass]="{'border-danger text-danger': creatingOperatorFailed}"
-                   placeholder="New operator" [(ngModel)]="newOperatorName"/>
-            <button class="btn btn-primary" (click)="newOperator(newOperatorName.trim())"><i
-              class="fas fa-plus-square"></i></button>
           </div>
         </div>
+
       </div>
+
       <div class="col-lg-9 col-md-8 col-sm-6 sl-col" id="sl-info-col">
         <iframe src="http://tryslang.com/slang-app/index-1"></iframe>
         <div id="sl-feedback-box">

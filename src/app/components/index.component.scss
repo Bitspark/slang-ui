@@ -90,28 +90,7 @@
 }
 
 // <> COPIED from operator.component.scss
-
 #sl-operator-sidebar {
   height: 100%;
-
-  .sl-ui-form-box {
-    height: 34px;
-    margin-bottom: $spacer;
-  }
-  .sl-ui-scrollable {
-    height: calc(100% - 68px - 1.0rem);
-    box-sizing: border-box;
-    margin-bottom: 0.5rem;
-    overflow: auto;
-  }
-  .list-group-item {
-    color: $dark-gray;
-  }
 }
-
-.sl-form-box {
-  padding-top: 8px;
-  padding-bottom: 8px;
-}
-
 // </> COPIED from operator.component.scss
