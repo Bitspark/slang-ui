@@ -1,4 +1,4 @@
-<nav class="navbar navbar-expand-xl navbar-dark bg-dark">
+<nav class="navbar navbar-expand navbar-dark bg-dark">
   <div id="sl-navbar-op-viewed">
     <a class="sl-navbar-go-back" routerLink="/"> <i class="fas fa-arrow-left"></i></a>
     <div class="navbar-text sl-operator-name">{{operatorName}}</div>
@@ -248,9 +248,7 @@
             (no operator instance selected)
           </div>
           <div *ngIf="isInstanceSelected()">
-            <h4>Instance '{{ getSelectedInstanceName() }}'</h4>
-
-            <h5>Operator</h5>
+            <h4>Operator</h4>
             <p class="sl-operator-name">{{ getSelectedInstanceFQName() }}</p>
 
             <h5>Transform</h5>
