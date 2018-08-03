@@ -35,15 +35,16 @@ export class OperatorListComponent implements OnInit {
 
   public globalOperatorList(): Array<OperatorDef> {
     return this.filteredOperatorList()
-      .filter(op => op.isLocal())
+      .filter(op => op.isGlobal())
       .sort(compareOperatorDefs);
+  }
+
+  public hasGlobals(): boolean {
+    return this.operatorList.find(op => op.isGlobal()) !== undefined;
   }
 
   public filteredOperatorList(): Array<OperatorDef> {
-    return Array
-      .from(this.operatorList.values())
-      .filter(op => op.getName().toLowerCase().indexOf(this.filterString.toLowerCase()) !== -1)
-      .sort(compareOperatorDefs);
+    return this.operatorList
+      .filter(op => op.getName().toLowerCase().indexOf(this.filterString.toLowerCase()) !== -1);
   }
-
 }

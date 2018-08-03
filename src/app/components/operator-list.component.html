@@ -6,14 +6,27 @@
 </div>
 <div class="sl-ui-scrollable">
   <div class="sl-operator-list">
+    <h4>Your Local Operators</h4>
     <ul class="list-group">
       <li class="list-group-item"
-          *ngFor="let op of filteredOperatorList()">
+          *ngFor="let op of localOperatorList()">
         <span class="sl-operator-name">{{ op.getName() }}</span>
         <button class="btn btn-sm btn-link" (click)="emitOperatorSelected(op)">
           <i class="fas" [ngClass]="buttonIcon"></i>
         </button>
       </li>
     </ul>
+    <div class="sl-operator-list" *ngIf="hasGlobals()">
+      <h4>Global Operators</h4>
+      <ul class="list-group">
+        <li class="list-group-item"
+            *ngFor="let op of globalOperatorList()">
+          <span class="sl-operator-name">{{ op.getName() }}</span>
+          <button class="btn btn-sm btn-link" (click)="emitOperatorSelected(op)">
+            <i class="fas" [ngClass]="buttonIcon"></i>
+          </button>
+        </li>
+      </ul>
+    </div>
   </div>
 </div>
