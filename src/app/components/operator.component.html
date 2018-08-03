@@ -1,4 +1,4 @@
-<nav class="navbar navbar-expand-xl navbar-dark bg-dark">
+<nav class="navbar navbar-expand navbar-dark bg-dark">
   <div id="sl-navbar-op-viewed">
     <a class="sl-navbar-go-back" routerLink="/"> <i class="fas fa-arrow-left"></i></a>
     <div class="navbar-text sl-operator-name">{{operatorName}}</div>
@@ -248,9 +248,7 @@
             (no operator instance selected)
           </div>
           <div *ngIf="isInstanceSelected()">
-            <h4>Instance '{{ getSelectedInstanceName() }}'</h4>
-
-            <h5>Operator</h5>
+            <h4>Operator</h4>
             <p class="sl-operator-name">{{ getSelectedInstanceFQName() }}</p>
 
             <h5>Transform</h5>
@@ -267,7 +265,7 @@
               <button class="btn btn-outline-secondary" (click)="mirrorVertically()"><i
                 class="fas fa-arrows-alt-v"></i></button>
             </div>
-
+            <!--
             <h5><label for="instanceName">Rename</label></h5>
             <div class="sl-form-box">
               <input id="instanceName" [(ngModel)]="newInstanceName"/>
@@ -275,26 +273,31 @@
                 rename
               </button>
             </div>
-            <h5 *ngIf="genericNames(selectedEntity.entity).length > 0">Generics</h5>
-            <div class="sl-form-box" *ngFor="let genName of genericNames(selectedEntity.entity)">
-              <h6>{{ genName }}</h6>
-              <app-type-def-form *ngIf="isGenericSpecified(selectedEntity.entity, genName)"
-                                 [(typeDef)]="getGenerics(selectedEntity.entity)[genName]"
-                                 (typeDefChange)="refresh()"></app-type-def-form>
-              <button *ngIf="!isGenericSpecified(selectedEntity.entity, genName)"
-                      (click)="addGeneric(selectedEntity.entity, genName)">Specify
-              </button>
+            -->
+            <div *ngIf="genericNames(selectedEntity.entity).length > 0">
+              <h5>Generics</h5>
+              <div class="sl-form-box" *ngFor="let genName of genericNames(selectedEntity.entity)">
+                <h6>{{ genName }}</h6>
+                <app-type-def-form *ngIf="isGenericSpecified(selectedEntity.entity, genName)"
+                                   [(typeDef)]="getGenerics(selectedEntity.entity)[genName]"
+                                   (typeDefChange)="refresh()"></app-type-def-form>
+                <button *ngIf="!isGenericSpecified(selectedEntity.entity, genName)"
+                        (click)="addGeneric(selectedEntity.entity, genName)">Specify
+                </button>
+              </div>
             </div>
-            <h5 *ngIf="getPropertyDefs(selectedEntity.entity).length > 0">Properties</h5>
-            <div class="sl-form-box" *ngFor="let prop of getPropertyDefs(selectedEntity.entity)">
-              <h6>{{ prop.name }}</h6>
-              <app-type-value-form *ngIf="isPropertySpecified(selectedEntity.entity, prop)"
-                                   [typeDef]="prop.def"
-                                   [(typeValue)]="getProperties(selectedEntity.entity)[prop.name]"
-                                   (typeValueChange)="refresh(true)"></app-type-value-form>
-              <button *ngIf="!isPropertySpecified(selectedEntity.entity, prop)"
-                      (click)="addProperty(selectedEntity.entity, prop)">Specify
-              </button>
+            <div *ngIf="getPropertyDefs(selectedEntity.entity).length > 0">
+              <h5>Properties</h5>
+              <div class="sl-form-box" *ngFor="let prop of getPropertyDefs(selectedEntity.entity)">
+                <h6>{{ prop.name }}</h6>
+                <app-type-value-form *ngIf="isPropertySpecified(selectedEntity.entity, prop)"
+                                     [typeDef]="prop.def"
+                                     [(typeValue)]="getProperties(selectedEntity.entity)[prop.name]"
+                                     (typeValueChange)="refresh(true)"></app-type-value-form>
+                <button *ngIf="!isPropertySpecified(selectedEntity.entity, prop)"
+                        (click)="addProperty(selectedEntity.entity, prop)">Specify
+                </button>
+              </div>
             </div>
           </div>
         </div>
