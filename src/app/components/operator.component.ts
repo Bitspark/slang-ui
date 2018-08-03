@@ -202,10 +202,7 @@ export class OperatorComponent implements OnInit {
   // General
 
   public async save() {
-    await this.operators.storeDefinition(this.operatorName, this.operatorDef.getDef())
-      .catch(err => {
-        console.log('>>> ERROR:', err);
-      });
+    await this.operators.storeDefinition(this.operatorName, this.operatorDef.getDef());
     await this.visuals.storeVisual(this.operatorName, this.operator.getVisual());
     await this.operators.refresh();
     await this.loadOperator(this.operatorName);
@@ -227,7 +224,14 @@ export class OperatorComponent implements OnInit {
           pos = [visual.geometry.x, visual.geometry.y];
         }
       }
-      this.operator = new OperatorInstance(this.operators, this.operatorName, '', this.operatorDef, {}, null, def, dim);
+      /*
+       * We compare selectedEntity by identity, so after re-initializing all operators, that comparsion fails
+       */
+      const newOperator = new OperatorInstance(this.operators, this.operatorName, '', this.operatorDef, {}, null, def, dim);
+      if (this.isSelected(this.operator)) {
+        this.selectedEntity.entity = newOperator;
+      }
+      this.operator = newOperator;
       this.operator.translate(pos);
       this.updateDef(def);
       if (visual) {
@@ -406,12 +410,16 @@ export class OperatorComponent implements OnInit {
     this.selectedEntity.entity = conn;
   }
 
-  public isSelected(entity: any) {
-    return this.selectedEntity.entity && this.selectedEntity.entity === entity;
+  public isAnyEntitySelected(): boolean {
+    return this.selectedEntity.entity !== null;
   }
 
-  public isInstanceSelected() {
-    return this.selectedEntity.entity && this.selectedEntity.entity !== this.operator &&
+  public isSelected(entity: any): boolean {
+    return this.isAnyEntitySelected() && this.selectedEntity.entity === entity;
+  }
+
+  public isInstanceSelected(): boolean {
+    return this.isAnyEntitySelected() && this.selectedEntity.entity !== this.operator &&
       this.selectedEntity.entity instanceof OperatorInstance;
   }
 
