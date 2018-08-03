@@ -568,7 +568,7 @@ export class OperatorComponent implements OnInit {
   public getOperatorList(): Array<OperatorDef> {
     return []
       .concat(
-        Array.from(this.operators.getLocals().values()),
+        Array.from(this.operators.getLocals().values()).filter(op => op !== this.operator.opDef),
         Array.from(this.operators.getLibraries().values()),
         Array.from(this.operators.getElementaries().values()));
   }
