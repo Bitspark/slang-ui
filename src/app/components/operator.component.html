@@ -133,6 +133,8 @@
             </svg:g>
           </svg>
 
+          <div id="sl-message-box" *ngIf="userMessage"><i class="fas fa-info-circle"></i> {{ userMessage }}</div>
+
         </div>
         <div id="sl-main-bottom" *ngIf="!!debugState">
           <div>

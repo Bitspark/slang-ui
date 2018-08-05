@@ -75,6 +75,16 @@
     &.large {
       height: initial;
     }
+
+    #sl-message-box {
+      position: absolute;
+      width: 100%;
+      padding: 5px;
+      top: 0;
+      text-align: center;
+      border: 3px solid $orange;
+      background-color: $body-bg;
+    }
   }
 
   #sl-main-bottom {
