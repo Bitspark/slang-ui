@@ -21,6 +21,7 @@ import {OperatorService} from './services/operator.service';
 import {VisualService} from './services/visual.service';
 
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
+import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 
 
 @NgModule({
@@ -35,6 +36,7 @@ import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
       {enableTracing: false}
     ),
     BrowserModule,
+    BrowserAnimationsModule,
     FormsModule,
     HttpClientModule,
     CodemirrorModule

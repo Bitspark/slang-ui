@@ -19,6 +19,9 @@
     <button type="button" class="btn btn-outline-light" (click)="stopOperator()"
             [ngClass]="{'active': !running}"><i class="fas fa-stop"></i></button>
   </div>
+  <div class="pl-3 navbar-text" [@operatorSaved]="isOperatorSaved">
+    Operator saved...
+  </div>
 </nav>
 
 <div class="container-fluid">
