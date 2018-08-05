@@ -27,16 +27,52 @@ export class OperatorListComponent implements OnInit {
     this.operatorSelected.emit(op);
   }
 
-  public localOperatorList(): Array<OperatorDef> {
+  public localOperatorList(): Array<{ newGroup: boolean, name: string, opDef: OperatorDef }> {
     return this.filteredOperatorList()
       .filter(op => op.isLocal())
-      .sort(compareOperatorDefs);
+      .sort(compareOperatorDefs)
+      .map(opDef => {
+        return {
+          newGroup: false,
+          name: opDef.getName(),
+          opDef: opDef,
+        };
+      });
   }
 
-  public globalOperatorList(): Array<OperatorDef> {
-    return this.filteredOperatorList()
-      .filter(op => op.isGlobal())
+  public globalOperatorList(): Array<{ newGroup: boolean, name: string, opDef: OperatorDef }> {
+    const opList: Array<OperatorDef> = this.filteredOperatorList()
+      .filter(opDef => opDef.isGlobal())
       .sort(compareOperatorDefs);
+
+    let grpName = '';
+    const listItems: Array<{ newGroup: boolean, name: string, opDef: OperatorDef }> = [];
+    for (const opDef of opList) {
+      // "slang", "...", "..."
+      let isNewGrp = false;
+      const splitName = opDef.getName().split('.').filter(n => n !== 'slang');
+
+      if (splitName.length > 1) {
+        const newGrp = splitName[0];
+        if (isNewGrp = newGrp !== grpName) {
+          grpName = newGrp;
+        }
+      }
+
+      if (isNewGrp) {
+        listItems.push({
+          newGroup: true,
+          name: grpName,
+          opDef: null,
+        });
+      }
+      listItems.push({
+        newGroup: false,
+        name: splitName[splitName.length - 1],
+        opDef: opDef,
+      });
+    }
+    return listItems;
   }
 
   public hasGlobals(): boolean {
@@ -45,6 +81,6 @@ export class OperatorListComponent implements OnInit {
 
   public filteredOperatorList(): Array<OperatorDef> {
     return this.operatorList
-      .filter(op => op.getName().toLowerCase().indexOf(this.filterString.toLowerCase()) !== -1);
+      .filter(opDef => opDef.getName().toLowerCase().indexOf(this.filterString.toLowerCase()) !== -1);
   }
 }
