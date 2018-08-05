@@ -1,0 +1,40 @@
+@import "../../styles/variables.scss";
+
+.sl-ui-form-box {
+  height: 34px;
+  margin-bottom: $spacer;
+}
+
+.sl-ui-scrollable {
+  height: calc(100% - 68px - 1.0rem);
+  box-sizing: border-box;
+  margin-bottom: 0.5rem;
+  overflow: auto;
+}
+
+.list-group-item {
+  color: $dark-gray;
+}
+
+.sl-form-box {
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
+
+.sl-operator-list {
+  margin-top: 2*$spacer;
+  li {
+    position: relative;
+    padding: 0 $spacer;
+    line-height: 1.4rem;
+    overflow-wrap: break-word;
+  }
+  button {
+    position: absolute;
+    right: 0;
+    line-height: 0;
+  }
+  .badge {
+    padding: 8px;
+  }
+}

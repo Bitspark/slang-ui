@@ -4,7 +4,6 @@ import {OperatorDef} from '../classes/operator';
 import {Router} from '@angular/router';
 import {HttpClient, HttpHeaders, HttpParams} from '@angular/common/http';
 import * as initialDef from '../initial-def.json';
-import {compareOperatorDefs} from '../utils';
 
 
 @Component({
@@ -52,23 +51,9 @@ export class IndexComponent {
     await this.router.navigate(['operator', operator.getName()]);
   }
 
-  public getLocals(filterString: string): Array<OperatorDef> {
+  public getLocals(): Array<OperatorDef> {
     return Array
-      .from(this.operators.getLocals().values())
-      .filter(op => op.getName().toLowerCase().indexOf(filterString.toLowerCase()) !== -1)
-      .sort(compareOperatorDefs);
-  }
-
-  public getElementaries(): Array<OperatorDef> {
-    return Array
-      .from(this.operators.getElementaries().values())
-      .sort(compareOperatorDefs);
-  }
-
-  public getLibraries(): Array<OperatorDef> {
-    return Array
-      .from(this.operators.getLibraries().values())
-      .sort(compareOperatorDefs);
+      .from(this.operators.getLocals().values());
   }
 
   public sendFeedback() {

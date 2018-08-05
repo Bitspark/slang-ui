@@ -33,36 +33,9 @@
   <!-- ui-mode visuals -->
   <div id="sl-visual-ui" *ngIf="isUIModeVisual()">
     <div class="row">
-      <div id="sl-operator-sidebar" class="sl-ui-sidebar col-2">
-        <div class="input-group sl-ui-form-box">
-          <div class="input-group-prepend">
-            <div class="input-group-text"><i class="fas fa-search"></i></div>
-          </div>
-          <input placeholder="Search for operators" type="text" class="form-control" [(ngModel)]="filterString"/>
-        </div>
-        <div class="sl-ui-scrollable">
-          <div class="sl-operator-list">
-            <h4>Local operators</h4>
-            <ul class="list-group">
-              <li class="list-group-item"
-                  *ngFor="let op of getLocals(filterString)">
-                <button class="btn btn-link" (click)="addInstance(op)"><i class="fas fa-plus-square"></i></button>
-                <span class="sl-operator-name">{{ op.getName() }}</span>
-              </li>
-            </ul>
-          </div>
-
-          <div class="sl-operator-list">
-            <h4>Global operators</h4>
-            <ul class="list-group">
-              <li class="list-group-item"
-                  *ngFor="let op of getGlobals(filterString)">
-                <button class="btn btn-link" (click)="addInstance(op)"><i class="fas fa-plus-square"></i></button>
-                <span class="sl-operator-name">{{ op.getName() }}</span>
-              </li>
-            </ul>
-          </div>
-        </div>
+      <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 sl-col" id="sl-operators-col">
+        <app-operator-list [buttonIcon]="'fa-plus'" [operatorList]="getOperatorList()"
+                           (operatorSelected)="addInstance($event)"></app-operator-list>
       </div>
       <div class="sl-ui-mainbar col">
         <div id="sl-svg-container" [ngClass]="{'large': !debugState}">
@@ -146,7 +119,8 @@
               </svg:g>
 
               <!-- Port Text/Labels -->
-              <svg:g *ngFor="let port of getPorts()" (click)="selectPort(port)" [attr.transform]="translatePort(port)">
+              <svg:g *ngFor="let port of getPorts()" (click)="selectPort(port)"
+                     [attr.transform]="translatePort(port)">
                 <svg:text [attr.text-anchor]="getPortLabelAnchor(port)" alignment-baseline="middle"
                           [attr.transform]="transformLabel(port)"
                           [attr.x]="getPortLabelX(port)" [attr.y]="getPortLabelY(port)"
@@ -215,7 +189,7 @@
           </div>
         </div>
       </div>
-      <div id="sl-instance-sidebar" class="sl-ui-sidebar col-2">
+      <div id="sl-instance-sidebar" class="d-none d-md-block sl-ui-sidebar col-2">
         <div class="sl-ui-scrollable">
           <h4>Main operator</h4>
           <h5>

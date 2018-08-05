@@ -49,12 +49,6 @@
   height: calc(100vh - 36px);
 }
 
-.sl-operator-list {
-  ul {
-    overflow-y: visible;
-  }
-}
-
 .sl-ui-sidebar {
   background-color: $pane-border-color;
   padding: $spacer;
@@ -120,20 +114,6 @@
     > div:not(:first-child) {
       margin-left: 8px;
     }
-  }
-}
-
-#sl-operator-sidebar {
-  .sl-ui-form-box {
-    height: 34px;
-    background-color: $body-bg;
-    margin-bottom: $spacer;
-  }
-  .sl-ui-scrollable {
-    background-color: $body-bg;
-    height: calc(100% - 34px - 0.5rem);
-    border-top: $spacer solid transparent;
-    box-sizing: border-box;
   }
 }
 

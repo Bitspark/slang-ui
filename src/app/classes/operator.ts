@@ -196,6 +196,22 @@ export class OperatorDef {
     return this.type;
   }
 
+  public isLocal(): boolean {
+    return this.type === 'local';
+  }
+
+  public isLibrary(): boolean {
+    return this.type === 'library';
+  }
+
+  public isElementary(): boolean {
+    return this.type === 'elementary';
+  }
+
+  public isGlobal(): boolean {
+    return this.type === 'library' || this.type === 'elementary';
+  }
+
   public isSaved(): boolean {
     return this.saved;
   }
