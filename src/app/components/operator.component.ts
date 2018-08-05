@@ -105,6 +105,8 @@ export class OperatorComponent implements OnInit {
   public status;
   public newPropName = '';
   public newInstanceName = '';
+  public userMessage = '';
+  public userMessageTimeout: any = null;
 
   // YAML
   public yamlRepr = '';
@@ -462,7 +464,23 @@ export class OperatorComponent implements OnInit {
     return Array.from(ins.getGenericNames());
   }
 
+  public displayUserMessage(msg: string) {
+    this.userMessage = msg;
+    if (this.userMessageTimeout != null) {
+      clearTimeout(this.userMessageTimeout);
+    }
+    const that = this;
+    this.userMessageTimeout = setTimeout(function () {
+      that.userMessage = '';
+    }, 5000);
+  }
+
   public selectPort(port1: Port) {
+    if (port1.isGeneric()) {
+      this.displayUserMessage(`Cannot select generic port. Specify generic type '${port1.getGeneric()}' in the left bottom panel while having the operator selected.`);
+      return;
+    }
+
     if (this.selectedEntity.entity && this.selectedEntity.entity instanceof Port) {
       const port2 = this.selectedEntity.entity as Port;
       if (port1.getOperator() === this.operator) {
