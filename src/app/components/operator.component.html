@@ -269,6 +269,7 @@
                                      [(typeValue)]="getProperties(selectedEntity.entity)[prop.name]"
                                      (typeValueChange)="refresh(true)"></app-type-value-form>
                 <button *ngIf="!isPropertySpecified(selectedEntity.entity, prop)"
+                        [disabled]="prop.def.type === 'generic' && !isGenericSpecified(selectedEntity.entity, prop.def.generic)"
                         (click)="addProperty(selectedEntity.entity, prop)">Specify
                 </button>
               </div>
