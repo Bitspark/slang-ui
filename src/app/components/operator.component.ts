@@ -1,4 +1,5 @@
 import {Component, HostListener, OnInit} from '@angular/core';
+import {animate, state, style, transition, trigger} from '@angular/animations';
 import {ActivatedRoute} from '@angular/router';
 import {OperatorService} from '../services/operator.service';
 import {Composable, Connection, OperatorDef, OperatorInstance, Port, Transformable} from '../classes/operator';
@@ -80,7 +81,19 @@ class MouseMoueTracker {
 
 @Component({
   templateUrl: './operator.component.html',
-  styleUrls: ['./operator.component.scss']
+  styleUrls: ['./operator.component.scss'],
+  animations: [
+    trigger('operatorSaved', [
+      state('true', style({
+        opacity: 1
+      })),
+      state('false', style({
+        opacity: 0
+      })),
+      transition('false => true', animate('250ms ease-in')),
+      transition('true => false', animate('1000ms 1000ms ease-out'))
+    ])
+  ]
 })
 export class OperatorComponent implements OnInit {
   // General
@@ -112,6 +125,7 @@ export class OperatorComponent implements OnInit {
   public selectedEntity = {entity: null as any};
   public scale = 0.6;
   public filterString = '';
+  public isOperatorSaved = false;
 
   private insPropDefs = new Map<string, Array<{ name: string, def: any }>>();
 
@@ -204,8 +218,10 @@ export class OperatorComponent implements OnInit {
   public async save() {
     await this.operators.storeDefinition(this.operatorName, this.operatorDef.getDef());
     await this.visuals.storeVisual(this.operatorName, this.operator.getVisual());
+    this.isOperatorSaved = true;
     await this.operators.refresh();
     await this.loadOperator(this.operatorName);
+    this.isOperatorSaved = false;
   }
 
   public async loadOperator(operatorName) {
