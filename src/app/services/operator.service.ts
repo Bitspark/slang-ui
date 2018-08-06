@@ -31,7 +31,7 @@ export class OperatorService {
         case 'local':
           this.localOperators.add(operator);
           break;
-        case 'lib':
+        case 'library':
           this.libraryOperators.add(operator);
           break;
         case 'elementary':
