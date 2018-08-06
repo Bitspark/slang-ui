@@ -18,67 +18,6 @@ import {TypeDefFormComponent} from './type-def-form.component';
 import {Orientation} from '../classes/vector';
 import {HttpClient} from '@angular/common/http';
 
-class MouseMoueTracker {
-  private static lastX: number;
-  private static lastY: number;
-
-  private moving: boolean;
-  private actionType = '';
-
-  constructor(private mouseAction: (t: MouseMoueTracker, event: any, actionPhase: string) => void) {
-  }
-
-  public static getLastX(): number {
-    return this.lastX;
-  }
-
-  public static getLastY(): number {
-    return this.lastY;
-  }
-
-  public setResizing() {
-    this.actionType = 'resize';
-  }
-
-  public setDragging() {
-    this.actionType = 'drag';
-  }
-
-  public isResizing() {
-    return this.actionType === 'resize';
-  }
-
-  public isDragging() {
-    return this.actionType === 'drag';
-  }
-
-  public start(event: any) {
-    this.moving = true;
-    this.mouseAction(this, event, 'start');
-    MouseMoueTracker.lastX = event.screenX;
-    MouseMoueTracker.lastY = event.screenY;
-  }
-
-  public stop(event: any) {
-    this.moving = false;
-    this.mouseAction(this, event, 'stop');
-    MouseMoueTracker.lastX = event.screenX;
-    MouseMoueTracker.lastY = event.screenY;
-    this.actionType = '';
-  }
-
-  public track(event: any) {
-    if (event.buttons === 0) {
-      this.moving = false;
-    }
-    if (this.moving) {
-      this.mouseAction(this, event, 'ongoing');
-      MouseMoueTracker.lastX = event.screenX;
-      MouseMoueTracker.lastY = event.screenY;
-    }
-  }
-}
-
 @Component({
   templateUrl: './operator.component.html',
   styleUrls: ['./operator.component.scss'],
