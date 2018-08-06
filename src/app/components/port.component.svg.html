@@ -19,6 +19,7 @@
   <svg:rect fill="transparent"
             class="sl-svg-port-click-overlay"
             (click)="select.emit(port)"
+            (mouseover)="hovered=true" (mouseout)="hovered=false"
             [attr.width]="port.getWidth()" [attr.height]="port.getHeight()"/>
 
   <!-- Stream -->

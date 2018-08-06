@@ -17,8 +17,11 @@ svg {
     font-size: 1.4em;
     font-weight: lighter;
 
-    &.selected {
-      fill: $svg-selected;
+    &.selected, &.selected.hovered, &.selected:hover {
+      stroke: $svg-selected;
+    }
+    &.hovered {
+      stroke: $svg-hovered;
     }
   }
 
@@ -26,8 +29,11 @@ svg {
     stroke: transparent;
     stroke-width: 2px;
     stroke-linecap: butt;
-    &.selected {
+    &.selected, &.selected.hovered, &.selected:hover {
       stroke: $svg-selected;
+    }
+    &.hovered {
+      stroke: $svg-hovered;
     }
   }
 
@@ -51,8 +57,11 @@ svg {
     stroke-width: 6px;
     stroke-linejoin: round;
     stroke-linecap: round;
-    &.selected {
+    &.selected, &.selected:hover {
       stroke: $svg-selected;
+    }
+    &:hover {
+      stroke: $svg-hovered;
     }
   }
 
@@ -64,7 +73,7 @@ svg {
     stroke-opacity: .55;
     fill-opacity: .9;
 
-    &.selected {
+    &.selected, &.selected:hover {
       stroke: $svg-selected;
     }
     &.sl-svg-op-surr {
@@ -72,6 +81,12 @@ svg {
       fill-opacity: .85;
     }
     &.sl-svg-op-ins {
+      &.selected, &.selected:hover {
+        stroke: $svg-selected;
+      }
+      &:hover {
+        stroke: $svg-hovered;
+      }
       &.sl-svg-op-type {
         &.elementary {
           fill: $svg-op-fill-elem
@@ -127,6 +142,9 @@ svg {
     }
   }
   .sl-svg-port-label {
+    &:hover {
+      stroke: $svg-hovered;
+    }
   }
 }
 
