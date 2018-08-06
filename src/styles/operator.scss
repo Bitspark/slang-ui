@@ -17,8 +17,11 @@ svg {
     font-size: 1.4em;
     font-weight: lighter;
 
-    &.selected {
-      fill: $svg-selected;
+    &.selected, &.selected.hovered, &.selected:hover {
+      stroke: $svg-selected;
+    }
+    &.hovered {
+      stroke: $svg-hovered;
     }
   }
 
@@ -26,8 +29,11 @@ svg {
     stroke: transparent;
     stroke-width: 2px;
     stroke-linecap: butt;
-    &.selected {
+    &.selected, &.selected.hovered, &.selected:hover {
       stroke: $svg-selected;
+    }
+    &.hovered {
+      stroke: $svg-hovered;
     }
   }
 
@@ -37,15 +43,26 @@ svg {
     stroke-width: 6px;
     stroke-linejoin: round;
     stroke-linecap: round;
-    &.selected {
-      stroke: $svg-selected;
-    }
   }
 
   .sl-svg-conn-click-overlay {
     fill: none;
     stroke: transparent;
     stroke-width: 14px;
+  }
+
+  .sl-svg-conn-highlight {
+    fill: none;
+    stroke: none;
+    stroke-width: 6px;
+    stroke-linejoin: round;
+    stroke-linecap: round;
+    &.selected, &.selected.hovered, &.selected:hover {
+      stroke: $svg-selected;
+    }
+    &:hover, &.hovered {
+      stroke: $svg-hovered;
+    }
   }
 
   .sl-svg-op {
@@ -56,7 +73,7 @@ svg {
     stroke-opacity: .55;
     fill-opacity: .9;
 
-    &.selected {
+    &.selected, &.selected:hover {
       stroke: $svg-selected;
     }
     &.sl-svg-op-surr {
@@ -64,6 +81,12 @@ svg {
       fill-opacity: .85;
     }
     &.sl-svg-op-ins {
+      &.selected, &.selected:hover {
+        stroke: $svg-selected;
+      }
+      &:hover {
+        stroke: $svg-hovered;
+      }
       &.sl-svg-op-type {
         &.elementary {
           fill: $svg-op-fill-elem
@@ -97,28 +120,31 @@ svg {
     stroke-opacity: .55;
 
     &.primitive {
-      fill: #7156FB;
+      fill: #5bcbca;
     }
     &.number {
-      fill: #40A1DE;
+      fill: #377eb8;
     }
     &.string {
-      fill: #46B5E8;
+      fill: #984ea3;
     }
     &.boolean {
-      fill: #3CCC90;
+      fill: #1b9e77;
     }
     &.binary {
       fill: #FBEB56;
     }
     &.trigger {
-      fill: #9ab;
+      fill: #767675;
     }
     &.generic {
-      fill: #9e008e;
+      fill: #E20074;
     }
   }
   .sl-svg-port-label {
+    &:hover {
+      stroke: $svg-hovered;
+    }
   }
 }
 

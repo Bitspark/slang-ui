@@ -408,7 +408,7 @@ export class OperatorInstance extends Composable {
 
     this.mainIn = new Port(this, 'service', 'main', true, null, '', this, def.services['main']['in']);
     const tmpMainOut = new Port(this, 'service', 'main', false, null, '', this, def.services['main']['out']);
-    width = Math.max(width, this.mainIn.getWidth(), tmpMainOut.getWidth() + 10, OperatorInstance.style.opMinWidth);
+    width = Math.max(width, this.mainIn.getWidth(), tmpMainOut.getWidth() + 10, this.getOpMinWidth());
     height = Math.max(height, this.mainIn.getHeight() + 10);
 
     let dlgHeight = OperatorInstance.style.dlgP;
@@ -431,7 +431,7 @@ export class OperatorInstance extends Composable {
         }
       }
     }
-    height = Math.max(height, dlgHeight + OperatorInstance.style.dlgP, OperatorInstance.style.opMinHeight);
+    height = Math.max(height, dlgHeight + OperatorInstance.style.dlgP, this.getOpMinHeight());
 
     this.dim = [width, height];
     this.mainOut = new Port(this, 'service', 'main', false, null, '', this, def.services['main']['out']);
@@ -485,6 +485,24 @@ export class OperatorInstance extends Composable {
 
     if (connections) {
       this.connections = connectDeep(this, connections);
+    }
+  }
+
+  private getOpMinWidth(): number {
+    switch (this.getFullyQualifiedName()) {
+      case 'slang.data.Convert':
+        return 40;
+      default:
+        return OperatorInstance.style.opMinWidth;
+    }
+  }
+
+  private getOpMinHeight(): number {
+    switch (this.getFullyQualifiedName()) {
+      case 'slang.data.Convert':
+        return 50;
+      default:
+        return OperatorInstance.style.opMinHeight;
     }
   }
 

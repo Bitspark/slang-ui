@@ -81,15 +81,32 @@
               <!-- Visible Connections -->
               <svg:path *ngFor="let conn of visualConnections()"
                         class="sl-svg-conn"
-                        [ngClass]="{selected: isSelected(conn)}"
+                        [attr.d]="connectionPoints(conn)"></svg:path>
+
+              <!-- Highlighted Connections -->
+              <svg:path *ngFor="let conn of visualConnections()"
+                        class="sl-svg-conn-highlight"
+                        [ngClass]="{selected: isSelected(conn), hovered: isHovered(conn)}"
                         [attr.d]="connectionPoints(conn)"></svg:path>
 
               <!-- Clickable Invisible Connections -->
               <svg:path *ngFor="let conn of visualConnections()"
                         class="sl-svg-conn-click-overlay"
                         (click)="selectConnection(conn)"
+                        (mouseover)="hoverConnection(conn)" (mouseout)="unhoverConnection()"
                         [attr.d]="connectionPoints(conn)"></svg:path>
 
+              <!-- Port Text/Labels -->
+              <svg:g *ngFor="let port of getPorts()" (click)="selectPort(port)"
+                     [attr.transform]="translatePort(port)">
+                <svg:text [attr.text-anchor]="getPortLabelAnchor(port)" alignment-baseline="middle"
+                          [attr.transform]="transformLabel(port)"
+                          [attr.x]="getPortLabelX(port)" [attr.y]="getPortLabelY(port)"
+                          class="sl-svg-port-label"
+                          [ngClass]="{selected: isSelected(port)}">
+                  {{port.getName()}}
+                </svg:text>
+              </svg:g>
               <!-- Ports -->
               <svg:g [attr.transform]="transform(operator)">
                 <!-- Delegates -->
@@ -118,18 +135,6 @@
                             r="12px"
                             (mousedown)="mouseTracker.setResizing()">
                 </svg:circle>
-              </svg:g>
-
-              <!-- Port Text/Labels -->
-              <svg:g *ngFor="let port of getPorts()" (click)="selectPort(port)"
-                     [attr.transform]="translatePort(port)">
-                <svg:text [attr.text-anchor]="getPortLabelAnchor(port)" alignment-baseline="middle"
-                          [attr.transform]="transformLabel(port)"
-                          [attr.x]="getPortLabelX(port)" [attr.y]="getPortLabelY(port)"
-                          class="sl-svg-port-label"
-                          [ngClass]="{selected: isSelected(port)}">
-                  {{port.getName()}}
-                </svg:text>
               </svg:g>
 
             </svg:g>

@@ -4,6 +4,7 @@ $primary: $orange;
 $svg-bg: transparentize($dark, .55);
 $pane-border-color: transparentize($dark, .65);
 $svg-selected: $orange;
+$svg-hovered: lighten(desaturate($orange, 16), 20);
 $svg-text: $body-color;
 $svg-conn: $white;
 $svg-op-stroke: $light-gray;

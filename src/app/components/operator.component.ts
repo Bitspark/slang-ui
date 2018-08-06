@@ -4,13 +4,7 @@ import {ActivatedRoute} from '@angular/router';
 import {OperatorService} from '../services/operator.service';
 import {Composable, Connection, OperatorDef, OperatorInstance, Port, Transformable} from '../classes/operator';
 import {safeDump, safeLoad} from 'js-yaml';
-import {
-  createDefaultValue,
-  generateSvgTransform,
-  normalizeConnections,
-  stringifyConnections,
-  SVGConnectionLineGenerator
-} from '../utils';
+import {createDefaultValue, generateSvgTransform, normalizeConnections, stringifyConnections, SVGConnectionLineGenerator} from '../utils';
 import {ApiService} from '../services/api.service';
 import {VisualService} from '../services/visual.service';
 import 'codemirror/mode/yaml/yaml.js';
@@ -63,6 +57,7 @@ export class OperatorComponent implements OnInit {
   };
 
   // Visual
+  public hoveredConn: Connection = null;
   public selectedEntity = {entity: null as any};
   public scale = 0.6;
   public filterString = '';
@@ -362,6 +357,18 @@ export class OperatorComponent implements OnInit {
     return Array.from(this.operator.getConnections().values());
   }
 
+  public hoverConnection(conn: Connection) {
+    return this.hoveredConn = conn;
+  }
+
+  public unhoverConnection() {
+    return this.hoveredConn = null;
+  }
+
+  public isHovered(conn: Connection): boolean {
+    return this.hoveredConn === conn;
+  }
+
   public selectInstance(ins: OperatorInstance) {
     this.mouseTracker.setDragging();
     this.selectedEntity.entity = ins;
@@ -421,7 +428,8 @@ export class OperatorComponent implements OnInit {
 
   public selectPort(port1: Port) {
     if (port1.isGeneric()) {
-      this.displayUserMessage(`Cannot select generic port. Specify generic type '${port1.getGeneric()}' in the left bottom panel while having the operator selected.`);
+      this.displayUserMessage(`Cannot select generic port.` +
+        `Specify generic type '${port1.getGeneric()}' in the left bottom panel while having the operator selected.`);
       return;
     }
 
@@ -632,24 +640,21 @@ export class OperatorComponent implements OnInit {
     return this.uiMode === 'yaml';
   }
 
-
   public text(ins: OperatorInstance): string {
     const fqn = ins.getFullyQualifiedName();
     const props = ins.getProperties();
 
-    if (fqn === 'slang.const') {
-      return !!props ? JSON.stringify(props['value']) : 'const?';
-    } else if (fqn === 'slang.eval') {
-      return !!props ? props['expression'] : 'eval?';
-    } else {
-      const opName = ins.getFullyQualifiedName().split('.');
-      return opName[opName.length - 1];
+    switch (fqn) {
+      case 'slang.data.Value':
+        return !!props ? JSON.stringify(props['value']) : 'value?';
+      case 'slang.data.Evaluate':
+        return !!props ? props['expression'] : 'eval?';
+      case 'slang.data.Convert':
+        return '';
+      default:
+        const opName = ins.getFullyQualifiedName().split('.');
+        return opName[opName.length - 1];
     }
-  }
-
-  public fqn(ins: OperatorInstance): string {
-    const fqn = ins.getFullyQualifiedName().split('.');
-    return fqn[fqn.length - 1];
   }
 
   // Executing

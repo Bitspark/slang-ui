@@ -8,6 +8,7 @@ import {Port, Transformable, Type} from '../classes/operator';
   styleUrls: []
 })
 export class PortComponent {
+  public hovered: boolean;
 
   @Input()
   public port: Port;
@@ -24,6 +25,7 @@ export class PortComponent {
     cssClass[this.port.getOrientation().name()] = true;
     cssClass['in'] = this.port.isIn();
     cssClass['out'] = this.port.isOut();
+    cssClass['hovered'] = this.hovered;
     return cssClass;
   }
 
