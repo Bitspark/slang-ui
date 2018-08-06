@@ -120,25 +120,25 @@ svg {
     stroke-opacity: .55;
 
     &.primitive {
-      fill: #7156FB;
+      fill: #5bcbca;
     }
     &.number {
-      fill: #40A1DE;
+      fill: #377eb8;
     }
     &.string {
-      fill: #46B5E8;
+      fill: #984ea3;
     }
     &.boolean {
-      fill: #3CCC90;
+      fill: #1b9e77;
     }
     &.binary {
       fill: #FBEB56;
     }
     &.trigger {
-      fill: #9ab;
+      fill: #767675;
     }
     &.generic {
-      fill: #9e008e;
+      fill: #E20074;
     }
   }
   .sl-svg-port-label {
