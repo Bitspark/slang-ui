@@ -4,13 +4,7 @@ import {ActivatedRoute} from '@angular/router';
 import {OperatorService} from '../services/operator.service';
 import {Composable, Connection, OperatorDef, OperatorInstance, Port, Transformable} from '../classes/operator';
 import {safeDump, safeLoad} from 'js-yaml';
-import {
-  createDefaultValue,
-  generateSvgTransform,
-  normalizeConnections,
-  stringifyConnections,
-  SVGConnectionLineGenerator
-} from '../utils';
+import {createDefaultValue, generateSvgTransform, normalizeConnections, stringifyConnections, SVGConnectionLineGenerator} from '../utils';
 import {ApiService} from '../services/api.service';
 import {VisualService} from '../services/visual.service';
 import 'codemirror/mode/yaml/yaml.js';
@@ -124,6 +118,7 @@ export class OperatorComponent implements OnInit {
   };
 
   // Visual
+  public hoveredConn: Connection = null;
   public selectedEntity = {entity: null as any};
   public scale = 0.6;
   public filterString = '';
@@ -416,6 +411,18 @@ export class OperatorComponent implements OnInit {
       return [];
     }
     return Array.from(this.operator.getConnections().values());
+  }
+
+  public hoverConnection(conn: Connection) {
+    return this.hoveredConn = conn;
+  }
+
+  public unhoverConnection() {
+    return this.hoveredConn = null;
+  }
+
+  public isHovered(conn: Connection): boolean {
+    return this.hoveredConn === conn;
   }
 
   public selectInstance(ins: OperatorInstance) {

@@ -57,10 +57,10 @@ svg {
     stroke-width: 6px;
     stroke-linejoin: round;
     stroke-linecap: round;
-    &.selected, &.selected:hover {
+    &.selected, &.selected.hovered, &.selected:hover {
       stroke: $svg-selected;
     }
-    &:hover {
+    &:hover, &.hovered {
       stroke: $svg-hovered;
     }
   }
