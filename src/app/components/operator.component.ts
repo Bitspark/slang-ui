@@ -67,6 +67,7 @@ export class OperatorComponent implements OnInit {
   public scale = 0.6;
   public filterString = '';
   public isOperatorSaved = false;
+  public canvasFocus = false;
 
   private insPropDefs = new Map<string, Array<{ name: string, def: any }>>();
 
@@ -111,6 +112,9 @@ export class OperatorComponent implements OnInit {
 
   @HostListener('window:keyup', ['$event'])
   keyEvent(event: KeyboardEvent) {
+    if (!this.canvasFocus) {
+      return;
+    }
     switch (event.key) {
       case '+':
         this.scale *= 1.1;
@@ -119,6 +123,7 @@ export class OperatorComponent implements OnInit {
         this.scale /= 1.1;
         break;
       case 'Delete':
+      case 'Backspace':
         if (!this.selectedEntity.entity) {
           return;
         }
