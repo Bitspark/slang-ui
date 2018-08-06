@@ -484,7 +484,8 @@ export class OperatorComponent implements OnInit {
 
   public selectPort(port1: Port) {
     if (port1.isGeneric()) {
-      this.displayUserMessage(`Cannot select generic port. Specify generic type '${port1.getGeneric()}' in the left bottom panel while having the operator selected.`);
+      this.displayUserMessage(`Cannot select generic port.` +
+        `Specify generic type '${port1.getGeneric()}' in the left bottom panel while having the operator selected.`);
       return;
     }
 
@@ -695,24 +696,21 @@ export class OperatorComponent implements OnInit {
     return this.uiMode === 'yaml';
   }
 
-
   public text(ins: OperatorInstance): string {
     const fqn = ins.getFullyQualifiedName();
     const props = ins.getProperties();
 
-    if (fqn === 'slang.const') {
-      return !!props ? JSON.stringify(props['value']) : 'const?';
-    } else if (fqn === 'slang.eval') {
-      return !!props ? props['expression'] : 'eval?';
-    } else {
-      const opName = ins.getFullyQualifiedName().split('.');
-      return opName[opName.length - 1];
+    switch (fqn) {
+      case 'slang.data.Value':
+        return !!props ? JSON.stringify(props['value']) : 'value?';
+      case 'slang.data.Evaluate':
+        return !!props ? props['expression'] : 'eval?';
+      case 'slang.data.Convert':
+        return '';
+      default:
+        const opName = ins.getFullyQualifiedName().split('.');
+        return opName[opName.length - 1];
     }
-  }
-
-  public fqn(ins: OperatorInstance): string {
-    const fqn = ins.getFullyQualifiedName().split('.');
-    return fqn[fqn.length - 1];
   }
 
   // Executing
