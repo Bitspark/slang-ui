@@ -37,15 +37,23 @@ svg {
     stroke-width: 6px;
     stroke-linejoin: round;
     stroke-linecap: round;
-    &.selected {
-      stroke: $svg-selected;
-    }
   }
 
   .sl-svg-conn-click-overlay {
     fill: none;
     stroke: transparent;
     stroke-width: 14px;
+  }
+
+  .sl-svg-conn-highlight {
+    fill: none;
+    stroke: none;
+    stroke-width: 6px;
+    stroke-linejoin: round;
+    stroke-linecap: round;
+    &.selected {
+      stroke: $svg-selected;
+    }
   }
 
   .sl-svg-op {

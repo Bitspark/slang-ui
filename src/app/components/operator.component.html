@@ -82,6 +82,11 @@
               <!-- Visible Connections -->
               <svg:path *ngFor="let conn of visualConnections()"
                         class="sl-svg-conn"
+                        [attr.d]="connectionPoints(conn)"></svg:path>
+
+              <!-- Highlighted Connections -->
+              <svg:path *ngFor="let conn of visualConnections()"
+                        class="sl-svg-conn-highlight"
                         [ngClass]="{selected: isSelected(conn)}"
                         [attr.d]="connectionPoints(conn)"></svg:path>
 
