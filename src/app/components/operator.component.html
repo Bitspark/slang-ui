@@ -4,7 +4,6 @@
     <div class="navbar-text sl-operator-name">{{operatorName}}</div>
   </div>
   <div class="btn-group btn-group-sm ml-3">
-    <button class="btn btn-outline-light"><i class="fas fa-pen-square"></i></button>
     <button class="btn btn-outline-light" (click)="save()"><i class="fas fa-save"></i></button>
   </div>
   <div class="btn-group btn-group-sm btn-group-toggle ml-3">
@@ -43,7 +42,7 @@
       <div class="sl-ui-mainbar col">
         <div id="sl-svg-container" [ngClass]="{'large': !debugState}">
 
-          <svg [attr.width]="50000*scale" [attr.height]="50000*scale"
+          <svg (focusin)="canvasFocus=true" (focusout)="canvasFocus=false" [attr.width]="50000*scale" [attr.height]="50000*scale"
                viewBox="0 0 50000 50000"
                xmlns:svg="http://www.w3.org/2000/svg"
                (mousedown)="mouseTracker.start($event)"
