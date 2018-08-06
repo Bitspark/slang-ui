@@ -663,8 +663,8 @@ export class OperatorComponent implements OnInit {
     this.debuggingLog.push(msg);
   }
 
-  public startDebugging() {
-    this.save();
+  public async startDebugging() {
+    await this.save();
     this.refreshDebugVariables();
     if (this.operator.getGenericNames().size > 0 || this.operator.getPropertyDefs().size > 0) {
       this.specifyOperator();
