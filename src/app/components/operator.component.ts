@@ -406,6 +406,13 @@ export class OperatorComponent implements OnInit {
     return '';
   }
 
+  public getSelectedInstanceLastName(): string {
+    if (this.isInstanceSelected()) {
+      return this.instanceLastName(this.selectedEntity.entity as OperatorInstance);
+    }
+    return '';
+  }
+
   public renameInstance(ins: OperatorInstance, newName: string) {
     this.operator.renameInstance(ins.getName(), newName);
     this.refresh();
@@ -654,6 +661,11 @@ export class OperatorComponent implements OnInit {
     return this.uiMode === 'yaml';
   }
 
+  public instanceLastName(ins: OperatorInstance): string {
+    const opName = ins.getFullyQualifiedName().split('.');
+    return opName[opName.length - 1];
+  }
+
   public text(ins: OperatorInstance): string {
     const fqn = ins.getFullyQualifiedName();
     const props = ins.getProperties();
@@ -666,8 +678,7 @@ export class OperatorComponent implements OnInit {
       case 'slang.data.Convert':
         return '';
       default:
-        const opName = ins.getFullyQualifiedName().split('.');
-        return opName[opName.length - 1];
+        return this.instanceLastName(ins);
     }
   }
 
