@@ -231,8 +231,7 @@
             (no operator instance selected)
           </div>
           <div *ngIf="isInstanceSelected()">
-            <h4>Operator</h4>
-            <p class="sl-operator-name">{{ getSelectedInstanceFQName() }}</p>
+            <h4>{{ getSelectedInstanceLastName() }}</h4>
 
             <h5>Transform</h5>
             <!-- Instance transformation control -->

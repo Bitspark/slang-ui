@@ -22,5 +22,5 @@
   </div>
 
   <app-type-def-form *ngIf="isStream()" [(typeDef)]="typeDef.stream" (typeDefChange)="handleTypeDefChanged()"></app-type-def-form>
-  <input [(ngModel)]="typeDef.generic" *ngIf="isGeneric()" title="generic name" style="width: 60px" />
+  <input [(ngModel)]="typeDef.generic" (ngModelChange)="renameGenericName($event)" *ngIf="isGeneric()" title="generic name" style="width: 60px" />
 </div>
