@@ -442,11 +442,11 @@ export class OperatorComponent implements OnInit {
     if (this.selectedEntity.entity && this.selectedEntity.entity instanceof Port) {
       const port2 = this.selectedEntity.entity as Port;
 
-      if (port1.isGeneric() && !port2.isGeneric()) {
+      if (port1.isGeneric() && !port2.isGeneric() && !port2.isTrigger()) {
         this.displayUserMessage(`Cannot connect generic port with non-generic port. Specify generic type '${port1.getGeneric()}'.`);
         return;
       }
-      if (port2.isGeneric() && !port1.isGeneric()) {
+      if (port2.isGeneric() && !port1.isGeneric() && !port1.isTrigger()) {
         this.displayUserMessage(`Cannot connect generic port with non-generic port. Specify generic type '${port2.getGeneric()}'.`);
         return;
       }

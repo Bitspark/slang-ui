@@ -962,6 +962,10 @@ export class Port extends Composable {
     return this.type === Type.generic;
   }
 
+  public isTrigger(): boolean {
+    return this.type === Type.trigger;
+  }
+
   public isStream(): boolean {
     return this.type === Type.stream;
   }
