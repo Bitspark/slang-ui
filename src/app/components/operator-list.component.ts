@@ -9,7 +9,7 @@ import {compareOperatorDefs} from '../utils';
 })
 export class OperatorListComponent implements OnInit {
   @Input()
-  private operatorList: Array<OperatorDef> = [];
+  private operatorList: Array<OperatorDef>;
   @Input()
   public buttonIcon = '';
   @Output()

@@ -42,7 +42,8 @@
       <div class="sl-ui-mainbar col">
         <div id="sl-svg-container" [ngClass]="{'large': !debugState}">
 
-          <svg (focusin)="canvasFocus=true" (focusout)="canvasFocus=false" [attr.width]="50000*scale" [attr.height]="50000*scale"
+          <svg (mouseenter)="canvasFocus=true" (mouseleave)="canvasFocus=false"
+               [attr.width]="50000*scale" [attr.height]="50000*scale"
                viewBox="0 0 50000 50000"
                xmlns:svg="http://www.w3.org/2000/svg"
                (mousedown)="mouseTracker.start($event)"
