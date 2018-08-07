@@ -60,7 +60,6 @@ export class OperatorComponent implements OnInit {
   public hoveredConn: Connection = null;
   public selectedEntity = {entity: null as any};
   public scale = 0.6;
-  public filterString = '';
   public isOperatorSaved = false;
   public canvasFocus = false;
 
