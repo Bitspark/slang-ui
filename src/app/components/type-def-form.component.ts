@@ -140,6 +140,10 @@ export class TypeDefFormComponent implements OnInit {
     this.handleTypeDefChanged();
   }
 
+  public renameGenericName(newName: string) {
+    this.handleTypeDefChanged();
+  }
+
   public removeMapPort(name: string) {
     const idx = this.getMapEntryIndex(name);
     if (idx > -1) {

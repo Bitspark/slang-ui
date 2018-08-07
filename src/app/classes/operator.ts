@@ -77,6 +77,7 @@ export class OperatorDef {
 
   public static specifyTypeDef(def: any, gens: any, props: any, propDefs: any) {
     if (def['type'] === 'generic') {
+      def['type'] = 'undefined';
       for (const genName in gens) {
         if (gens.hasOwnProperty(genName) && genName === def['generic']) {
           const genTypeCpy = JSON.parse(JSON.stringify(gens[genName]));
@@ -92,6 +93,10 @@ export class OperatorDef {
           }
           break;
         }
+      }
+      if (def['type'] === 'undefined') {
+        def['type'] = 'generic';
+        def['generic'] += '?';
       }
       return;
     }
@@ -970,7 +975,14 @@ export class Port extends Composable {
   }
 
   public getGeneric(): string {
-    return this.generic;
+    if (!this.generic.endsWith('?')) {
+      return this.generic;
+    }
+    return this.generic.substr(0, this.generic.length - 1);
+  }
+
+  public isUnspecifiedGeneric(): boolean {
+    return this.type === Type.generic && this.generic.endsWith('?');
   }
 
   public getStream(): Port {

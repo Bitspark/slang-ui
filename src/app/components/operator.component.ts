@@ -427,14 +427,28 @@ export class OperatorComponent implements OnInit {
   }
 
   public selectPort(port1: Port) {
-    if (port1.isGeneric()) {
-      this.displayUserMessage(`Cannot select generic port.` +
-        `Specify generic type '${port1.getGeneric()}' in the left bottom panel while having the operator selected.`);
+    if (port1.isUnspecifiedGeneric()) {
+      this.displayUserMessage(`Cannot select unspecified generic port. Specify generic type '${port1.getGeneric()}'.`);
       return;
     }
 
     if (this.selectedEntity.entity && this.selectedEntity.entity instanceof Port) {
       const port2 = this.selectedEntity.entity as Port;
+
+      if (port1.isGeneric() && !port2.isGeneric()) {
+        this.displayUserMessage(`Cannot connect generic port with non-generic port. Specify generic type '${port1.getGeneric()}'.`);
+        return;
+      }
+      if (port2.isGeneric() && !port1.isGeneric()) {
+        this.displayUserMessage(`Cannot connect generic port with non-generic port. Specify generic type '${port2.getGeneric()}'.`);
+        return;
+      }
+      if (port1.isGeneric() && port2.isGeneric() && port1.getGeneric() !== port2.getGeneric()) {
+        this.displayUserMessage(`Cannot connect generic ports with differing names: ` +
+          `'${port1.getGeneric()}' is not the same as '${port2.getGeneric()}'.`);
+        return;
+      }
+
       if (port1.getOperator() === this.operator) {
         if (port2.getOperator() === this.operator) {
           if (port1.isIn() && port2.isOut()) {
