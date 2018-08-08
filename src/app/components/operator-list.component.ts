@@ -20,31 +20,8 @@ export class OperatorListComponent implements OnInit {
   constructor() {
   }
 
-  ngOnInit() {
-  }
-
-  public emitOperatorSelected(op: OperatorDef) {
-    this.operatorSelected.emit(op);
-  }
-
-  public localOperatorList(): Array<{ newGroup: boolean, name: string, opDef: OperatorDef }> {
-    return this.filteredOperatorList()
-      .filter(op => op.isLocal())
-      .sort(compareOperatorDefs)
-      .map(opDef => {
-        return {
-          newGroup: false,
-          name: opDef.getName(),
-          opDef: opDef,
-        };
-      });
-  }
-
-  public globalOperatorList(): Array<{ newGroup: boolean, name: string, opDef: OperatorDef }> {
-    const opList: Array<OperatorDef> = this.filteredOperatorList()
-      .filter(opDef => opDef.isGlobal())
-      .sort(compareOperatorDefs);
-
+  private static groupOperatorList(opList: Array<OperatorDef>,
+                                   opName: (n: string[]) => string): Array<{ newGroup: boolean, name: string, opDef: OperatorDef }> {
     let grpName = '';
     const listItems: Array<{ newGroup: boolean, name: string, opDef: OperatorDef }> = [];
     for (const opDef of opList) {
@@ -53,7 +30,7 @@ export class OperatorListComponent implements OnInit {
       const splitName = opDef.getName().split('.').filter(n => n !== 'slang');
 
       if (splitName.length > 1) {
-        const newGrp = splitName[0];
+        const newGrp = splitName.shift();
         if (isNewGrp = newGrp !== grpName) {
           grpName = newGrp;
         }
@@ -68,11 +45,14 @@ export class OperatorListComponent implements OnInit {
       }
       listItems.push({
         newGroup: false,
-        name: splitName[splitName.length - 1],
+        name: opName(splitName),
         opDef: opDef,
       });
     }
     return listItems;
+  }
+
+  ngOnInit() {
   }
 
   public hasGlobals(): boolean {
@@ -83,4 +63,26 @@ export class OperatorListComponent implements OnInit {
     return this.operatorList
       .filter(opDef => opDef.getName().toLowerCase().indexOf(this.filterString.toLowerCase()) !== -1);
   }
+
+  public emitOperatorSelected(op: OperatorDef) {
+    this.operatorSelected.emit(op);
+  }
+
+  public localOperatorList(): Array<{ newGroup: boolean, name: string, opDef: OperatorDef }> {
+    return OperatorListComponent.groupOperatorList(
+      this.filteredOperatorList()
+        .filter(op => op.isLocal())
+        .sort(compareOperatorDefs),
+      (opNameList: string[]) => opNameList.join('.'));
+  }
+
+  public globalOperatorList(): Array<{ newGroup: boolean, name: string, opDef: OperatorDef }> {
+    return OperatorListComponent.groupOperatorList(
+      this.filteredOperatorList()
+        .filter(opDef => opDef.isGlobal())
+        .sort(compareOperatorDefs),
+      (opNameList: string[]) => opNameList[opNameList.length - 1]
+    );
+  }
 }
+

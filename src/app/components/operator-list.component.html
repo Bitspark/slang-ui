@@ -8,10 +8,10 @@
   <div class="sl-operator-list">
     <h4>Your Local Operators</h4>
     <ul class="list-group">
-      <li class="list-group-item"
+      <li class="list-group-item" [ngClass]="{'list-group-item-secondary': li.newGroup}"
           *ngFor="let li of localOperatorList()">
         <span class="sl-operator-name">{{ li.name }}</span>
-        <button class="btn btn-sm btn-link" (click)="emitOperatorSelected(li.opDef)">
+        <button *ngIf="!li.newGroup" class="btn btn-sm btn-link" (click)="emitOperatorSelected(li.opDef)">
           <i class="fas" [ngClass]="buttonIcon"></i>
         </button>
       </li>
