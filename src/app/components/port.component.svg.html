@@ -21,9 +21,8 @@
   </svg:g>
 
   <!-- Stream -->
-  <svg:rect *ngIf="port.isStream()" fill="white" stroke-width="2" fill="transparent"
+  <svg:rect *ngIf="port.isStream()" stroke-width="2" fill="transparent" stroke="transparent"
             paint-order="stroke fill"
-            [ngClass]="getCSSClass()"
             [attr.width]="port.getWidth()" [attr.height]="port.getHeight()"/>
   <svg:g *ngIf="port.isStream()" [attr.transform]="transform(port.getStream())" app-port [port]="port.getStream()"
          (select)="select.emit($event)" (hover)="handleHover($event)" [selectedEntity]="selectedEntity"></svg:g>
