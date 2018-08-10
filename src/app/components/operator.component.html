@@ -69,16 +69,6 @@
 
 
             <svg:g *ngIf="operator">
-              <!-- Instances without Ports -->
-              <svg:g *ngFor="let ins of visualInstances()">
-                <!-- [ngClass]="{selected: isSelected(ins)}" -->
-                <svg:text text-anchor="middle" alignment-baseline="middle"
-                          [attr.x]="ins.getCenterX()" [attr.y]="ins.getCenterY()"
-                          (mousedown)="selectInstance(ins)">
-                  {{text(ins)}}
-                </svg:text>
-              </svg:g>
-
               <!-- Visible Connections -->
               <svg:path *ngFor="let conn of visualConnections()"
                         class="sl-svg-conn"
@@ -96,6 +86,16 @@
                         (click)="selectConnection(conn)"
                         (mouseover)="hover(conn)" (mouseout)="hover(null)"
                         [attr.d]="connectionPoints(conn)"></svg:path>
+
+              <!-- Just Instance Names -->
+              <svg:g *ngFor="let ins of visualInstances()">
+                <!-- [ngClass]="{selected: isSelected(ins)}" -->
+                <svg:text text-anchor="middle" alignment-baseline="middle"
+                          [attr.x]="ins.getCenterX()" [attr.y]="ins.getCenterY()"
+                          (mousedown)="selectInstance(ins)">
+                  {{text(ins)}}
+                </svg:text>
+              </svg:g>
 
               <!-- Port Text/Labels -->
               <svg:g *ngFor="let port of getPorts()"
