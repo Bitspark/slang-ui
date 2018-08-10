@@ -94,17 +94,17 @@
               <svg:path *ngFor="let conn of visualConnections()"
                         class="sl-svg-conn-click-overlay"
                         (click)="selectConnection(conn)"
-                        (mouseover)="hoverConnection(conn)" (mouseout)="unhoverConnection()"
+                        (mouseover)="hover(conn)" (mouseout)="hover(null)"
                         [attr.d]="connectionPoints(conn)"></svg:path>
 
               <!-- Port Text/Labels -->
-              <svg:g *ngFor="let port of getPorts()" (click)="selectPort(port)"
+              <svg:g *ngFor="let port of getPorts()"
                      [attr.transform]="translatePort(port)">
                 <svg:text [attr.text-anchor]="getPortLabelAnchor(port)" alignment-baseline="middle"
                           [attr.transform]="transformLabel(port)"
                           [attr.x]="getPortLabelX(port)" [attr.y]="getPortLabelY(port)"
                           class="sl-svg-port-label"
-                          [ngClass]="{selected: isSelected(port)}">
+                          [ngClass]="getPortLabelCSSClass(port)">
                   {{port.getName()}}
                 </svg:text>
               </svg:g>
@@ -113,22 +113,26 @@
                 <!-- Delegates -->
                 <svg:g *ngFor="let dlg of operator.getDelegates()" [attr.transform]="transform(dlg)">
                   <svg:g [attr.transform]="transform(dlg.getIn())" app-port [port]="dlg.getIn()"
-                         (select)="selectPort($event)"
+                         (hover)="hover($event)" (select)="selectPort($event)"
                          [selectedEntity]="selectedEntity"></svg:g>
                   <svg:g [attr.transform]="transform(dlg.getOut())" app-port [port]="dlg.getOut()"
-                         (select)="selectPort($event)" [selectedEntity]="selectedEntity"></svg:g>
+                         (hover)="hover($event)" (select)="selectPort($event)"
+                         [selectedEntity]="selectedEntity"></svg:g>
                 </svg:g>
                 <!-- Services -->
                 <svg:g>
                   <svg:g [attr.transform]="transform(operator.getMainIn())" app-port [port]="operator.getMainIn()"
-                         (select)="selectPort($event)" [selectedEntity]="selectedEntity"></svg:g>
+                         (hover)="hover($event)" (select)="selectPort($event)"
+                         [selectedEntity]="selectedEntity"></svg:g>
                   <svg:g [attr.transform]="transform(operator.getMainOut())" app-port [port]="operator.getMainOut()"
-                         (select)="selectPort($event)" [selectedEntity]="selectedEntity"></svg:g>
+                         (hover)="hover($event)" (select)="selectPort($event)"
+                         [selectedEntity]="selectedEntity"></svg:g>
                 </svg:g>
                 <!-- Instance ports -->
                 <svg:g app-instance *ngFor="let ins of visualInstances()"
                        [instance]="ins" [aspect]="'port'" [selectedEntity]="selectedEntity"
-                       (selectPort)="selectPort($event)" (selectInstance)="selectInstance($event)">
+                       (hoverPort)="hover($event)" (selectPort)="selectPort($event)"
+                       (selectInstance)="selectInstance($event)">
                 </svg:g>
                 <!-- Surrounding operator resizer -->
                 <svg:circle [attr.cx]="operator.getWidth() - 20" [attr.cy]="operator.getHeight() - 20"

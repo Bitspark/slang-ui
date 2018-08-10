@@ -18,6 +18,8 @@ export class InstanceComponent implements OnInit {
   private fqn = '';
 
   @Output()
+  public hoverPort: EventEmitter<any> = new EventEmitter();
+  @Output()
   public selectPort: EventEmitter<any> = new EventEmitter();
   @Output()
   public selectInstance: EventEmitter<any> = new EventEmitter();

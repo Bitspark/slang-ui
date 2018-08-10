@@ -21,13 +21,17 @@
   <svg:g *ngIf="aspect === 'port'">
     <svg:g *ngFor="let dlg of instance.getDelegates()" [attr.transform]="transform(dlg)">
       <svg:g [attr.transform]="transform(dlg.getIn())" app-port [port]="dlg.getIn()"
-             (select)="selectPort.emit($event)" [selectedEntity]="selectedEntity"></svg:g>
+             (select)="selectPort.emit($event)" (hover)="hoverPort.emit($event)"
+             [selectedEntity]="selectedEntity"></svg:g>
       <svg:g [attr.transform]="transform(dlg.getOut())" app-port [port]="dlg.getOut()"
-             (select)="selectPort.emit($event)" [selectedEntity]="selectedEntity"></svg:g>
+             (select)="selectPort.emit($event)" (hover)="hoverPort.emit($event)"
+             [selectedEntity]="selectedEntity"></svg:g>
     </svg:g>
     <svg:g [attr.transform]="transform(instance.getMainIn())" app-port [port]="instance.getMainIn()"
-           (select)="selectPort.emit($event)" [selectedEntity]="selectedEntity"></svg:g>
+           (select)="selectPort.emit($event)" (hover)="hoverPort.emit($event)"
+           [selectedEntity]="selectedEntity"></svg:g>
     <svg:g [attr.transform]="transform(instance.getMainOut())" app-port [port]="instance.getMainOut()"
-           (select)="selectPort.emit($event)" [selectedEntity]="selectedEntity"></svg:g>
+           (select)="selectPort.emit($event)" (hover)="hoverPort.emit($event)"
+           [selectedEntity]="selectedEntity"></svg:g>
   </svg:g>
 </svg:g>

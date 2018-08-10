@@ -57,7 +57,7 @@ export class OperatorComponent implements OnInit {
   };
 
   // Visual
-  public hoveredConn: Connection = null;
+  public hoveredEntity: { entity: Port | Connection } = {entity: null as any};
   public selectedEntity = {entity: null as any};
   public scale = 0.6;
   public isOperatorSaved = false;
@@ -356,16 +356,12 @@ export class OperatorComponent implements OnInit {
     return Array.from(this.operator.getConnections().values());
   }
 
-  public hoverConnection(conn: Connection) {
-    return this.hoveredConn = conn;
+  public hover(e: Port | Connection | null) {
+    this.hoveredEntity.entity = e;
   }
 
-  public unhoverConnection() {
-    return this.hoveredConn = null;
-  }
-
-  public isHovered(conn: Connection): boolean {
-    return this.hoveredConn === conn;
+  public isHovered(e: Port | Connection): boolean {
+    return this.hoveredEntity.entity === e;
   }
 
   public selectInstance(ins: OperatorInstance) {
@@ -528,6 +524,12 @@ export class OperatorComponent implements OnInit {
   public removePropertyDef(propName: string) {
     delete this.propertyDefs[propName];
     this.refresh();
+  }
+
+  public getPortLabelCSSClass(port: Port): any {
+    const cssClasses = {};
+    cssClasses['displayed'] = this.isSelected(port) || this.isHovered(port); // || this.isAnyRelatedConnectionHovered(port);
+    return cssClasses;
   }
 
   public getPorts(): Array<Port> {
