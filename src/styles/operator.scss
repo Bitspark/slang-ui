@@ -142,9 +142,17 @@ svg {
     }
   }
   .sl-svg-port-label {
-    &:hover {
+    stroke: none;
+    fill: none;
+    &.displayed {
+      fill: $body-color;
       stroke: $svg-hovered;
     }
+  }
+  .sl-svg-port-click-overlay {
+    fill: transparent;
+    stroke: transparent;
+    stroke-width: 6px;
   }
 }
 

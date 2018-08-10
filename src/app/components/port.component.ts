@@ -14,7 +14,9 @@ export class PortComponent {
   public port: Port;
 
   @Output()
-  public select: EventEmitter<any> = new EventEmitter();
+  public select: EventEmitter<Port> = new EventEmitter();
+  @Output()
+  public hover: EventEmitter<Port> = new EventEmitter();
   @Input()
   public selectedEntity: any;
 
@@ -27,6 +29,15 @@ export class PortComponent {
     cssClass['out'] = this.port.isOut();
     cssClass['hovered'] = this.hovered;
     return cssClass;
+  }
+
+  public handleHover(port: Port) {
+    this.hovered = port != null;
+    if (this.hovered) {
+      this.hover.emit(port);
+    } else {
+      this.hover.emit(null);
+    }
   }
 
   public isSelected() {

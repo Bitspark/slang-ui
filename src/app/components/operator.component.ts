@@ -57,7 +57,7 @@ export class OperatorComponent implements OnInit {
   };
 
   // Visual
-  public hoveredConn: Connection = null;
+  public hoveredEntity: { entity: Port | Connection } = {entity: null as any};
   public selectedEntity = {entity: null as any};
   public scale = 0.6;
   public isOperatorSaved = false;
@@ -356,16 +356,20 @@ export class OperatorComponent implements OnInit {
     return Array.from(this.operator.getConnections().values());
   }
 
-  public hoverConnection(conn: Connection) {
-    return this.hoveredConn = conn;
+  public hover(e: Port | Connection | null) {
+    this.hoveredEntity.entity = e;
   }
 
-  public unhoverConnection() {
-    return this.hoveredConn = null;
+  public isAnyEntityHovered(): boolean {
+    return this.hoveredEntity.entity !== null;
   }
 
-  public isHovered(conn: Connection): boolean {
-    return this.hoveredConn === conn;
+  public isHovered(e: Port | Connection): boolean {
+    return this.hoveredEntity.entity === e;
+  }
+
+  public isConnectionHovered(): boolean {
+    return this.isAnyEntityHovered() && this.hoveredEntity.entity instanceof Connection;
   }
 
   public selectInstance(ins: OperatorInstance) {
@@ -389,6 +393,22 @@ export class OperatorComponent implements OnInit {
   public isInstanceSelected(): boolean {
     return this.isAnyEntitySelected() && this.selectedEntity.entity !== this.operator &&
       this.selectedEntity.entity instanceof OperatorInstance;
+  }
+
+  public isConnectionSelected(): boolean {
+    return this.isAnyEntitySelected() && this.selectedEntity.entity instanceof Connection;
+  }
+
+  public isPortRelatedToConnection(c: Connection, p: Port): boolean {
+    const srcPorts = c.getSource().getPrimitivePorts();
+    if (srcPorts.filter(_p => _p === p).length) {
+      return true;
+    }
+    const dstPorts = c.getDestination().getPrimitivePorts();
+    if (dstPorts.filter(_p => _p === p).length) {
+      return true;
+    }
+    return false;
   }
 
   public getSelectedInstanceName(): string {
@@ -528,6 +548,14 @@ export class OperatorComponent implements OnInit {
   public removePropertyDef(propName: string) {
     delete this.propertyDefs[propName];
     this.refresh();
+  }
+
+  public getPortLabelCSSClass(port: Port): any {
+    const cssClasses = {};
+    cssClasses['displayed'] = this.isHovered(port) || this.isSelected(port) ||
+      this.isConnectionHovered() && this.isPortRelatedToConnection(this.hoveredEntity.entity as Connection, port) ||
+      this.isConnectionSelected() && this.isPortRelatedToConnection(this.selectedEntity.entity as Connection, port);
+    return cssClasses;
   }
 
   public getPorts(): Array<Port> {
