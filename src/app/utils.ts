@@ -546,6 +546,9 @@ export class SVGConnectionLineGenerator {
 
   private static vectorToUnitVector(v: Vec2): [Vec2, number] {
     const magnitude = Math.sqrt(v.x * v.x + v.y * v.y);
+    if (magnitude === 0) {
+      return [v, magnitude];
+    }
     return [v.div(magnitude), magnitude];
   }
 

@@ -797,6 +797,10 @@ export class OperatorComponent implements OnInit {
     this.debugState = null;
   }
 
+  public clearOutput() {
+    this.debuggingReponses = [];
+  }
+
 }
 
 class MouseMoveTracker {

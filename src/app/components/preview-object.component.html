@@ -1,0 +1,36 @@
+<div>
+  <div *ngIf="isPrimitive(object)" class="value" [ngClass]="colorClass(object)">
+    {{toString(object)}}
+  </div>
+
+  <div *ngIf="isImage(object)">
+    <div *ngIf="object.name">
+      {{object.name}}, <a [href]="fileDownload(object.image)" [download]="object.name"><i class="fa fa-download"></i></a>
+      <div>
+        <img *ngIf="object.name" [src]="imageSrc(object.image)" />
+      </div>
+    </div>
+    <div *ngIf="!object.name">
+      <i>No image</i>
+    </div>
+  </div>
+
+  <div *ngIf="isFile(object)">
+    <div *ngIf="object.name">
+      {{object.name}}, <a *ngIf="object.name && object.file" [href]="fileDownload(object.file)" [download]="object.name"><i class="fa fa-download"></i></a>
+    </div>
+  </div>
+
+  <div *ngIf="isStream(object)">
+    <div *ngFor="let item of object" class="entry item">
+      <app-preview-object class="inline" [object]="item"></app-preview-object>
+    </div>
+  </div>
+
+  <div *ngIf="isMap(object)">
+    <div *ngFor="let item of object | keyvalue" class="entry">
+      {{item.key}}:
+      <app-preview-object class="inline" [object]="item.value"></app-preview-object>
+    </div>
+  </div>
+</div>

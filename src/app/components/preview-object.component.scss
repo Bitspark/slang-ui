@@ -1,0 +1,57 @@
+@import "../../styles/variables.scss";
+
+.entry {
+  margin-left: 5px;
+  border-left: 1px solid $gray;
+  padding-left: 2px;
+}
+
+.item {
+  border-bottom: 1px dotted $gray;
+}
+
+.value {
+  display: inline-block;
+  padding: 2px;
+  margin: 2px;
+  border-radius: 5px;
+}
+
+.inline {
+  vertical-align: top;
+  display: inline-block;
+}
+
+.stream-item {
+  border: 1px solid $gray;
+  margin: 5px;
+}
+
+.string {
+  background-color: #984ea3;
+  color: white;
+}
+
+.number {
+  background-color: #377eb8;
+  color: white;
+}
+
+.boolean {
+  background-color: #1b9e77;
+  color: white;
+}
+
+.binary {
+  background-color: #FBEB56;
+  color: black;
+}
+
+.primitive {
+  background-color: #5bcbca;
+  color: black;
+}
+
+.trigger {
+  background-color: #767675;
+}

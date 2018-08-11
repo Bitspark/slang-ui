@@ -15,6 +15,7 @@ import {InstanceComponent} from './components/instance.component';
 import {PortComponent} from './components/port.component';
 import {TypeDefFormComponent} from './components/type-def-form.component';
 import {TypeValueFormComponent} from './components/type-value-form.component';
+import {PreviewObjectComponent} from './components/preview-object.component';
 
 import {ApiService} from './services/api.service';
 import {OperatorService} from './services/operator.service';
@@ -27,7 +28,8 @@ import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 @NgModule({
   declarations: [
     AppComponent, IndexComponent, TypeDefFormComponent, TypeValueFormComponent,
-    OperatorListComponent, OperatorComponent, InstanceComponent, PortComponent
+    OperatorListComponent, OperatorComponent, InstanceComponent, PortComponent,
+    PreviewObjectComponent
   ],
   imports: [
     NgbModule.forRoot(),

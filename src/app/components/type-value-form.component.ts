@@ -8,6 +8,31 @@ import {createDefaultValue} from '../utils';
 })
 export class TypeValueFormComponent implements OnInit, OnChanges {
 
+  private specialTypes = {
+    'file': {
+      type: 'map',
+      map: {
+        'file': {
+          type: 'binary'
+        },
+        'name': {
+          type: 'string'
+        }
+      }
+    },
+    'image': {
+      type: 'map',
+      map: {
+        'image': {
+          type: 'binary'
+        },
+        'name': {
+          type: 'string'
+        }
+      }
+    }
+  };
+
   constructor() {
   }
 
@@ -79,15 +104,63 @@ export class TypeValueFormComponent implements OnInit, OnChanges {
   }
 
   public selectFile(event) {
+    const special = this.specialType();
+
     const file = event.srcElement.files[0];
     const reader = new FileReader();
     const that = this;
     reader.onload = function() {
       const data = reader.result;
       const base64 = data.substr(data.indexOf(',') + 1);
-      that.typeValue = 'base64:' + base64;
+      if (!special) {
+        that.typeValue = 'base64:' + base64;
+      } else {
+        switch (special) {
+          case 'file':
+            that.typeValue.name = file.name;
+            that.typeValue.file = 'base64:' + base64;
+            break;
+          case 'image':
+            that.typeValue.name = file.name;
+            that.typeValue.image = 'base64:' + base64;
+            break;
+        }
+      }
     };
     reader.readAsDataURL(file);
+  }
+
+  public mapContains(def: any, test: any): boolean {
+    if (typeof def !== 'object' || typeof test !== 'object') {
+      return def === test;
+    }
+    for (const entry in def) {
+      if (def.hasOwnProperty(entry)) {
+        if (!test[entry]) {
+          return false;
+        }
+        if (!this.mapContains(def[entry], test[entry])) {
+          return false;
+        }
+      }
+    }
+    return true;
+  }
+
+  public hasType(def: any, test: any): boolean {
+    return this.mapContains(def, test) && this.mapContains(test, def);
+  }
+
+  public specialType(): string {
+    for (const spec in this.specialTypes) {
+      if (this.specialTypes.hasOwnProperty(spec)) {
+        const specType = this.specialTypes[spec];
+        if (this.hasType(this.typeDef, specType)) {
+          return spec;
+        }
+      }
+    }
+    return undefined;
   }
 
 }
