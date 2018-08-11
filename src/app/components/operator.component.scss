@@ -94,9 +94,17 @@
     padding: 8px 0 8px 0;
     display: flex;
 
-    .preview-object, .response {
+    .preview-object {
       font-size: 0.7em;
       color: $body-color;
+    }
+
+    .response {
+      border: 1px solid $gray;
+      padding: 5px;
+      margin-bottom: 10px;
+      border-radius: 5px;
+      background-color: white;
     }
 
     h6 {

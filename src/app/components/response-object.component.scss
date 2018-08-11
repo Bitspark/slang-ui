@@ -1,0 +1,14 @@
+@import "../../styles/variables.scss";
+
+.response {
+  margin-left: 5px;
+}
+
+.value {
+  display: inline-block;
+  padding: 3px;
+  background-color: $cyan;
+  border-radius: 5px;
+  color: white;
+  min-height: 28px;
+}

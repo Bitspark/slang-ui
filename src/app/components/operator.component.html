@@ -175,7 +175,9 @@
           <div>
             <div *ngIf="debugState === 'debugging'">
               <h4><i class="fas fa-arrow-down"></i> Output</h4>
-              <pre class="response" *ngFor="let resp of debuggingReponses">{{ stringify(resp) }}</pre>
+              <div *ngFor="let resp of debuggingReponses" class="response">
+                <app-response-object [object]="resp"></app-response-object>
+              </div>
             </div>
             <div *ngIf="debugState === 'specifying'">
               <h4><i class="fas fa-stream"></i> Properties</h4>
