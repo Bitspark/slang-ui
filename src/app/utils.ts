@@ -546,6 +546,9 @@ export class SVGConnectionLineGenerator {
 
   private static vectorToUnitVector(v: Vec2): [Vec2, number] {
     const magnitude = Math.sqrt(v.x * v.x + v.y * v.y);
+    if (magnitude === 0) {
+      return [v, magnitude];
+    }
     return [v.div(magnitude), magnitude];
   }
 
@@ -573,6 +576,7 @@ export class SVGConnectionLineGenerator {
       const p1 = points[i];
       const p2 = points[i + 1];
       const p3 = points[i + 2];
+      console.log(this.roundOneCorner(p1, p2, p3));
       svgPath += this.printPath(this.roundOneCorner(p1, p2, p3)) + ' ';
     }
     svgPath += `L ${points[points.length - 1].x} ${points[points.length - 1].y}`;
