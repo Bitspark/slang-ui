@@ -18,6 +18,9 @@ export class PreviewObjectComponent {
   }
 
   public colorClass(obj: any): string {
+    if (typeof obj === 'string' && (obj as string).startsWith('base64:')) {
+      return 'binary';
+    }
     return typeof obj;
   }
 
@@ -62,6 +65,14 @@ export class PreviewObjectComponent {
 
   public isMap(obj: any): boolean {
     return !this.isImage(obj) && !this.isFile(obj) && !Array.isArray(obj) && typeof obj === 'object';
+  }
+
+  public toString(obj: any): string {
+    const str = obj.toString();
+    if (str.length < 64) {
+      return str;
+    }
+    return `${str.substr(0, 40)}... (${str.length})`;
   }
 }
 
