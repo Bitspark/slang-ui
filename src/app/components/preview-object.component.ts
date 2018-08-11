@@ -2,11 +2,11 @@ import {Component, Input} from '@angular/core';
 import {DomSanitizer, SafeUrl} from '@angular/platform-browser';
 
 @Component({
-  selector: 'app-response-object',
-  templateUrl: './response-object.component.html',
-  styleUrls: ['./response-object.component.scss']
+  selector: 'app-preview-object',
+  templateUrl: './preview-object.component.html',
+  styleUrls: ['./preview-object.component.scss']
 })
-export class ResponseObjectComponent {
+export class PreviewObjectComponent {
   @Input()
   public object: any;
 
@@ -42,7 +42,11 @@ export class ResponseObjectComponent {
   }
 
   public imageSrc(obj: any): SafeUrl {
-    return this.sanitizer.bypassSecurityTrustUrl('data:image;base64,' + (obj as string).substr(7));
+    return this.sanitizer.bypassSecurityTrustUrl('data:image/png;base64,' + (obj as string).substr(7));
+  }
+
+  public fileDownload(file: string): SafeUrl {
+    return this.sanitizer.bypassSecurityTrustUrl('data:image/png;base64,' + file.substr(7));
   }
 
   public isStream(obj: any): boolean {

@@ -157,7 +157,9 @@
                 <button [disabled]="!running" (click)="sendInputValue(inputValue)">Send</button>
               </div>
               <h6>Preview object</h6>
-              <pre class="preview-object">{{ stringify(inputValue) }}</pre>
+              <div class="preview">
+                <app-preview-object [object]="inputValue"></app-preview-object>
+              </div>
             </div>
             <div *ngIf="debugState === 'specifying'">
               <h4><i class="fas fa-plug"></i> Generics</h4>
@@ -175,8 +177,11 @@
           <div>
             <div *ngIf="debugState === 'debugging'">
               <h4><i class="fas fa-arrow-down"></i> Output</h4>
-              <div *ngFor="let resp of debuggingReponses" class="response">
-                <app-response-object [object]="resp"></app-response-object>
+              <div class="output-options">
+                <button *ngIf="debuggingReponses.length > 0" (click)="clearOutput()"><i class="fa fa-broom"></i> clear</button>
+              </div>
+              <div *ngFor="let resp of debuggingReponses" class="preview">
+                <app-preview-object [object]="resp"></app-preview-object>
               </div>
             </div>
             <div *ngIf="debugState === 'specifying'">
@@ -205,7 +210,7 @@
           </div>
         </div>
       </div>
-      <div id="sl-instance-sidebar" class="d-none d-md-block sl-ui-sidebar col-2">
+      <div id="sl-instance-sidebar" class="d-none d-md-block sl-ui-sidebar col-2" *ngIf="!debugState">
         <div class="sl-ui-scrollable">
           <h4>Main operator</h4>
           <h5>

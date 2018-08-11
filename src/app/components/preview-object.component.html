@@ -1,0 +1,27 @@
+<div class="response">
+  <div *ngIf="isPrimitive(object)" class="value">
+    {{object}}
+  </div>
+
+  <div *ngIf="isImage(object)">
+    {{object.name}} <a *ngIf="object.name && object.image" [href]="fileDownload(object.image)" [download]="object.name"><i class="fa fa-download"></i> download</a>
+    <img *ngIf="object.image" [src]="imageSrc(object.image)" />
+  </div>
+
+  <div *ngIf="isFile(object)">
+    {{object.name}} <a *ngIf="object.name && object.file" [href]="fileDownload(object.file)" [download]="object.name"><i class="fa fa-download"></i> download</a>
+  </div>
+
+  <div *ngIf="isStream(object)">
+    <div *ngFor="let item of object">
+      <app-preview-object [object]="item"></app-preview-object>
+    </div>
+  </div>
+
+  <div *ngIf="isMap(object)">
+    <div *ngFor="let item of object | keyvalue">
+      &bull; {{item.key}}
+      <app-preview-object [object]="item.value"></app-preview-object>
+    </div>
+  </div>
+</div>
