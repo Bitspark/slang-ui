@@ -1,14 +1,37 @@
 @import "../../styles/variables.scss";
 
-.response {
+.preview {
   margin-left: 5px;
 }
 
 .value {
   display: inline-block;
-  padding: 3px;
-  background-color: $cyan;
+  padding: 2px;
+  margin: 2px;
   border-radius: 5px;
   color: white;
-  min-height: 28px;
+}
+
+.string {
+  background-color: #984ea3;
+}
+
+.number {
+  background-color: #377eb8;
+}
+
+.boolean {
+  background-color: #1b9e77;
+}
+
+.binary {
+  background-color: #FBEB56;
+}
+
+.primitive {
+  background-color: #5bcbca;
+}
+
+.trigger {
+  background-color: #767675;
 }

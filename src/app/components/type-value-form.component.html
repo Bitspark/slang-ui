@@ -1,5 +1,5 @@
 <div style="display: inline-block; vertical-align: top; margin-bottom: 5px">
-  <div *ngIf="!specialType(typeDef)">
+  <div *ngIf="!specialType()">
     <div *ngIf="typeDef.type === 'generic'">
       <input [(ngModel)]="typeValue" type="text" title="value" />
     </div>
@@ -38,11 +38,11 @@
       <button (click)="add()">Add</button>
     </div>
   </div>
-  <div *ngIf="specialType(typeDef) === 'image'">
+  <div *ngIf="specialType() === 'image'">
     Image file:
     <input class="upload" type="file" (change)="selectFile($event)" />
   </div>
-  <div *ngIf="specialType(typeDef) === 'file'">
+  <div *ngIf="specialType() === 'file'">
     File:
     <input class="upload" type="file" (change)="selectFile($event)" />
   </div>

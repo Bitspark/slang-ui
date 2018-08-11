@@ -1,5 +1,5 @@
-<div class="response">
-  <div *ngIf="isPrimitive(object)" class="value">
+<div class="preview">
+  <div *ngIf="isPrimitive(object)" class="value" [ngClass]="colorClass(object)">
     {{object}}
   </div>
 

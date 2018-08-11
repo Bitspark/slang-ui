@@ -17,7 +17,14 @@ export class PreviewObjectComponent {
     return ['string', 'number', 'boolean'].indexOf(typeof obj) !== -1;
   }
 
+  public colorClass(obj: any): string {
+    return typeof obj;
+  }
+
   public isType(obj: any, entries: Array<string>): boolean {
+    if (!obj) {
+      return false;
+    }
     for (const entry of entries) {
       if (!obj.hasOwnProperty(entry)) {
         return false;

@@ -576,7 +576,6 @@ export class SVGConnectionLineGenerator {
       const p1 = points[i];
       const p2 = points[i + 1];
       const p3 = points[i + 2];
-      console.log(this.roundOneCorner(p1, p2, p3));
       svgPath += this.printPath(this.roundOneCorner(p1, p2, p3)) + ' ';
     }
     svgPath += `L ${points[points.length - 1].x} ${points[points.length - 1].y}`;
