@@ -51,6 +51,35 @@ export class PreviewObjectComponent {
     return this.isType(obj, ['file', 'name']);
   }
 
+  public isColor(obj: any): boolean {
+    return this.isType(obj, ['red', 'green', 'blue']);
+  }
+
+  public colorHex(obj: any): string {
+    const rgbToHex = function (rgb) {
+      let hex = Number(rgb).toString(16);
+      if (hex.length < 2) {
+        hex = '0' + hex;
+      }
+      return hex;
+    };
+
+    return '#' +
+      rgbToHex(Math.floor(obj.red / 256)) +
+      rgbToHex(Math.floor(obj.green / 256)) +
+      rgbToHex(Math.floor(obj.blue / 256));
+  }
+
+  public colorRGB48(obj: any): string {
+    return `R: ${Math.floor(obj.red)}, G: ${Math.floor(obj.green)}, B: ${Math.floor(obj.blue)}`;
+  }
+
+  public colorStyle(obj): any {
+    return {
+      'background-color': `rgb(${obj.red / 255}, ${obj.green / 255}, ${obj.blue / 255})`
+    };
+  }
+
   public imageSrc(obj: any): SafeUrl {
     return this.sanitizer.bypassSecurityTrustUrl('data:image/png;base64,' + (obj as string).substr(7));
   }
@@ -64,7 +93,7 @@ export class PreviewObjectComponent {
   }
 
   public isMap(obj: any): boolean {
-    return !this.isImage(obj) && !this.isFile(obj) && !Array.isArray(obj) && typeof obj === 'object';
+    return !this.isImage(obj) && !this.isFile(obj) && !this.isColor(obj) && !Array.isArray(obj) && typeof obj === 'object';
   }
 
   public toString(obj: any): string {
