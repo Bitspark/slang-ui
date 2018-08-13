@@ -21,6 +21,14 @@
     </div>
   </div>
 
+  <div *ngIf="isColor(object)">
+    <div class="color-box" [ngStyle]="colorStyle(object)"></div>
+    <div class="color-details">
+      RGB48: {{colorRGB48(object)}}<br>
+      HEX: {{colorHex(object)}}
+    </div>
+  </div>
+
   <div *ngIf="isStream(object)">
     <div *ngFor="let item of object" class="entry item">
       <app-preview-object class="inline" [object]="item"></app-preview-object>
