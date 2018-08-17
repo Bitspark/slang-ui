@@ -4,6 +4,7 @@ import {BrowserModule} from '@angular/platform-browser';
 import {FormsModule} from '@angular/forms';
 import {HttpClientModule} from '@angular/common/http';
 import {CodemirrorModule} from 'ng2-codemirror';
+import {FileUploadModule} from 'ng2-file-upload';
 
 import {AppRoutes} from './app.routes';
 
@@ -41,7 +42,8 @@ import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
     BrowserAnimationsModule,
     FormsModule,
     HttpClientModule,
-    CodemirrorModule
+    CodemirrorModule,
+    FileUploadModule
   ],
   providers: [ApiService, OperatorService, VisualService],
   bootstrap: [AppComponent]

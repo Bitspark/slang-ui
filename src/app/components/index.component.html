@@ -2,15 +2,23 @@
   <div id="sl-main-content">
     <div class="row" id="sl-main-row">
       <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 sl-col" id="sl-operators-col">
+        <div id="sl-operator-list">
           <app-operator-list [buttonIcon]="'fa-arrow-right'" [operatorList]="getLocals()"
                              (operatorSelected)="openOperator($event)"></app-operator-list>
-          <div class="sl-ui-form-box input-group">
-            <input type="text" class="form-control" placeholder="New operator" [ngClass]="{'border-danger text-danger': creatingOperatorFailed}" [(ngModel)]="newOperatorName"/>
-            <div class="input-group-append">
-              <button class="btn btn-primary" (click)="newOperator(newOperatorName.trim())"><i class="fas fa-plus-square"></i></button>
-            </div>
-        </div>
 
+        </div>
+        <div class="sl-ui-form-box input-group">
+          <input type="text" class="form-control" placeholder="New operator" [ngClass]="{'border-danger text-danger': creatingOperatorFailed}" [(ngModel)]="newOperatorName"/>
+          <div class="input-group-append">
+            <button class="btn btn-primary" (click)="newOperator(newOperatorName.trim())"><i class="fas fa-plus-square"></i></button>
+          </div>
+        </div>
+        <div class="sl-ui-form-box input-group">
+          <input type="file" class="form-control" name="file" ng2FileSelect [uploader]="uploader" />
+          <div class="input-group-append">
+            <button class="btn btn-primary" (click)="upload()" [disabled]="!uploader.getNotUploadedItems().length"><i class="fas fa-upload"></i></button>
+          </div>
+        </div>
       </div>
 
       <div class="col-xl-10 col-lg-9 col-md-8 col-sm-6 sl-col" id="sl-info-col">
