@@ -10,11 +10,17 @@
   border-bottom: 1px dotted $gray;
 }
 
-.value {
+div.value {
   display: inline-block;
   padding: 2px;
   margin: 2px;
   border-radius: 5px;
+}
+
+textarea.value {
+  width: 300px;
+  white-space: nowrap;
+  overflow: scroll;
 }
 
 .inline {
