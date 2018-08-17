@@ -4,6 +4,8 @@ import {OperatorDef} from '../classes/operator';
 import {Router} from '@angular/router';
 import {HttpClient, HttpHeaders, HttpParams} from '@angular/common/http';
 import * as initialDef from '../initial-def.json';
+import {FileUploader} from "ng2-file-upload";
+import {ApiService} from "../services/api.service";
 
 
 @Component({
@@ -21,7 +23,13 @@ export class IndexComponent {
   public feedbackMessage = '';
   public feedbackThankYou = false;
 
-  constructor(private http: HttpClient, private router: Router, public operators: OperatorService) {
+  public uploader: FileUploader;
+
+  constructor(private api: ApiService, private http: HttpClient, private router: Router, public operators: OperatorService) {
+    this.uploader = new FileUploader({url: this.api.uploadUrl(), itemAlias: 'file'});
+    this.uploader.onBeforeUploadItem = (item) => {
+      item.withCredentials = false;
+    };
   }
 
   public async refreshOperators() {
@@ -41,6 +49,11 @@ export class IndexComponent {
       this.operators.addLocal(newOperator);
       await this.openOperator(newOperator);
     }
+  }
+
+  public async upload() {
+    await this.uploader.uploadAll();
+    await this.refreshOperators();
   }
 
   public async save(opDef: OperatorDef): Promise<boolean> {

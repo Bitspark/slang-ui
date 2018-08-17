@@ -23,6 +23,14 @@
       height: 100%;
       width: 100%;
 
+      .input-group {
+        margin-top: 10px;
+      }
+
+      #sl-operator-list {
+        height: calc(100% - 94px);
+      }
+
       .sl-col {
         height: 100%;
       }

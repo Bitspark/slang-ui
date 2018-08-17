@@ -25,4 +25,8 @@ export class ApiService {
     return `${ApiService.host}/share/export?fqop=${fqop}`;
   }
 
+  public uploadUrl(): string {
+    return `${ApiService.host}/share/import`;
+  }
+
 }
