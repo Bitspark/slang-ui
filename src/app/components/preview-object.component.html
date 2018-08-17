@@ -1,7 +1,8 @@
 <div>
-  <div *ngIf="isPrimitive(object)" class="value" [ngClass]="colorClass(object)">
+  <div *ngIf="isPrimitive(object) && !expand" class="value" [ngClass]="colorClass(object)" (click)="expand = true">
     {{toString(object)}}
   </div>
+  <textarea class="value" *ngIf="expand" [value]="object"></textarea>
 
   <div *ngIf="isImage(object)">
     <div *ngIf="object.name">

@@ -9,6 +9,7 @@ import {DomSanitizer, SafeUrl} from '@angular/platform-browser';
 export class PreviewObjectComponent {
   @Input()
   public object: any;
+  public expand = false;
 
   constructor(private sanitizer: DomSanitizer) {
   }
