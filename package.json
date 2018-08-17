@@ -26,6 +26,7 @@
     "core-js": "^2.5.4",
     "js-yaml": "^3.11.0",
     "ng2-codemirror": "^1.1.3",
+    "ng2-file-upload": "^1.3.0",
     "rxjs": "^6.1.0",
     "zone.js": "^0.8.26"
   },

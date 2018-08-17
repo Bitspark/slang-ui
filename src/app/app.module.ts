@@ -4,6 +4,7 @@ import {BrowserModule} from '@angular/platform-browser';
 import {FormsModule} from '@angular/forms';
 import {HttpClientModule} from '@angular/common/http';
 import {CodemirrorModule} from 'ng2-codemirror';
+import {FileSelectDirective} from 'ng2-file-upload';
 
 import {AppRoutes} from './app.routes';
 
@@ -29,7 +30,7 @@ import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
   declarations: [
     AppComponent, IndexComponent, TypeDefFormComponent, TypeValueFormComponent,
     OperatorListComponent, OperatorComponent, InstanceComponent, PortComponent,
-    PreviewObjectComponent
+    PreviewObjectComponent, FileSelectDirective
   ],
   imports: [
     NgbModule.forRoot(),
