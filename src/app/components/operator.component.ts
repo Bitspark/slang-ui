@@ -164,6 +164,11 @@ export class OperatorComponent implements OnInit {
     this.isOperatorSaved = false;
   }
 
+  public download() {
+    const url = this.api.downloadUrl(this.operator.getFullyQualifiedName());
+    window.location.href = url;
+  }
+
   public async loadOperator(operatorName) {
     this.operatorName = operatorName;
     this.operatorDef = this.operators.getLocal(this.operatorName);

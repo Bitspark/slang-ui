@@ -21,4 +21,8 @@ export class ApiService {
     }).toPromise();
   }
 
+  public downloadUrl(fqop: string): string {
+    return `${ApiService.host}/share/export?fqop=${fqop}`;
+  }
+
 }
