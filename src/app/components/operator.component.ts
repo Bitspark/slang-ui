@@ -4,7 +4,13 @@ import {ActivatedRoute} from '@angular/router';
 import {OperatorService} from '../services/operator.service';
 import {Composable, Connection, OperatorDef, OperatorInstance, Port, Transformable} from '../classes/operator';
 import {safeDump, safeLoad} from 'js-yaml';
-import {createDefaultValue, generateSvgTransform, normalizeConnections, stringifyConnections, SVGConnectionLineGenerator} from '../utils';
+import {
+  createDefaultValue, deepEquals,
+  generateSvgTransform, HTTP_REQUEST_DEF, HTTP_RESPONSE_DEF,
+  normalizeConnections,
+  stringifyConnections,
+  SVGConnectionLineGenerator
+} from '../utils';
 import {ApiService} from '../services/api.service';
 import {VisualService} from '../services/visual.service';
 import 'codemirror/mode/yaml/yaml.js';
@@ -756,10 +762,13 @@ export class OperatorComponent implements OnInit {
 
     this.debugLog('Request daemon to start operator...');
 
+    const isStream = !this.httpInput() && !this.httpOutput();
+
     this.http.post('http://localhost:5149/run/', {
       fqn: this.operatorName,
       gens: this.debuggingGens,
-      props: this.debuggingProps
+      props: this.debuggingProps,
+      stream: isStream
     }).toPromise()
       .then(data => {
         if (data['status'] === 'success') {
@@ -767,6 +776,22 @@ export class OperatorComponent implements OnInit {
           this.debugLog('Operator is running at ' + this.operatorEndpoint);
           this.running = true;
           this.runningHandle = data['handle'];
+
+          if (isStream) {
+            let interval = null;
+            const that = this;
+            const fetchItems = function () {
+              that.http.get(that.operatorEndpoint).toPromise()
+                .then(responses => {
+                  that.debuggingReponses = responses as Array<any>;
+                })
+                .catch(() => {
+                  clearInterval(interval);
+                });
+            };
+            fetchItems();
+            interval = setInterval(fetchItems, 2000);
+          }
         } else {
           const error = data['error'];
           this.debugLog(`Error ${error.code} occurred: ${error.msg}`);
@@ -774,11 +799,16 @@ export class OperatorComponent implements OnInit {
       });
   }
 
-  public sendInputValue(obj: any) {
-    this.http.post(this.operatorEndpoint, JSON.stringify(obj)).toPromise()
-      .then(data => {
-        this.debuggingReponses.push(data);
-      });
+  public httpInput(): boolean {
+    return deepEquals(this.operatorDef.getDef().services.main.in, HTTP_REQUEST_DEF);
+  }
+
+  public httpOutput(): boolean {
+    return deepEquals(this.operatorDef.getDef().services.main.out, HTTP_RESPONSE_DEF);
+  }
+
+  public async sendInputValue(obj: any) {
+    await this.http.post(this.operatorEndpoint, JSON.stringify(obj)).toPromise();
   }
 
   public stopOperator() {

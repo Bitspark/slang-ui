@@ -4,8 +4,8 @@ import {OperatorDef} from '../classes/operator';
 import {Router} from '@angular/router';
 import {HttpClient, HttpHeaders, HttpParams} from '@angular/common/http';
 import * as initialDef from '../initial-def.json';
-import {FileUploader} from "ng2-file-upload";
-import {ApiService} from "../services/api.service";
+import {FileUploader} from 'ng2-file-upload';
+import {ApiService} from '../services/api.service';
 
 
 @Component({
