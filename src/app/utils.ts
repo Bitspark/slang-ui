@@ -635,11 +635,20 @@ function objContains(sub: any, sup: any): boolean {
   if (!sub) {
     return false;
   }
+  if (sup === sub) {
+    return true;
+  }
+  if (typeof sup !== 'object') {
+    return false;
+  }
   for (const entry in sub) {
     if (!sub.hasOwnProperty(entry)) {
       continue;
     }
     if (!sup.hasOwnProperty(entry)) {
+      return false;
+    }
+    if (!objContains(sub[entry], sup[entry])) {
       return false;
     }
   }
