@@ -847,6 +847,7 @@ class MouseMoveTracker {
     this.mouseAction(this, event, 'start');
     MouseMoveTracker.lastX = event.screenX;
     MouseMoveTracker.lastY = event.screenY;
+    return false;
   }
 
   public stop(event: any) {
@@ -855,6 +856,7 @@ class MouseMoveTracker {
     MouseMoveTracker.lastX = event.screenX;
     MouseMoveTracker.lastY = event.screenY;
     this.actionType = '';
+    return false;
   }
 
   public track(event: any) {
@@ -866,5 +868,6 @@ class MouseMoveTracker {
       MouseMoveTracker.lastX = event.screenX;
       MouseMoveTracker.lastY = event.screenY;
     }
+    return false;
   }
 }
