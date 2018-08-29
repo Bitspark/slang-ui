@@ -18,11 +18,9 @@ export class InstanceComponent implements OnInit {
   @Input()
   set instance(ins: OperatorInstance) {
     this.instance_ = ins;
-    if (this.aspect === 'operator') {
-      this.visual.registerCallback(ins, () => {
-        this.ref.detectChanges();
-      });
-    }
+    this.visual.registerCallback(ins, () => {
+      this.ref.detectChanges();
+    });
     this.ref.detectChanges();
   }
 
@@ -54,6 +52,7 @@ export class InstanceComponent implements OnInit {
 
   public ngOnInit() {
     this.fqn = this.instance.getFullyQualifiedName();
+    this.ref.detectChanges();
   }
 
   public transform(trans: Transformable): string {

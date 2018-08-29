@@ -30,4 +30,18 @@
     <svg:g [attr.transform]="transform(instance.getMainIn())" app-port [port]="instance.getMainIn()"></svg:g>
     <svg:g [attr.transform]="transform(instance.getMainOut())" app-port [port]="instance.getMainOut()"></svg:g>
   </svg:g>
+  <svg:g *ngIf="aspect === 'surrounding'">
+    <svg:rect *ngIf="form() === 'rect'"
+              x="0" y="0" rx="20" ry="20"
+              class="sl-svg-op sl-svg-op-surr"
+              [ngClass]="getCSSClass()"
+              [attr.width]="instance.getWidth()" [attr.height]="instance.getHeight()"
+              paint-order="stroke fill"
+              (mouseover)="visual.hoverInstance(instance)"
+              (mouseout)="visual.hoverInstance(null)"
+              (mousedown)="visual.selectInstance(instance)"
+    ></svg:rect>
+
+    <ng-content></ng-content>
+  </svg:g>
 </svg:g>

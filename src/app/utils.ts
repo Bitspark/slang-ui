@@ -320,7 +320,7 @@ export class SVGConnectionLineGenerator {
     const src = conn.getSource();
     const dst = conn.getDestination();
 
-    this.normTrl = new Vec2(src.getCenter());
+    this.normTrl = new Vec2(src.getCenter(outerOperator));
     this.normRot90Deg = src.getOrientation().value();
 
     if (src.getOperator() === this.outerOperator) {
@@ -328,7 +328,7 @@ export class SVGConnectionLineGenerator {
     }
 
     const sOrigin = Vec2.null();
-    const dOrigin = new Vec2(dst.getCenter(),
+    const dOrigin = new Vec2(dst.getCenter(outerOperator),
       dst.getOrientation().rotatedBy((dst.getOperator() === this.outerOperator) ? 2 : 0));
     dOrigin.translate(this.normTrl.neg()).rotate(-this.normRot90Deg);
 

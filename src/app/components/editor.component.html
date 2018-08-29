@@ -51,49 +51,36 @@
                (mouseup)="mouseTracker.stop($event)"
                (mousemove)="mouseTracker.track($event)">
 
-            <svg:g *ngIf="operator" [attr.transform]="transform(operator)">
-              <!-- Surrounding operator -->
-              <svg:rect x="0" y="0" rx="20" ry="20"
-                        [attr.width]="operator.getWidth()"
-                        [attr.height]="operator.getHeight()"
-                        class="sl-svg-op sl-svg-op-surr"
-                        [ngClass]="{selected: isSelected(operator)}"
-                        paint-order="stroke fill"
-                        (mousedown)="selectInstance(operator)">
-              </svg:rect>
+            <svg:g *ngIf="operator" app-instance [instance]="operator" aspect="surrounding">
               <!-- Instances -->
-              <svg:g app-instance *ngFor="let ins of visualInstances()"
-                     [instance]="ins" aspect="operator"
-                     (selectPort)="selectPort($event)" (selectInstance)="selectInstance($event)">
+              <svg:g app-instance *ngFor="let ins of visualInstances(); trackBy: ins"
+                     [instance]="ins" aspect="operator">
               </svg:g>
-            </svg:g>
 
-
-            <svg:g *ngIf="operator">
               <!-- Visible Connections -->
               <svg:path *ngFor="let conn of visualConnections(); trackBy:conn"
                         class="sl-svg-conn"
-                        [attr.d]="connectionPoints(conn)"></svg:path>
+                        [attr.d]="connectionPoints(conn, operator)"></svg:path>
 
               <!-- Highlighted Connections -->
               <svg:path *ngFor="let conn of visualConnections(); trackBy:conn"
                         class="sl-svg-conn-highlight"
                         [ngClass]="{selected: isSelected(conn), hovered: visual.isConnectionHovered(conn)}"
-                        [attr.d]="connectionPoints(conn)"></svg:path>
+                        [attr.d]="connectionPoints(conn, operator)"></svg:path>
 
               <!-- Clickable Invisible Connections -->
               <svg:path *ngFor="let conn of visualConnections(); trackBy:conn"
                         class="sl-svg-conn-click-overlay"
                         (click)="selectConnection(conn)"
                         (mouseover)="visual.hoverConnection(conn)" (mouseout)="visual.hoverConnection(null)"
-                        [attr.d]="connectionPoints(conn)"></svg:path>
+                        [attr.d]="connectionPoints(conn, operator)"></svg:path>
 
               <!-- Just Instance Names -->
               <svg:g *ngFor="let ins of visualInstances()">
                 <!-- [ngClass]="{selected: isSelected(ins)}" -->
                 <svg:text text-anchor="middle" alignment-baseline="middle"
-                          [attr.x]="ins.getCenterX()" [attr.y]="ins.getCenterY()"
-                          (mousedown)="selectInstance(ins)"
+                          [attr.x]="ins.getCenterX(operator)" [attr.y]="ins.getCenterY(operator)"
+                          (mousedown)="visual.selectInstance(ins)"
                           (mouseover)="visual.hoverInstance(ins)"
                           (mouseout)="visual.hoverInstance(null)">
                   {{text(ins)}}
@@ -111,28 +98,21 @@
                   {{port.getName()}}
                 </svg:text>
               </svg:g>
+
               <!-- Ports -->
-              <svg:g [attr.transform]="transform(operator)">
+              <svg:g>
                 <!-- Delegates -->
                 <svg:g *ngFor="let dlg of operator.getDelegates()" [attr.transform]="transform(dlg)">
-                  <svg:g [attr.transform]="transform(dlg.getIn())" app-port [port]="dlg.getIn()"
-                         (hover)="hover($event)" (select)="selectPort($event)"></svg:g>
-                  <svg:g [attr.transform]="transform(dlg.getOut())" app-port [port]="dlg.getOut()"
-                         (hover)="hover($event)" (select)="selectPort($event)"></svg:g>
+                  <svg:g [attr.transform]="transform(dlg.getIn())" app-port [port]="dlg.getIn()"></svg:g>
+                  <svg:g [attr.transform]="transform(dlg.getOut())" app-port [port]="dlg.getOut()"></svg:g>
                 </svg:g>
                 <!-- Services -->
                 <svg:g>
-                  <svg:g [attr.transform]="transform(operator.getMainIn())" app-port [port]="operator.getMainIn()"
-                         (hover)="hover($event)" (select)="selectPort($event)"></svg:g>
-                  <svg:g [attr.transform]="transform(operator.getMainOut())" app-port [port]="operator.getMainOut()"
-                         (hover)="hover($event)" (select)="selectPort($event)"></svg:g>
+                  <svg:g [attr.transform]="transform(operator.getMainIn())" app-port [port]="operator.getMainIn()"></svg:g>
+                  <svg:g [attr.transform]="transform(operator.getMainOut())" app-port [port]="operator.getMainOut()"></svg:g>
                 </svg:g>
                 <!-- Instance ports -->
-                <svg:g app-instance *ngFor="let ins of visualInstances()"
-                       [instance]="ins" aspect="port"
-                       (hoverPort)="hover($event)" (selectPort)="selectPort($event)"
-                       (selectInstance)="selectInstance($event)">
-                </svg:g>
+                <svg:g app-instance *ngFor="let ins of visualInstances()" [instance]="ins" aspect="port"></svg:g>
                 <!-- Surrounding operator resizer -->
                 <svg:circle [attr.cx]="operator.getWidth() - 20" [attr.cy]="operator.getHeight() - 20"
                             class="sl-svg-op-resize"
@@ -140,7 +120,6 @@
                             (mousedown)="mouseTracker.setResizing()">
                 </svg:circle>
               </svg:g>
-
             </svg:g>
           </svg>
 

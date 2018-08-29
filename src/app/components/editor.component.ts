@@ -87,22 +87,24 @@ export class EditorComponent implements OnInit {
   public operatorEndpoint = '';
 
   // Dragging
-  public mouseTracker = new MouseMoveTracker((t, event, phase) => {
+  public mouseTracker = new MouseTracker((tracker, event, phase) => {
     const update = phase === 'ongoing';
 
     if (!update) {
       return;
     }
 
-    const xDiff = event.screenX - MouseMoveTracker.getLastX();
-    const yDiff = event.screenY - MouseMoveTracker.getLastY();
+    const xDiff = event.screenX - MouseTracker.getLastX();
+    const yDiff = event.screenY - MouseTracker.getLastY();
 
-    if (t.isDragging()) {
-      if (!this.selectedEntity.entity || typeof this.selectedEntity.entity.translate !== 'function') {
+    if (tracker.isDragging()) {
+      const selectedInstance = this.visual.getSelectedInstance();
+      if (!selectedInstance) {
         return;
       }
-      this.selectedEntity.entity.translate([xDiff / this.scale, yDiff / this.scale]);
-    } else if (t.isResizing()) {
+      selectedInstance.translate([xDiff / this.scale, yDiff / this.scale]);
+      this.visual.update(selectedInstance);
+    } else if (tracker.isResizing()) {
       if (!this.operator) {
         return;
       }
@@ -149,6 +151,12 @@ export class EditorComponent implements OnInit {
               public api: ApiService,
               private cd: ChangeDetectorRef) {
     cd.detach();
+    visual.subscribeInstanceSelect(ins => {
+      this.selectInstance(ins);
+    });
+    visual.subscribePortSelect(port => {
+      this.selectPort(port);
+    });
   }
 
   ngOnInit() {
@@ -318,7 +326,6 @@ export class EditorComponent implements OnInit {
   }
 
   public transform(trans: Transformable): string {
-    console.log(new Date(), '...');
     return generateSvgTransform(trans);
   }
 
@@ -354,7 +361,7 @@ export class EditorComponent implements OnInit {
     }
   }
 
-  public connectionPoints(conn: Connection): string {
+  public connectionPoints(conn: Connection, outer: OperatorInstance): string {
     return SVGConnectionLineGenerator.generateRoundPath(this.operator, conn);
   }
 
@@ -392,7 +399,6 @@ export class EditorComponent implements OnInit {
     this.mouseTracker.setDragging();
     this.selectedEntity.entity = ins;
     this.newInstanceName = ins.getName();
-    this.visual.selectInstance(ins);
   }
 
   public selectConnection(conn: Connection) {
@@ -844,14 +850,14 @@ export class EditorComponent implements OnInit {
 
 }
 
-class MouseMoveTracker {
+class MouseTracker {
   private static lastX: number;
   private static lastY: number;
 
   private moving: boolean;
   private actionType = '';
 
-  constructor(private mouseAction: (t: MouseMoveTracker, event: any, actionPhase: string) => void) {
+  constructor(private mouseAction: (tracker: MouseTracker, event: any, actionPhase: string) => void) {
   }
 
   public static getLastX(): number {
@@ -881,16 +887,16 @@ class MouseMoveTracker {
   public start(event: any) {
     this.moving = true;
     this.mouseAction(this, event, 'start');
-    MouseMoveTracker.lastX = event.screenX;
-    MouseMoveTracker.lastY = event.screenY;
+    MouseTracker.lastX = event.screenX;
+    MouseTracker.lastY = event.screenY;
     return false;
   }
 
   public stop(event: any) {
     this.moving = false;
     this.mouseAction(this, event, 'stop');
-    MouseMoveTracker.lastX = event.screenX;
-    MouseMoveTracker.lastY = event.screenY;
+    MouseTracker.lastX = event.screenX;
+    MouseTracker.lastY = event.screenY;
     this.actionType = '';
     return false;
   }
@@ -901,8 +907,8 @@ class MouseMoveTracker {
     }
     if (this.moving) {
       this.mouseAction(this, event, 'ongoing');
-      MouseMoveTracker.lastX = event.screenX;
-      MouseMoveTracker.lastY = event.screenY;
+      MouseTracker.lastX = event.screenX;
+      MouseTracker.lastY = event.screenY;
     }
     return false;
   }

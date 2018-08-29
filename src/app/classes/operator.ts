@@ -328,16 +328,19 @@ export class Composable extends Transformable {
     return this.parent;
   }
 
-  protected getAbsMat3(): Mat3 {
-    return !!this.parent ? this.mat.copy().multiply(this.parent.getAbsMat3()) : this.mat.copy();
+  protected getAbsMat3(origin?: any): Mat3 {
+    if (!!this.parent && (!origin || this.parent !== origin)) {
+      return this.mat.copy().multiply(this.parent.getAbsMat3(origin));
+    }
+    return this.mat.copy();
   }
 
-  private getCenterMat3(): Mat3 {
+  private getCenterMat3(origin?: Transformable): Mat3 {
     return (new Mat3([
       0, 0, this.getWidth() / 2,
       0, 0, this.getHeight() / 2,
       0, 0, 1
-    ]).multiply(this.getAbsMat3()));
+    ]).multiply(this.getAbsMat3(origin)));
   }
 
   public getAbs(): [number, number] {
@@ -352,20 +355,21 @@ export class Composable extends Transformable {
     return this.getAbsMat3().at(5);
   }
 
-  public getCenter(): [number, number] {
-    return [this.getCenterX(), this.getCenterY()];
+  public getCenter(origin?: Transformable): [number, number] {
+    const centerMat = this.getCenterMat3(origin);
+    return [centerMat.at(2), centerMat.at(5)];
   }
 
-  public getCenterX(): number {
-    return this.getCenterMat3().at(2);
+  public getCenterX(origin?: Transformable): number {
+    return this.getCenterMat3(origin).at(2);
   }
 
-  public getCenterY(): number {
-    return this.getCenterMat3().at(5);
+  public getCenterY(origin?: Transformable): number {
+    return this.getCenterMat3(origin).at(5);
   }
 
-  public getOrientation(): Orientation {
-    const mat = this.getAbsMat3();
+  public getOrientation(origin?: Transformable): Orientation {
+    const mat = this.getAbsMat3(origin);
     return Orientation.fromMat3(Mat3.fromVec2([0, 1]).multiply(mat));
   }
 
