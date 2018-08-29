@@ -1,5 +1,5 @@
-<svg:g xmlns:svg="http://www.w3.org/2000/svg" [attr.transform]="transform(instance)">
-  <svg:g *ngIf="aspect === 'operator'">
+<svg:g xmlns:svg="http://www.w3.org/2000/svg">
+  <svg:g *ngIf="aspect === 'operator'" [attr.transform]="transform(instance)">
     <svg:rect *ngIf="form() === 'rect'"
               x="0" y="0" rx="20" ry="20"
               class="sl-svg-op sl-svg-op-ins"
@@ -22,7 +22,7 @@
     ></svg:circle>
   </svg:g>
 
-  <svg:g *ngIf="aspect === 'port'">
+  <svg:g *ngIf="aspect === 'port'" [attr.transform]="transform(instance)">
     <svg:g *ngFor="let dlg of instance.getDelegates()" [attr.transform]="transform(dlg)">
       <svg:g [attr.transform]="transform(dlg.getIn())" app-port [port]="dlg.getIn()"></svg:g>
       <svg:g [attr.transform]="transform(dlg.getOut())" app-port [port]="dlg.getOut()"></svg:g>
@@ -30,7 +30,8 @@
     <svg:g [attr.transform]="transform(instance.getMainIn())" app-port [port]="instance.getMainIn()"></svg:g>
     <svg:g [attr.transform]="transform(instance.getMainOut())" app-port [port]="instance.getMainOut()"></svg:g>
   </svg:g>
-  <svg:g *ngIf="aspect === 'surrounding'">
+
+  <svg:g *ngIf="aspect === 'surrounding'" [attr.transform]="transform(instance)">
     <svg:rect *ngIf="form() === 'rect'"
               x="0" y="0" rx="20" ry="20"
               class="sl-svg-op sl-svg-op-surr"
@@ -41,7 +42,16 @@
               (mouseout)="visual.hoverInstance(null)"
               (mousedown)="visual.selectInstance(instance)"
     ></svg:rect>
-
     <ng-content></ng-content>
+  </svg:g>
+
+  <svg:g *ngIf="aspect === 'text'">
+    <svg:text text-anchor="middle" alignment-baseline="middle"
+              [attr.x]="instance.getCenterX(instance.getParent())" [attr.y]="instance.getCenterY(instance.getParent())"
+              (mousedown)="visual.selectInstance(instance)"
+              (mouseover)="visual.hoverInstance(instance)"
+              (mouseout)="visual.hoverInstance(null)">
+      {{text()}}
+    </svg:text>
   </svg:g>
 </svg:g>

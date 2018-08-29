@@ -772,6 +772,11 @@ export class OperatorInstance extends Composable {
       dlg.translate([0, centerY]);
     });
   }
+
+  public lastName(): string {
+    const opName = this.getFullyQualifiedName().split('.');
+    return opName[opName.length - 1];
+  }
 }
 
 export class Connection {

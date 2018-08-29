@@ -450,7 +450,7 @@ export class EditorComponent implements OnInit {
 
   public getSelectedInstanceLastName(): string {
     if (this.isInstanceSelected()) {
-      return this.instanceLastName(this.selectedEntity.entity as OperatorInstance);
+      return (this.selectedEntity.entity as OperatorInstance).lastName();
     }
     return '';
   }
@@ -709,27 +709,6 @@ export class EditorComponent implements OnInit {
 
   public isUIModeYAML(): boolean {
     return this.uiMode === 'yaml';
-  }
-
-  public instanceLastName(ins: OperatorInstance): string {
-    const opName = ins.getFullyQualifiedName().split('.');
-    return opName[opName.length - 1];
-  }
-
-  public text(ins: OperatorInstance): string {
-    const fqn = ins.getFullyQualifiedName();
-    const props = ins.getProperties();
-
-    switch (fqn) {
-      case 'slang.data.Value':
-        return !!props ? JSON.stringify(props['value']) : 'value?';
-      case 'slang.data.Evaluate':
-        return !!props ? props['expression'] : 'eval?';
-      case 'slang.data.Convert':
-        return '';
-      default:
-        return this.instanceLastName(ins);
-    }
   }
 
   // Executing

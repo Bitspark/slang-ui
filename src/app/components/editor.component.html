@@ -53,8 +53,7 @@
 
             <svg:g *ngIf="operator" app-instance [instance]="operator" aspect="surrounding">
               <!-- Instances -->
-              <svg:g app-instance *ngFor="let ins of visualInstances(); trackBy: ins"
-                     [instance]="ins" aspect="operator">
+              <svg:g app-instance *ngFor="let ins of visualInstances(); trackBy: ins" [instance]="ins" aspect="operator">
               </svg:g>
 
               <!-- Visible Connections -->
@@ -75,16 +74,7 @@
                         (mouseover)="visual.hoverConnection(conn)" (mouseout)="visual.hoverConnection(null)"
                         [attr.d]="connectionPoints(conn, operator)"></svg:path>
 
-              <!-- Just Instance Names -->
-              <svg:g *ngFor="let ins of visualInstances()">
-                <!-- [ngClass]="{selected: isSelected(ins)}" -->
-                <svg:text text-anchor="middle" alignment-baseline="middle"
-                          [attr.x]="ins.getCenterX(operator)" [attr.y]="ins.getCenterY(operator)"
-                          (mousedown)="visual.selectInstance(ins)"
-                          (mouseover)="visual.hoverInstance(ins)"
-                          (mouseout)="visual.hoverInstance(null)">
-                  {{text(ins)}}
-                </svg:text>
+              <svg:g app-instance *ngFor="let ins of visualInstances(); trackBy: ins" [instance]="ins" aspect="text">
               </svg:g>
 
               <!-- Port Text/Labels -->
