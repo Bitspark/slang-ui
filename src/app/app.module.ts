@@ -10,7 +10,7 @@ import {AppRoutes} from './app.routes';
 
 import {AppComponent} from './app.component';
 import {IndexComponent} from './components/index.component';
-import {OperatorComponent} from './components/operator.component';
+import {EditorComponent} from './components/editor.component';
 import {OperatorListComponent} from './components/operator-list.component';
 import {InstanceComponent} from './components/instance.component';
 import {PortComponent} from './components/port.component';
@@ -29,7 +29,7 @@ import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 @NgModule({
   declarations: [
     AppComponent, IndexComponent, TypeDefFormComponent, TypeValueFormComponent,
-    OperatorListComponent, OperatorComponent, InstanceComponent, PortComponent,
+    OperatorListComponent, EditorComponent, InstanceComponent, PortComponent,
     PreviewObjectComponent
   ],
   imports: [

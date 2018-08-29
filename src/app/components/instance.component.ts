@@ -1,11 +1,12 @@
-import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output, ChangeDetectorRef, ChangeDetectionStrategy} from '@angular/core';
 import {OperatorInstance, Transformable} from '../classes/operator';
 import {generateSvgTransform} from '../utils';
 
 @Component({
   selector: 'app-instance,[app-instance]',
   templateUrl: './instance.component.svg.html',
-  styleUrls: []
+  styleUrls: [],
+  changeDetection: ChangeDetectionStrategy.Default
 })
 export class InstanceComponent implements OnInit {
   @Input()
@@ -24,7 +25,7 @@ export class InstanceComponent implements OnInit {
   @Output()
   public selectInstance: EventEmitter<any> = new EventEmitter();
 
-  public constructor() {
+  public constructor(private cd: ChangeDetectorRef) {
   }
 
   public getCSSClass(): any {

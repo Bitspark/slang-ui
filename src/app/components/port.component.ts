@@ -1,47 +1,44 @@
-import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {Component, Input, ChangeDetectorRef, ChangeDetectionStrategy} from '@angular/core';
 import {generateSvgTransform} from '../utils';
 import {Port, Transformable, Type} from '../classes/operator';
+import {VisualService} from '../services/visual.service';
 
 @Component({
   selector: 'app-port,[app-port]',
   templateUrl: './port.component.svg.html',
-  styleUrls: []
+  styleUrls: [],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class PortComponent {
-  public hovered: boolean;
+  constructor(private cd: ChangeDetectorRef, public visual: VisualService) {
+    cd.detach();
+  }
 
   @Input()
-  public port: Port;
+  public port_: Port;
 
-  @Output()
-  public select: EventEmitter<Port> = new EventEmitter();
-  @Output()
-  public hover: EventEmitter<Port> = new EventEmitter();
   @Input()
-  public selectedEntity: any;
+  set port(port: Port) {
+    this.port_ = port;
+    this.visual.registerCallback(port, () => {
+      this.cd.detectChanges();
+    });
+    this.cd.detectChanges();
+  }
+
+  get port() {
+    return this.port_;
+  }
 
   public getCSSClass(): any {
     const cssClass = {};
-    cssClass['selected'] = this.isSelected();
+    cssClass['selected'] = this.visual.isPortSelected(this.port);
     cssClass[Type[this.port.getType()]] = true;
     cssClass[this.port.getOrientation().name()] = true;
     cssClass['in'] = this.port.isIn();
     cssClass['out'] = this.port.isOut();
-    cssClass['hovered'] = this.hovered;
+    cssClass['hovered'] = this.visual.isPortHovered(this.port);
     return cssClass;
-  }
-
-  public handleHover(port: Port) {
-    this.hovered = port != null;
-    if (this.hovered) {
-      this.hover.emit(port);
-    } else {
-      this.hover.emit(null);
-    }
-  }
-
-  public isSelected() {
-    return this.selectedEntity.entity && this.selectedEntity.entity === this.port;
   }
 
   public getEntries(): Array<Port> {

@@ -33,7 +33,7 @@
                 (blur)="storeYaml()">
     </codemirror>
   </div>
-  <!-- ui-mode visuals -->
+  <!-- ui-mode visual -->
   <div id="sl-visual-ui" *ngIf="isUIModeVisual()">
     <div class="row">
       <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 sl-col" id="sl-operators-col">
@@ -71,21 +71,21 @@
 
             <svg:g *ngIf="operator">
               <!-- Visible Connections -->
-              <svg:path *ngFor="let conn of visualConnections()"
+              <svg:path *ngFor="let conn of visualConnections(); trackBy:conn"
                         class="sl-svg-conn"
                         [attr.d]="connectionPoints(conn)"></svg:path>
 
               <!-- Highlighted Connections -->
-              <svg:path *ngFor="let conn of visualConnections()"
+              <svg:path *ngFor="let conn of visualConnections(); trackBy:conn"
                         class="sl-svg-conn-highlight"
-                        [ngClass]="{selected: isSelected(conn), hovered: isHovered(conn)}"
+                        [ngClass]="{selected: isSelected(conn), hovered: visual.isConnectionHovered(conn)}"
                         [attr.d]="connectionPoints(conn)"></svg:path>
 
               <!-- Clickable Invisible Connections -->
-              <svg:path *ngFor="let conn of visualConnections()"
+              <svg:path *ngFor="let conn of visualConnections(); trackBy:conn"
                         class="sl-svg-conn-click-overlay"
                         (click)="selectConnection(conn)"
-                        (mouseover)="hover(conn)" (mouseout)="hover(null)"
+                        (mouseover)="visual.hoverConnection(conn)" (mouseout)="visual.hoverConnection(null)"
                         [attr.d]="connectionPoints(conn)"></svg:path>
 
               <!-- Just Instance Names -->
@@ -114,20 +114,16 @@
                 <!-- Delegates -->
                 <svg:g *ngFor="let dlg of operator.getDelegates()" [attr.transform]="transform(dlg)">
                   <svg:g [attr.transform]="transform(dlg.getIn())" app-port [port]="dlg.getIn()"
-                         (hover)="hover($event)" (select)="selectPort($event)"
-                         [selectedEntity]="selectedEntity"></svg:g>
+                         (hover)="hover($event)" (select)="selectPort($event)"></svg:g>
                   <svg:g [attr.transform]="transform(dlg.getOut())" app-port [port]="dlg.getOut()"
-                         (hover)="hover($event)" (select)="selectPort($event)"
-                         [selectedEntity]="selectedEntity"></svg:g>
+                         (hover)="hover($event)" (select)="selectPort($event)"></svg:g>
                 </svg:g>
                 <!-- Services -->
                 <svg:g>
                   <svg:g [attr.transform]="transform(operator.getMainIn())" app-port [port]="operator.getMainIn()"
-                         (hover)="hover($event)" (select)="selectPort($event)"
-                         [selectedEntity]="selectedEntity"></svg:g>
+                         (hover)="hover($event)" (select)="selectPort($event)"></svg:g>
                   <svg:g [attr.transform]="transform(operator.getMainOut())" app-port [port]="operator.getMainOut()"
-                         (hover)="hover($event)" (select)="selectPort($event)"
-                         [selectedEntity]="selectedEntity"></svg:g>
+                         (hover)="hover($event)" (select)="selectPort($event)"></svg:g>
                 </svg:g>
                 <!-- Instance ports -->
                 <svg:g app-instance *ngFor="let ins of visualInstances()"
@@ -307,7 +303,6 @@
             </div>
           </div>
         </div>
-
       </div>
     </div>
   </div>

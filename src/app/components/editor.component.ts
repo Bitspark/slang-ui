@@ -1,4 +1,4 @@
-import {Component, HostListener, OnInit} from '@angular/core';
+import {Component, HostListener, OnInit, ChangeDetectionStrategy, ChangeDetectorRef} from '@angular/core';
 import {animate, state, style, transition, trigger} from '@angular/animations';
 import {ActivatedRoute} from '@angular/router';
 import {OperatorService} from '../services/operator.service';
@@ -19,8 +19,8 @@ import {Orientation} from '../classes/vector';
 import {HttpClient} from '@angular/common/http';
 
 @Component({
-  templateUrl: './operator.component.html',
-  styleUrls: ['./operator.component.scss'],
+  templateUrl: './editor.component.html',
+  styleUrls: ['./editor.component.scss'],
   animations: [
     trigger('operatorSaved', [
       state('true', style({
@@ -32,9 +32,10 @@ import {HttpClient} from '@angular/common/http';
       transition('false => true', animate('250ms ease-in')),
       transition('true => false', animate('1000ms 1000ms ease-out'))
     ])
-  ]
+  ],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class OperatorComponent implements OnInit {
+export class EditorComponent implements OnInit {
   // General
   public operatorName = '';
   public operatorDef: OperatorDef = null;
@@ -144,8 +145,10 @@ export class OperatorComponent implements OnInit {
   constructor(private route: ActivatedRoute,
               private http: HttpClient,
               public operators: OperatorService,
-              public visuals: VisualService,
-              public api: ApiService) {
+              public visual: VisualService,
+              public api: ApiService,
+              private cd: ChangeDetectorRef) {
+    cd.detach();
   }
 
   ngOnInit() {
@@ -163,7 +166,7 @@ export class OperatorComponent implements OnInit {
 
   public async save() {
     await this.operators.storeDefinition(this.operatorName, this.operatorDef.getDef());
-    await this.visuals.storeVisual(this.operatorName, this.operator.getVisual());
+    await this.visual.storeVisual(this.operatorName, this.operator.getVisual());
     this.isOperatorSaved = true;
     await this.operators.refresh();
     await this.loadOperator(this.operatorName);
@@ -180,7 +183,7 @@ export class OperatorComponent implements OnInit {
     this.operatorDef = this.operators.getLocal(this.operatorName);
     if (this.operatorDef) {
       const def = this.operatorDef.getDef();
-      const visual = await this.visuals.loadVisual(operatorName);
+      const visual = await this.visual.loadVisual(operatorName);
       let dim: [number, number] = [1200, 1100];
       let pos: [number, number] = [50, 50];
       if (visual && visual.geometry) {
@@ -204,6 +207,7 @@ export class OperatorComponent implements OnInit {
       if (visual) {
         this.operator.updateVisual(visual);
       }
+      this.cd.detectChanges();
     } else {
       this.status = `Operator "${this.operatorName}" not found.`;
     }
@@ -314,6 +318,7 @@ export class OperatorComponent implements OnInit {
   }
 
   public transform(trans: Transformable): string {
+    console.log(new Date(), '...');
     return generateSvgTransform(trans);
   }
 
