@@ -5,16 +5,20 @@
               class="sl-svg-op sl-svg-op-ins"
               [ngClass]="getCSSClass()"
               [attr.width]="instance.getWidth()" [attr.height]="instance.getHeight()"
-              (mousedown)="selectInstance.emit(instance)"
               paint-order="stroke fill"
+              (mouseover)="visual.hoverInstance(instance)"
+              (mouseout)="visual.hoverInstance(null)"
+              (mousedown)="visual.selectInstance(instance)"
     ></svg:rect>
     <svg:circle *ngIf="form() === 'circle'"
                 rx="20" ry="20"
                 class="sl-svg-op sl-svg-op-ins"
                 [ngClass]="getCSSClass()"
                 [attr.cx]="radius()" [attr.cy]="radius()" [attr.r]="radius()"
-                (mousedown)="selectInstance.emit(instance)"
                 paint-order="stroke fill"
+                (mouseover)="visual.hoverInstance(instance)"
+                (mouseout)="visual.hoverInstance(null)"
+                (mousedown)="visual.selectInstance(instance)"
     ></svg:circle>
   </svg:g>
 

@@ -392,6 +392,7 @@ export class EditorComponent implements OnInit {
     this.mouseTracker.setDragging();
     this.selectedEntity.entity = ins;
     this.newInstanceName = ins.getName();
+    this.visual.selectInstance(ins);
   }
 
   public selectConnection(conn: Connection) {

@@ -1,20 +1,34 @@
 import {Component, EventEmitter, Input, OnInit, Output, ChangeDetectorRef, ChangeDetectionStrategy} from '@angular/core';
 import {OperatorInstance, Transformable} from '../classes/operator';
 import {generateSvgTransform} from '../utils';
+import {VisualService} from "../services/visual.service";
 
 @Component({
   selector: 'app-instance,[app-instance]',
   templateUrl: './instance.component.svg.html',
   styleUrls: [],
-  changeDetection: ChangeDetectionStrategy.Default
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class InstanceComponent implements OnInit {
   @Input()
   public aspect: string;
+
+  public instance_: OperatorInstance;
+
   @Input()
-  public selectedEntity: any = {entity: null};
-  @Input()
-  public instance: OperatorInstance;
+  set instance(ins: OperatorInstance) {
+    this.instance_ = ins;
+    if (this.aspect === 'operator') {
+      this.visual.registerCallback(ins, () => {
+        this.ref.detectChanges();
+      });
+    }
+    this.ref.detectChanges();
+  }
+
+  get instance() {
+    return this.instance_;
+  }
 
   private fqn = '';
 
@@ -25,12 +39,14 @@ export class InstanceComponent implements OnInit {
   @Output()
   public selectInstance: EventEmitter<any> = new EventEmitter();
 
-  public constructor(private cd: ChangeDetectorRef) {
+  public constructor(private ref: ChangeDetectorRef, public visual: VisualService) {
+    ref.detach();
   }
 
   public getCSSClass(): any {
     const cssClass = {};
-    cssClass['selected'] = this.isSelected();
+    cssClass['selected'] = this.visual.isInstanceSelected(this.instance);
+    cssClass['hovered'] = this.visual.isInstanceHovered(this.instance);
     cssClass['sl-svg-op-type'] = true;
     cssClass[this.instance.getOperatorType()] = true;
     return cssClass;
@@ -38,10 +54,6 @@ export class InstanceComponent implements OnInit {
 
   public ngOnInit() {
     this.fqn = this.instance.getFullyQualifiedName();
-  }
-
-  public isSelected() {
-    return this.selectedEntity.entity && this.selectedEntity.entity === this.instance;
   }
 
   public transform(trans: Transformable): string {

@@ -32,12 +32,16 @@ export class PortComponent {
 
   public getCSSClass(): any {
     const cssClass = {};
+
     cssClass['selected'] = this.visual.isPortSelected(this.port);
+    cssClass['hovered'] = this.visual.isPortHovered(this.port);
+
     cssClass[Type[this.port.getType()]] = true;
     cssClass[this.port.getOrientation().name()] = true;
+
     cssClass['in'] = this.port.isIn();
     cssClass['out'] = this.port.isOut();
-    cssClass['hovered'] = this.visual.isPortHovered(this.port);
+
     return cssClass;
   }
 

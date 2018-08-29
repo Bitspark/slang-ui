@@ -38,6 +38,12 @@ export class VisualService {
     });
   }
 
+  private unselectAll() {
+    this.selectInstance(null);
+    this.selectPort(null);
+    this.selectConnection(null);
+  }
+
   // CONNECTION
 
   public async hoverConnection(conn: Connection) {
@@ -48,14 +54,20 @@ export class VisualService {
   }
 
   public async selectConnection(conn: Connection) {
+    if (conn !== null) {
+      this.unselectAll();
+    }
+    const oldConn = this.selectedConnection;
     this.selectedConnection = conn;
+    this.callback(conn);
+    this.callback(oldConn);
   }
 
-  public isConnectionHovered(conn: Connection) {
+  public isConnectionHovered(conn: Connection): boolean {
     return this.hoveredConnection === conn;
   }
 
-  public isConnectionSelected(conn: Connection) {
+  public isConnectionSelected(conn: Connection): boolean {
     return this.selectedConnection === conn;
   }
 
@@ -69,23 +81,49 @@ export class VisualService {
   }
 
   public async selectPort(port: Port) {
+    if (port !== null) {
+      this.unselectAll();
+    }
     const oldPort = this.selectedPort;
     this.selectedPort = port;
     this.callback(port);
     this.callback(oldPort);
   }
 
-  public isPortHovered(port: Port) {
+  public isPortHovered(port: Port): boolean {
     return this.hoveredPort === port;
   }
 
-  public isPortSelected(port: Port) {
+  public isPortSelected(port: Port): boolean {
     return this.selectedPort === port;
   }
 
   // INSTANCE
 
-  // TODO: Implement
+  public hoverInstance(ins: OperatorInstance) {
+    const oldInstance = this.hoveredInstance;
+    this.hoveredInstance = ins;
+    this.callback(ins);
+    this.callback(oldInstance);
+  }
+
+  public selectInstance(ins: OperatorInstance) {
+    if (ins !== null) {
+      this.unselectAll();
+    }
+    const oldInstance = this.selectedInstance;
+    this.selectedInstance = ins;
+    this.callback(ins);
+    this.callback(oldInstance);
+  }
+
+  public isInstanceHovered(ins: OperatorInstance): boolean {
+    return this.hoveredInstance === ins;
+  }
+
+  public isInstanceSelected(ins: OperatorInstance): boolean {
+    return this.selectedInstance === ins;
+  }
 
   // CALLBACK HANDLING
 

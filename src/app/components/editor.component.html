@@ -63,7 +63,7 @@
               </svg:rect>
               <!-- Instances -->
               <svg:g app-instance *ngFor="let ins of visualInstances()"
-                     [instance]="ins" [aspect]="'operator'" [selectedEntity]="selectedEntity"
+                     [instance]="ins" aspect="operator"
                      (selectPort)="selectPort($event)" (selectInstance)="selectInstance($event)">
               </svg:g>
             </svg:g>
@@ -93,7 +93,9 @@
                 <!-- [ngClass]="{selected: isSelected(ins)}" -->
                 <svg:text text-anchor="middle" alignment-baseline="middle"
                           [attr.x]="ins.getCenterX()" [attr.y]="ins.getCenterY()"
-                          (mousedown)="selectInstance(ins)">
+                          (mousedown)="selectInstance(ins)"
+                          (mouseover)="visual.hoverInstance(ins)"
+                          (mouseout)="visual.hoverInstance(null)">
                   {{text(ins)}}
                 </svg:text>
               </svg:g>
@@ -127,7 +129,7 @@
                 </svg:g>
                 <!-- Instance ports -->
                 <svg:g app-instance *ngFor="let ins of visualInstances()"
-                       [instance]="ins" [aspect]="'port'" [selectedEntity]="selectedEntity"
+                       [instance]="ins" aspect="port"
                        (hoverPort)="hover($event)" (selectPort)="selectPort($event)"
                        (selectInstance)="selectInstance($event)">
                 </svg:g>

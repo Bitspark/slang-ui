@@ -81,11 +81,11 @@ svg {
       fill-opacity: .85;
     }
     &.sl-svg-op-ins {
-      &.selected, &.selected:hover {
-        stroke: $svg-selected;
-      }
-      &:hover {
+      &.hovered {
         stroke: $svg-hovered;
+      }
+      &.selected {
+        stroke: $svg-selected;
       }
       &.sl-svg-op-type {
         &.elementary {
