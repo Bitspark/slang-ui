@@ -188,29 +188,29 @@
               </button>
             </div>
             -->
-            <div *ngIf="genericNames(selectedEntity.entity).length > 0">
+            <div *ngIf="genericNames(getSelectedInstance()).length > 0">
               <h5>Generics</h5>
-              <div class="sl-form-box" *ngFor="let genName of genericNames(selectedEntity.entity)">
+              <div class="sl-form-box" *ngFor="let genName of genericNames(getSelectedInstance())">
                 <h6>{{ genName }}</h6>
-                <app-type-def-form *ngIf="isGenericSpecified(selectedEntity.entity, genName)"
-                                   [(typeDef)]="getGenerics(selectedEntity.entity)[genName]"
+                <app-type-def-form *ngIf="isGenericSpecified(getSelectedInstance(), genName)"
+                                   [(typeDef)]="getGenerics(getSelectedInstance())[genName]"
                                    (typeDefChange)="refresh()"></app-type-def-form>
-                <button *ngIf="!isGenericSpecified(selectedEntity.entity, genName)"
-                        (click)="addGeneric(selectedEntity.entity, genName)">Specify
+                <button *ngIf="!isGenericSpecified(getSelectedInstance(), genName)"
+                        (click)="addGeneric(getSelectedInstance(), genName)">Specify
                 </button>
               </div>
             </div>
-            <div *ngIf="getPropertyDefs(selectedEntity.entity).length > 0">
+            <div *ngIf="getPropertyDefs(getSelectedInstance()).length > 0">
               <h5>Properties</h5>
-              <div class="sl-form-box" *ngFor="let prop of getPropertyDefs(selectedEntity.entity)">
+              <div class="sl-form-box" *ngFor="let prop of getPropertyDefs(getSelectedInstance())">
                 <h6>{{ prop.name }}</h6>
-                <app-type-value-form *ngIf="isPropertySpecified(selectedEntity.entity, prop)"
+                <app-type-value-form *ngIf="isPropertySpecified(getSelectedInstance(), prop)"
                                      [typeDef]="prop.def"
-                                     [(typeValue)]="getProperties(selectedEntity.entity)[prop.name]"
+                                     [(typeValue)]="getProperties(getSelectedInstance())[prop.name]"
                                      (typeValueChange)="refresh(true)"></app-type-value-form>
-                <button *ngIf="!isPropertySpecified(selectedEntity.entity, prop)"
-                        [disabled]="prop.def.type === 'generic' && !isGenericSpecified(selectedEntity.entity, prop.def.generic)"
-                        (click)="addProperty(selectedEntity.entity, prop)">Specify
+                <button *ngIf="!isPropertySpecified(getSelectedInstance(), prop)"
+                        [disabled]="prop.def.type === 'generic' && !isGenericSpecified(getSelectedInstance(), prop.def.generic)"
+                        (click)="addProperty(getSelectedInstance(), prop)">Specify
                 </button>
               </div>
             </div>

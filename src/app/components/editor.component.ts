@@ -104,20 +104,13 @@ export class EditorComponent implements OnInit, OnDestroy {
         return;
       }
       selectedInstance.translate([xDiff / this.scale, yDiff / this.scale]);
-      this.visual.update(selectedInstance);
-      // Also update connections
-      this.operator.getConnections().forEach(conn => {
-        if (conn.getSource().getOperator() === selectedInstance || conn.getDestination().getOperator() === selectedInstance) {
-          this.visual.update(conn);
-        }
-      });
+      this.updateInstance(selectedInstance);
     } else if (this.mouse.isResizing()) {
       if (!this.operator) {
         return;
       }
       this.operator.resize([xDiff / this.scale, yDiff / this.scale]);
       this.refresh();
-      this.visual.update(this.operator);
     }
   }
 
@@ -129,11 +122,11 @@ export class EditorComponent implements OnInit, OnDestroy {
     switch (event.key) {
       case '+':
         this.scale *= 1.1;
-        this.cd.detectChanges();
+        this.ref.detectChanges();
         break;
       case '-':
         this.scale /= 1.1;
-        this.cd.detectChanges();
+        this.ref.detectChanges();
         break;
       case 'Delete':
       case 'Backspace':
@@ -162,9 +155,9 @@ export class EditorComponent implements OnInit, OnDestroy {
               public operators: OperatorService,
               public visual: VisualService,
               public api: ApiService,
-              private cd: ChangeDetectorRef,
+              private ref: ChangeDetectorRef,
               public mouse: MouseService) {
-    cd.detach();
+    ref.detach();
   }
 
   ngOnInit() {
@@ -178,7 +171,7 @@ export class EditorComponent implements OnInit, OnDestroy {
     });
     this.visual.subscribeSelect(obj => {
       if (obj instanceof OperatorInstance) {
-        this.select(obj);
+        this.selectInstance(obj);
       } else if (obj instanceof Port) {
         this.selectPort(obj);
       }
@@ -235,7 +228,7 @@ export class EditorComponent implements OnInit, OnDestroy {
       if (visual) {
         this.operator.updateVisual(visual);
       }
-      this.cd.detectChanges();
+      this.ref.detectChanges();
     } else {
       this.status = `Operator "${this.operatorName}" not found.`;
     }
@@ -289,6 +282,16 @@ export class EditorComponent implements OnInit, OnDestroy {
 
   public stringify(val: any): string {
     return JSON.stringify(val, undefined, 2);
+  }
+
+  private updateInstance(ins: OperatorInstance) {
+    this.visual.update(ins);
+    // Also update connections
+    this.operator.getConnections().forEach(conn => {
+      if (conn.getSource().getOperator() === ins || conn.getDestination().getOperator() === ins) {
+        this.visual.update(conn);
+      }
+    });
   }
 
   // YAML
@@ -350,26 +353,34 @@ export class EditorComponent implements OnInit, OnDestroy {
   }
 
   public rotateRight() {
-    if (this.isInstanceSelected()) {
-      this.selectedEntity.entity.rotate(Math.PI / 2);
+    const ins = this.getSelectedInstance();
+    if (!!ins) {
+      ins.rotate(Math.PI / 2);
+      this.updateInstance(ins);
     }
   }
 
   public rotateLeft() {
-    if (this.isInstanceSelected()) {
-      this.selectedEntity.entity.rotate(-Math.PI / 2);
+    const ins = this.getSelectedInstance();
+    if (!!ins) {
+      ins.rotate(-Math.PI / 2);
+      this.updateInstance(ins);
     }
   }
 
   public mirrorVertically() {
-    if (this.isInstanceSelected()) {
-      this.selectedEntity.entity.scale([1, -1]);
+    const ins = this.getSelectedInstance();
+    if (!!ins) {
+      ins.scale([1, -1]);
+      this.updateInstance(ins);
     }
   }
 
   public mirrorHorizontally() {
-    if (this.isInstanceSelected()) {
-      this.selectedEntity.entity.scale([-1, 1]);
+    const ins = this.getSelectedInstance();
+    if (!!ins) {
+      ins.scale([-1, 1]);
+      this.updateInstance(ins);
     }
   }
 
@@ -389,10 +400,13 @@ export class EditorComponent implements OnInit, OnDestroy {
     return this.isAnyEntityHovered() && this.hoveredEntity.entity instanceof Connection;
   }
 
-  public select(ins: OperatorInstance) {
+  public selectInstance(ins: OperatorInstance) {
     this.mouse.setDragging();
     this.selectedEntity.entity = ins;
     this.newInstanceName = ins.getName();
+    setTimeout(() => {
+      this.ref.detectChanges();
+    }, 300);
   }
 
   public selectConnection(conn: Connection) {
@@ -426,6 +440,14 @@ export class EditorComponent implements OnInit, OnDestroy {
       return true;
     }
     return false;
+  }
+
+  public getSelectedInstance(): OperatorInstance {
+    const selected = this.visual.getSelected();
+    if (!(selected instanceof OperatorInstance)) {
+      return null;
+    }
+    return selected;
   }
 
   public getSelectedInstanceName(): string {
@@ -533,6 +555,7 @@ export class EditorComponent implements OnInit, OnDestroy {
   private displayVisual() {
     const def = this.operatorDef.getDef();
     this.operator.updateOperator(def, undefined);
+    this.visual.update(this.operator);
   }
 
   public addInstance(op: any) {
@@ -565,14 +588,6 @@ export class EditorComponent implements OnInit, OnDestroy {
   public removePropertyDef(propName: string) {
     delete this.propertyDefs[propName];
     this.refresh();
-  }
-
-  public getPorts(): Array<Port> {
-    if (this.operator) {
-      return this.operator.getPrimitivePorts();
-    } else {
-      return [];
-    }
   }
 
   public getOperatorList(): Array<OperatorDef> {
@@ -639,6 +654,7 @@ export class EditorComponent implements OnInit, OnDestroy {
       insOpDef.properties = {};
     }
     insOpDef.properties[prop.name] = createDefaultValue(prop.def);
+    this.ref.detectChanges();
   }
 
   public specifyProperty(props, name, def) {
@@ -647,6 +663,7 @@ export class EditorComponent implements OnInit, OnDestroy {
 
   public setUIMode(mode: string): string {
     this.uiMode = mode.toLowerCase();
+    this.ref.detectChanges();
     return this.uiMode;
   }
 
@@ -676,6 +693,7 @@ export class EditorComponent implements OnInit, OnDestroy {
 
   public specifyOperator() {
     this.debugState = 'specifying';
+    this.ref.detectChanges();
   }
 
   public refreshDebugVariables() {
@@ -697,8 +715,8 @@ export class EditorComponent implements OnInit, OnDestroy {
   public runOperator() {
     this.debugState = 'debugging';
     this.inputValue = createDefaultValue(this.debuggingInPort);
-
     this.debugLog('Request daemon to start operator...');
+    this.ref.detectChanges();
 
     const isStream = !this.httpInput() && !this.httpOutput();
 
@@ -726,6 +744,7 @@ export class EditorComponent implements OnInit, OnDestroy {
                 .catch(() => {
                   clearInterval(interval);
                 });
+              that.ref.detectChanges();
             };
             fetchItems();
             interval = setInterval(fetchItems, 2000);
@@ -734,6 +753,7 @@ export class EditorComponent implements OnInit, OnDestroy {
           const error = data['error'];
           this.debugLog(`Error ${error.code} occurred: ${error.msg}`);
         }
+        this.ref.detectChanges();
       });
   }
 
@@ -763,15 +783,13 @@ export class EditorComponent implements OnInit, OnDestroy {
           const error = data['error'];
           this.debugLog(`Error ${error.code} occurred: ${error.msg}`);
         }
+        this.ref.detectChanges();
       });
   }
 
   public closeDebugPanel() {
     this.debugState = null;
-  }
-
-  public clearOutput() {
-    this.debuggingReponses = [];
+    this.ref.detectChanges();
   }
 
 }
