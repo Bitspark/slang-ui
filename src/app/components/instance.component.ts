@@ -2,6 +2,7 @@ import {Component, EventEmitter, Input, OnInit, Output, ChangeDetectorRef, Chang
 import {OperatorInstance, Transformable} from '../classes/operator';
 import {generateSvgTransform} from '../utils';
 import {VisualService} from "../services/visual.service";
+import {MouseService} from "../services/mouse.service";
 
 @Component({
   selector: 'app-instance,[app-instance]',
@@ -37,7 +38,7 @@ export class InstanceComponent implements OnInit {
   @Output()
   public selectInstance: EventEmitter<any> = new EventEmitter();
 
-  public constructor(private ref: ChangeDetectorRef, public visual: VisualService) {
+  public constructor(private ref: ChangeDetectorRef, public visual: VisualService, public mouse: MouseService) {
     ref.detach();
   }
 

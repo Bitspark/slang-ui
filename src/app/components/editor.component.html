@@ -47,9 +47,9 @@
                [attr.width]="50000*scale" [attr.height]="50000*scale"
                viewBox="0 0 50000 50000"
                xmlns:svg="http://www.w3.org/2000/svg"
-               (mousedown)="mouseTracker.start($event)"
-               (mouseup)="mouseTracker.stop($event)"
-               (mousemove)="mouseTracker.track($event)">
+               (mousedown)="mouse.start($event)"
+               (mouseup)="mouse.stop($event)"
+               (mousemove)="mouse.track($event)">
 
             <svg:g *ngIf="operator" app-instance [instance]="operator" aspect="surrounding">
               <!-- Instances -->
@@ -77,39 +77,31 @@
               <svg:g app-instance *ngFor="let ins of visualInstances(); trackBy: ins" [instance]="ins" aspect="text">
               </svg:g>
 
-              <!-- Port Text/Labels -->
-              <svg:g *ngFor="let port of getPorts()"
-                     [attr.transform]="translatePort(port)">
-                <svg:text [attr.text-anchor]="getPortLabelAnchor(port)" alignment-baseline="middle"
-                          [attr.transform]="transformLabel(port)"
-                          [attr.x]="getPortLabelX(port)" [attr.y]="getPortLabelY(port)"
-                          class="sl-svg-port-label"
-                          [ngClass]="getPortLabelCSSClass(port)">
-                  {{port.getName()}}
-                </svg:text>
+              <svg:g app-instance *ngFor="let ins of visualInstances(); trackBy: ins" [instance]="ins" aspect="port-text">
               </svg:g>
 
-              <!-- Ports -->
-              <svg:g>
-                <!-- Delegates -->
-                <svg:g *ngFor="let dlg of operator.getDelegates()" [attr.transform]="transform(dlg)">
-                  <svg:g [attr.transform]="transform(dlg.getIn())" app-port [port]="dlg.getIn()"></svg:g>
-                  <svg:g [attr.transform]="transform(dlg.getOut())" app-port [port]="dlg.getOut()"></svg:g>
-                </svg:g>
-                <!-- Services -->
-                <svg:g>
-                  <svg:g [attr.transform]="transform(operator.getMainIn())" app-port [port]="operator.getMainIn()"></svg:g>
-                  <svg:g [attr.transform]="transform(operator.getMainOut())" app-port [port]="operator.getMainOut()"></svg:g>
-                </svg:g>
-                <!-- Instance ports -->
-                <svg:g app-instance *ngFor="let ins of visualInstances()" [instance]="ins" aspect="port"></svg:g>
-                <!-- Surrounding operator resizer -->
-                <svg:circle [attr.cx]="operator.getWidth() - 20" [attr.cy]="operator.getHeight() - 20"
-                            class="sl-svg-op-resize"
-                            r="12px"
-                            (mousedown)="mouseTracker.setResizing()">
-                </svg:circle>
+              <!-- Delegates -->
+              <svg:g *ngFor="let dlg of operator.getDelegates()" [attr.transform]="transform(dlg)">
+                <svg:g [attr.transform]="transform(dlg.getIn())" app-port [port]="dlg.getIn()" aspect="port"></svg:g>
+                <svg:g [attr.transform]="transform(dlg.getOut())" app-port [port]="dlg.getOut()" aspect="port"></svg:g>
               </svg:g>
+              <svg:g *ngFor="let dlg of operator.getDelegates()" [attr.transform]="transform(dlg)">
+                <svg:g [attr.transform]="transform(dlg.getIn())" app-port [port]="dlg.getIn()" aspect="text"></svg:g>
+                <svg:g [attr.transform]="transform(dlg.getOut())" app-port [port]="dlg.getOut()" aspect="text"></svg:g>
+              </svg:g>
+
+              <!-- Services -->
+              <svg:g>
+                <svg:g [attr.transform]="transform(operator.getMainIn())" app-port [port]="operator.getMainIn()" aspect="port"></svg:g>
+                <svg:g [attr.transform]="transform(operator.getMainOut())" app-port [port]="operator.getMainOut()" aspect="port"></svg:g>
+              </svg:g>
+              <svg:g>
+                <svg:g app-port [port]="operator.getMainIn()" aspect="text"></svg:g>
+                <svg:g app-port [port]="operator.getMainOut()" aspect="text"></svg:g>
+              </svg:g>
+
+              <!-- Instance ports -->
+              <svg:g app-instance *ngFor="let ins of visualInstances(); trackBy: ins" [instance]="ins" aspect="port"></svg:g>
             </svg:g>
           </svg>
 

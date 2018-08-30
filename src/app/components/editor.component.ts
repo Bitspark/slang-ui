@@ -15,8 +15,8 @@ import {ApiService} from '../services/api.service';
 import {VisualService} from '../services/visual.service';
 import 'codemirror/mode/yaml/yaml.js';
 import {TypeDefFormComponent} from './type-def-form.component';
-import {Orientation} from '../classes/vector';
 import {HttpClient} from '@angular/common/http';
+import {MouseService} from '../services/mouse.service';
 
 @Component({
   templateUrl: './editor.component.html',
@@ -87,31 +87,32 @@ export class EditorComponent implements OnInit {
   public operatorEndpoint = '';
 
   // Dragging
-  public mouseTracker = new MouseTracker((tracker, event, phase) => {
+  private mouseAction(event, phase) {
     const update = phase === 'ongoing';
 
     if (!update) {
       return;
     }
 
-    const xDiff = event.screenX - MouseTracker.getLastX();
-    const yDiff = event.screenY - MouseTracker.getLastY();
+    const xDiff = event.screenX - this.mouse.getLastX();
+    const yDiff = event.screenY - this.mouse.getLastY();
 
-    if (tracker.isDragging()) {
+    if (this.mouse.isDragging()) {
       const selectedInstance = this.visual.getSelectedInstance();
       if (!selectedInstance) {
         return;
       }
       selectedInstance.translate([xDiff / this.scale, yDiff / this.scale]);
       this.visual.update(selectedInstance);
-    } else if (tracker.isResizing()) {
+    } else if (this.mouse.isResizing()) {
       if (!this.operator) {
         return;
       }
       this.operator.resize([xDiff / this.scale, yDiff / this.scale]);
       this.refresh();
+      this.visual.update(this.operator);
     }
-  });
+  }
 
   @HostListener('window:keyup', ['$event'])
   keyEvent(event: KeyboardEvent) {
@@ -149,7 +150,8 @@ export class EditorComponent implements OnInit {
               public operators: OperatorService,
               public visual: VisualService,
               public api: ApiService,
-              private cd: ChangeDetectorRef) {
+              private cd: ChangeDetectorRef,
+              public mouse: MouseService) {
     cd.detach();
     visual.subscribeInstanceSelect(ins => {
       this.selectInstance(ins);
@@ -157,6 +159,7 @@ export class EditorComponent implements OnInit {
     visual.subscribePortSelect(port => {
       this.selectPort(port);
     });
+    mouse.subscribe((event: any, actionPhase: string) => this.mouseAction(event, actionPhase));
   }
 
   ngOnInit() {
@@ -321,20 +324,12 @@ export class EditorComponent implements OnInit {
 
   // Visual
 
-  public transformLabel(port: Port): string {
-    return `rotate(-55 ${this.getPortLabelX(port)},${this.getPortLabelY(port)})`;
-  }
-
   public transform(trans: Transformable): string {
     return generateSvgTransform(trans);
   }
 
   public translate(comp: Composable): string {
     return `translate(${comp.getAbsX()},${comp.getAbsY()})`;
-  }
-
-  public translatePort(port: Port): string {
-    return `translate(${port.getCenterX()},${port.getCenterY()})`;
   }
 
   public rotateRight() {
@@ -396,7 +391,7 @@ export class EditorComponent implements OnInit {
   }
 
   public selectInstance(ins: OperatorInstance) {
-    this.mouseTracker.setDragging();
+    this.mouse.setDragging();
     this.selectedEntity.entity = ins;
     this.newInstanceName = ins.getName();
   }
@@ -573,58 +568,11 @@ export class EditorComponent implements OnInit {
     this.refresh();
   }
 
-  public getPortLabelCSSClass(port: Port): any {
-    const cssClasses = {};
-    cssClasses['displayed'] = this.isHovered(port) || this.isSelected(port) ||
-      this.isConnectionHovered() && this.isPortRelatedToConnection(this.hoveredEntity.entity as Connection, port) ||
-      this.isConnectionSelected() && this.isPortRelatedToConnection(this.selectedEntity.entity as Connection, port);
-    return cssClasses;
-  }
-
   public getPorts(): Array<Port> {
     if (this.operator) {
       return this.operator.getPrimitivePorts();
     } else {
       return [];
-    }
-  }
-
-  public getPortLabelX(port: Port): number {
-    switch (port.getOrientation().value()) {
-      case Orientation.north:
-        return 0;
-      case Orientation.west:
-        return 15;
-      case Orientation.south:
-        return 0;
-      case Orientation.east:
-        return -15;
-    }
-  }
-
-  public getPortLabelY(port: Port): number {
-    switch (port.getOrientation().value()) {
-      case Orientation.north:
-        return 15;
-      case Orientation.west:
-        return 0;
-      case Orientation.south:
-        return -15;
-      case Orientation.east:
-        return 0;
-    }
-  }
-
-  public getPortLabelAnchor(port: Port): string {
-    switch (port.getOrientation().value()) {
-      case Orientation.north:
-        return 'end';
-      case Orientation.west:
-        return 'begin';
-      case Orientation.south:
-        return 'begin';
-      case Orientation.east:
-        return 'end';
     }
   }
 
@@ -827,68 +775,4 @@ export class EditorComponent implements OnInit {
     this.debuggingReponses = [];
   }
 
-}
-
-class MouseTracker {
-  private static lastX: number;
-  private static lastY: number;
-
-  private moving: boolean;
-  private actionType = '';
-
-  constructor(private mouseAction: (tracker: MouseTracker, event: any, actionPhase: string) => void) {
-  }
-
-  public static getLastX(): number {
-    return this.lastX;
-  }
-
-  public static getLastY(): number {
-    return this.lastY;
-  }
-
-  public setResizing() {
-    this.actionType = 'resize';
-  }
-
-  public setDragging() {
-    this.actionType = 'drag';
-  }
-
-  public isResizing() {
-    return this.actionType === 'resize';
-  }
-
-  public isDragging() {
-    return this.actionType === 'drag';
-  }
-
-  public start(event: any) {
-    this.moving = true;
-    this.mouseAction(this, event, 'start');
-    MouseTracker.lastX = event.screenX;
-    MouseTracker.lastY = event.screenY;
-    return false;
-  }
-
-  public stop(event: any) {
-    this.moving = false;
-    this.mouseAction(this, event, 'stop');
-    MouseTracker.lastX = event.screenX;
-    MouseTracker.lastY = event.screenY;
-    this.actionType = '';
-    return false;
-  }
-
-  public track(event: any) {
-    if (event.buttons === 0) {
-      this.moving = false;
-    }
-    if (this.moving) {
-      this.mouseAction(this, event, 'ongoing');
-      MouseTracker.lastX = event.screenX;
-      MouseTracker.lastY = event.screenY;
-    }
-    return false;
-  }
 }

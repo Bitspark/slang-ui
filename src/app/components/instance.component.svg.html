@@ -24,11 +24,11 @@
 
   <svg:g *ngIf="aspect === 'port'" [attr.transform]="transform(instance)">
     <svg:g *ngFor="let dlg of instance.getDelegates()" [attr.transform]="transform(dlg)">
-      <svg:g [attr.transform]="transform(dlg.getIn())" app-port [port]="dlg.getIn()"></svg:g>
-      <svg:g [attr.transform]="transform(dlg.getOut())" app-port [port]="dlg.getOut()"></svg:g>
+      <svg:g [attr.transform]="transform(dlg.getIn())" app-port [port]="dlg.getIn()" aspect="port"></svg:g>
+      <svg:g [attr.transform]="transform(dlg.getOut())" app-port [port]="dlg.getOut()" aspect="port"></svg:g>
     </svg:g>
-    <svg:g [attr.transform]="transform(instance.getMainIn())" app-port [port]="instance.getMainIn()"></svg:g>
-    <svg:g [attr.transform]="transform(instance.getMainOut())" app-port [port]="instance.getMainOut()"></svg:g>
+    <svg:g [attr.transform]="transform(instance.getMainIn())" app-port [port]="instance.getMainIn()" aspect="port"></svg:g>
+    <svg:g [attr.transform]="transform(instance.getMainOut())" app-port [port]="instance.getMainOut()" aspect="port"></svg:g>
   </svg:g>
 
   <svg:g *ngIf="aspect === 'surrounding'" [attr.transform]="transform(instance)">
@@ -43,6 +43,11 @@
               (mousedown)="visual.selectInstance(instance)"
     ></svg:rect>
     <ng-content></ng-content>
+
+    <!-- Surrounding operator resizer -->
+    <svg:circle [attr.cx]="instance.getWidth() - 20" [attr.cy]="instance.getHeight() - 20"
+                class="sl-svg-op-resize" r="12px" (mousedown)="mouse.setResizing()">
+    </svg:circle>
   </svg:g>
 
   <svg:g *ngIf="aspect === 'text'">
@@ -53,5 +58,12 @@
               (mouseout)="visual.hoverInstance(null)">
       {{text()}}
     </svg:text>
+
+    <svg:g *ngFor="let dlg of instance.getDelegates()">
+      <svg:g app-port [port]="dlg.getIn()" aspect="text"></svg:g>
+      <svg:g app-port [port]="dlg.getOut()" aspect="text"></svg:g>
+    </svg:g>
+    <svg:g app-port [port]="instance.getMainIn()" aspect="text"></svg:g>
+    <svg:g app-port [port]="instance.getMainOut()" aspect="text"></svg:g>
   </svg:g>
 </svg:g>

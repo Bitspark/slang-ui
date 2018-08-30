@@ -21,6 +21,7 @@ import {PreviewObjectComponent} from './components/preview-object.component';
 import {ApiService} from './services/api.service';
 import {OperatorService} from './services/operator.service';
 import {VisualService} from './services/visual.service';
+import {MouseService} from './services/mouse.service';
 
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
@@ -45,7 +46,7 @@ import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
     CodemirrorModule,
     FileUploadModule
   ],
-  providers: [ApiService, OperatorService, VisualService],
+  providers: [ApiService, OperatorService, VisualService, MouseService],
   bootstrap: [AppComponent]
 })
 export class AppModule {
