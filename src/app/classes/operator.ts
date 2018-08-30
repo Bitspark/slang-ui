@@ -803,7 +803,7 @@ export class OperatorInstance extends Composable implements Identifiable {
   // }
 }
 
-export class Connection {
+export class Connection implements Identifiable {
   constructor(private src: Port, private dst: Port) {
     if (!src) {
       console.error('source null', src);
@@ -826,7 +826,7 @@ export class Connection {
   }
 }
 
-export class PortGroup extends Composable implements Identifiable {
+export class PortGroup extends Composable {
   private in: Port;
   private out: Port;
 
