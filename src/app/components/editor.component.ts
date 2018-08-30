@@ -8,8 +8,7 @@ import {
   createDefaultValue, deepEquals,
   generateSvgTransform, HTTP_REQUEST_DEF, HTTP_RESPONSE_DEF,
   normalizeConnections,
-  stringifyConnections,
-  SVGConnectionLineGenerator
+  stringifyConnections
 } from '../utils';
 import {ApiService} from '../services/api.service';
 import {VisualService} from '../services/visual.service';
@@ -100,8 +99,8 @@ export class EditorComponent implements OnInit, OnDestroy {
     const yDiff = event.screenY - this.mouse.getLastY();
 
     if (this.mouse.isDragging()) {
-      const selectedInstance = this.visual.getSelectedInstance();
-      if (!selectedInstance) {
+      const selectedInstance = this.visual.getSelected();
+      if (!selectedInstance || !(selectedInstance instanceof OperatorInstance)) {
         return;
       }
       selectedInstance.translate([xDiff / this.scale, yDiff / this.scale]);
@@ -122,7 +121,7 @@ export class EditorComponent implements OnInit, OnDestroy {
     }
   }
 
-  @HostListener('window:keyup', ['$event'])
+  @HostListener('window:keydown', ['$event'])
   keyEvent(event: KeyboardEvent) {
     if (!this.canvasFocus) {
       return;
@@ -130,23 +129,28 @@ export class EditorComponent implements OnInit, OnDestroy {
     switch (event.key) {
       case '+':
         this.scale *= 1.1;
+        this.cd.detectChanges();
         break;
       case '-':
         this.scale /= 1.1;
+        this.cd.detectChanges();
         break;
       case 'Delete':
       case 'Backspace':
-        if (!this.selectedEntity.entity) {
+        const selectedEntity = this.visual.getSelected();
+        if (!selectedEntity) {
           return;
         }
-        if (this.selectedEntity.entity instanceof OperatorInstance) {
-          this.removeInstance(this.selectedEntity.entity);
-          this.selectedEntity.entity = null;
+        if (selectedEntity instanceof OperatorInstance) {
+          this.removeInstance(selectedEntity);
+          this.visual.select(null);
+          this.visual.update(this.operator);
           break;
         }
-        if (this.selectedEntity.entity instanceof Connection) {
-          this.removeConnection(this.selectedEntity.entity);
-          this.selectedEntity.entity = null;
+        if (selectedEntity instanceof Connection) {
+          this.removeConnection(selectedEntity);
+          this.visual.select(null);
+          this.visual.update(this.operator);
           break;
         }
         break;
@@ -172,11 +176,12 @@ export class EditorComponent implements OnInit, OnDestroy {
         this.loadOperator(this.operatorName);
       }
     });
-    this.visual.subscribeInstanceSelect(ins => {
-      this.selectInstance(ins);
-    });
-    this.visual.subscribePortSelect(port => {
-      this.selectPort(port);
+    this.visual.subscribeSelect(obj => {
+      if (obj instanceof OperatorInstance) {
+        this.select(obj);
+      } else if (obj instanceof Port) {
+        this.selectPort(obj);
+      }
     });
     this.mouseCallback = this.mouse.subscribe((event: any, actionPhase: string) => this.mouseAction(event, actionPhase));
   }
@@ -384,7 +389,7 @@ export class EditorComponent implements OnInit, OnDestroy {
     return this.isAnyEntityHovered() && this.hoveredEntity.entity instanceof Connection;
   }
 
-  public selectInstance(ins: OperatorInstance) {
+  public select(ins: OperatorInstance) {
     this.mouse.setDragging();
     this.selectedEntity.entity = ins;
     this.newInstanceName = ins.getName();
@@ -395,20 +400,20 @@ export class EditorComponent implements OnInit, OnDestroy {
   }
 
   public isAnyEntitySelected(): boolean {
-    return this.selectedEntity.entity !== null;
+    return !!this.visual.getSelected();
   }
 
   public isSelected(entity: any): boolean {
-    return this.isAnyEntitySelected() && this.selectedEntity.entity === entity;
+    return this.isAnyEntitySelected() && this.visual.getSelected() === entity;
   }
 
   public isInstanceSelected(): boolean {
-    return this.isAnyEntitySelected() && this.selectedEntity.entity !== this.operator &&
-      this.selectedEntity.entity instanceof OperatorInstance;
+    return this.isAnyEntitySelected() && this.visual.getSelected() !== this.operator &&
+      this.visual.getSelected() instanceof OperatorInstance;
   }
 
   public isConnectionSelected(): boolean {
-    return this.isAnyEntitySelected() && this.selectedEntity.entity instanceof Connection;
+    return this.isAnyEntitySelected() && this.visual.getSelected() instanceof Connection;
   }
 
   public isPortRelatedToConnection(c: Connection, p: Port): boolean {

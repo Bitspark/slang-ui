@@ -6,25 +6,18 @@ import {Connection, Identifiable, OperatorInstance, Port} from '../classes/opera
 export class VisualService {
   private static pathMetaVisual = '/operator/meta/visual/';
 
-  private selectedConnection: Connection = null;
-  private hoveredConnection: Connection = null;
-
-  private selectedPort: Port = null;
-  private hoveredPort: Port = null;
-
-  private selectedInstance: OperatorInstance = null;
-  private hoveredInstance: OperatorInstance = null;
+  private selectedEntity: Identifiable = null;
+  private hoveredEntity: Identifiable = null;
 
   private updateCallbacks: Map<Object, Array<() => void>>;
 
-  private selectPortSubscriptions: Array<(Port) => void>;
-  private selectInstanceSubscriptions: Array<(OperatorInstance) => void>;
+  private selectEntitySubscriptions: Array<(Identifiable) => void>;
 
   constructor(private api: ApiService) {
     this.updateCallbacks = new Map<Object, Array<() => void>>();
 
-    this.selectPortSubscriptions = [];
-    this.selectInstanceSubscriptions = [];
+    this.selectEntitySubscriptions = [];
+    this.selectEntitySubscriptions = [];
   }
 
   public loadVisual(opName: string): Promise<any> {
@@ -48,129 +41,53 @@ export class VisualService {
     });
   }
 
-  private unselectAll() {
-    this.selectInstance(null);
-    this.selectPort(null);
-    this.selectConnection(null);
+  // HOVERING AND SELECTING
+
+  public hover(obj: Identifiable) {
+    const oldObj = this.hoveredEntity;
+    this.hoveredEntity = obj;
+    this.update(obj);
+    this.update(oldObj);
   }
 
-  // CONNECTION
-
-  public hoverConnection(conn: Connection) {
-    const oldConn = this.hoveredConnection;
-    this.hoveredConnection = conn;
-    this.update(conn);
-    this.update(oldConn);
+  public select(obj: Identifiable) {
+    const oldObj = this.selectedEntity;
+    this.selectedEntity = obj;
+    this.update(obj);
+    this.update(oldObj);
+    this.broadcastSelect(obj);
   }
 
-  public selectConnection(conn: Connection) {
-    if (conn !== null) {
-      this.unselectAll();
-    }
-    const oldConn = this.selectedConnection;
-    this.selectedConnection = conn;
-    this.update(conn);
-    this.update(oldConn);
-  }
-
-  public isConnectionHovered(conn: Connection): boolean {
-    if (!this.hoveredConnection) {
+  public isHovered(obj: Identifiable): boolean {
+    if (!this.hoveredEntity) {
       return false;
     }
-    return this.hoveredConnection.getIdentity() === conn.getIdentity();
+    return this.hoveredEntity.getIdentity() === obj.getIdentity();
   }
 
-  public isConnectionSelected(conn: Connection): boolean {
-    if (!this.selectedConnection) {
+  public isSelected(obj: Identifiable): boolean {
+    if (!this.selectedEntity) {
       return false;
     }
-    return this.selectedConnection.getIdentity() === conn.getIdentity();
+    return this.selectedEntity.getIdentity() === obj.getIdentity();
   }
 
-  // PORT
-
-  public subscribePortSelect(callback: (Port) => void) {
-    this.selectPortSubscriptions.push(callback);
+  public getHovered(): Identifiable {
+    return this.hoveredEntity;
   }
 
-  private broadcastPortSelect(port: Port): void {
-    for (const callback of this.selectPortSubscriptions) {
-      callback(port);
+  public getSelected(): Identifiable {
+    return this.selectedEntity;
+  }
+
+  public subscribeSelect(callback: (Identifiable) => void) {
+    this.selectEntitySubscriptions.push(callback);
+  }
+
+  private broadcastSelect(obj: Identifiable): void {
+    for (const callback of this.selectEntitySubscriptions) {
+      callback(obj);
     }
-  }
-
-  public hoverPort(port: Port) {
-    const oldPort = this.hoveredPort;
-    this.hoveredPort = port;
-    this.update(port);
-    this.update(oldPort);
-  }
-
-  public selectPort(port: Port) {
-    if (port !== null) {
-      this.broadcastPortSelect(port);
-      this.unselectAll();
-    }
-    const oldPort = this.selectedPort;
-    this.selectedPort = port;
-    this.update(port);
-    this.update(oldPort);
-  }
-
-  public isPortHovered(port: Port): boolean {
-    if (!this.hoveredPort) {
-      return false;
-    }
-    return this.hoveredPort.getIdentity() === port.getIdentity();
-  }
-
-  public isPortSelected(port: Port): boolean {
-    if (!this.selectedPort) {
-      return false;
-    }
-    return this.selectedPort.getIdentity() === port.getIdentity();
-  }
-
-  // INSTANCE
-
-  public subscribeInstanceSelect(callback: (OperatorInstance) => void) {
-    this.selectInstanceSubscriptions.push(callback);
-  }
-
-  private broadcastInstanceSelect(ins: OperatorInstance): void {
-    for (const callback of this.selectInstanceSubscriptions) {
-      callback(ins);
-    }
-  }
-
-  public hoverInstance(ins: OperatorInstance) {
-    const oldInstance = this.hoveredInstance;
-    this.hoveredInstance = ins;
-    this.update(ins);
-    this.update(oldInstance);
-  }
-
-  public selectInstance(ins: OperatorInstance) {
-    if (ins !== null) {
-      this.broadcastInstanceSelect(ins);
-      this.unselectAll();
-    }
-    const oldInstance = this.selectedInstance;
-    this.selectedInstance = ins;
-    this.update(ins);
-    this.update(oldInstance);
-  }
-
-  public isInstanceHovered(ins: OperatorInstance): boolean {
-    return this.hoveredInstance === ins;
-  }
-
-  public isInstanceSelected(ins: OperatorInstance): boolean {
-    return this.selectedInstance === ins;
-  }
-
-  public getSelectedInstance(): OperatorInstance {
-    return this.selectedInstance;
   }
 
   // CALLBACK HANDLING

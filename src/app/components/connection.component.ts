@@ -54,14 +54,14 @@ export class ConnectionComponent implements OnDestroy {
   public getCSSClass(): any {
     const cssClass = {};
 
-    cssClass['selected'] = this.visual.isConnectionSelected(this.connection);
-    cssClass['hovered'] = this.visual.isConnectionHovered(this.connection);
+    cssClass['selected'] = this.visual.isSelected(this.connection);
+    cssClass['hovered'] = this.visual.isHovered(this.connection);
 
     return cssClass;
   }
 
   public normalVisible(): boolean {
-    return !this.visual.isConnectionSelected(this.connection) && !this.visual.isConnectionHovered(this.connection);
+    return !this.visual.isSelected(this.connection) && !this.visual.isHovered(this.connection);
   }
 
   private subscribe() {

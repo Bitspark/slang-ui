@@ -13,8 +13,8 @@
   <svg:g *ngIf="aspect === 'clickable'">
     <!-- Clickable Invisible Connections -->
     <svg:path class="sl-svg-conn-click-overlay"
-              (mousedown)="visual.selectConnection(connection)"
-              (mouseover)="visual.hoverConnection(connection)" (mouseout)="visual.hoverConnection(null)"
+              (mousedown)="visual.select(connection)"
+              (mouseover)="visual.hover(connection)" (mouseout)="visual.hover(null)"
               [attr.d]="connectionPoints()"></svg:path>
   </svg:g>
 </svg:g>

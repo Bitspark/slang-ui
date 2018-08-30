@@ -33,21 +33,14 @@ export class InstanceComponent implements OnInit, OnDestroy {
 
   private fqn = '';
 
-  @Output()
-  public hoverPort: EventEmitter<any> = new EventEmitter();
-  @Output()
-  public selectPort: EventEmitter<any> = new EventEmitter();
-  @Output()
-  public selectInstance: EventEmitter<any> = new EventEmitter();
-
   public constructor(private ref: ChangeDetectorRef, public visual: VisualService, public mouse: MouseService) {
     ref.detach();
   }
 
   public getCSSClass(): any {
     const cssClass = {};
-    cssClass['selected'] = this.visual.isInstanceSelected(this.instance);
-    cssClass['hovered'] = this.visual.isInstanceHovered(this.instance);
+    cssClass['selected'] = this.visual.isSelected(this.instance);
+    cssClass['hovered'] = this.visual.isHovered(this.instance);
     cssClass['sl-svg-op-type'] = true;
     cssClass[this.instance.getOperatorType()] = true;
     return cssClass;

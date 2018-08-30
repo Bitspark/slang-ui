@@ -43,8 +43,8 @@ export class PortComponent implements OnDestroy {
   public getCSSClass(): any {
     const cssClass = {};
 
-    cssClass['selected'] = this.visual.isPortSelected(this.port);
-    cssClass['hovered'] = this.visual.isPortHovered(this.port);
+    cssClass['selected'] = this.visual.isSelected(this.port);
+    cssClass['hovered'] = this.visual.isHovered(this.port);
 
     cssClass[Type[this.port.getType()]] = true;
     cssClass[this.port.getOrientation().name()] = true;
@@ -113,10 +113,7 @@ export class PortComponent implements OnDestroy {
 
   public getPortLabelCSSClass(): any {
     const cssClasses = {};
-    /*cssClasses['displayed'] = this.isHovered(port) || this.isSelected(port) ||
-      this.isConnectionHovered() && this.isPortRelatedToConnection(this.hoveredEntity.entity as Connection, port) ||
-      this.isConnectionSelected() && this.isPortRelatedToConnection(this.selectedEntity.entity as Connection, port);*/
-    cssClasses['displayed'] = this.visual.isPortHovered(this.port) || this.visual.isPortSelected(this.port);
+    cssClasses['displayed'] = this.visual.isHovered(this.port) || this.visual.isSelected(this.port);
     return cssClasses;
   }
 }

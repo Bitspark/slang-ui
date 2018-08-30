@@ -6,9 +6,9 @@
               [ngClass]="getCSSClass()"
               [attr.width]="instance.getWidth()" [attr.height]="instance.getHeight()"
               paint-order="stroke fill"
-              (mouseover)="visual.hoverInstance(instance)"
-              (mouseout)="visual.hoverInstance(null)"
-              (mousedown)="visual.selectInstance(instance)"
+              (mouseover)="visual.hover(instance)"
+              (mouseout)="visual.hover(null)"
+              (mousedown)="visual.select(instance)"
     ></svg:rect>
     <svg:circle *ngIf="form() === 'circle'"
                 rx="20" ry="20"
@@ -16,9 +16,9 @@
                 [ngClass]="getCSSClass()"
                 [attr.cx]="radius()" [attr.cy]="radius()" [attr.r]="radius()"
                 paint-order="stroke fill"
-                (mouseover)="visual.hoverInstance(instance)"
-                (mouseout)="visual.hoverInstance(null)"
-                (mousedown)="visual.selectInstance(instance)"
+                (mouseover)="visual.hover(instance)"
+                (mouseout)="visual.hover(null)"
+                (mousedown)="visual.select(instance)"
     ></svg:circle>
   </svg:g>
 
@@ -38,9 +38,9 @@
               [ngClass]="getCSSClass()"
               [attr.width]="instance.getWidth()" [attr.height]="instance.getHeight()"
               paint-order="stroke fill"
-              (mouseover)="visual.hoverInstance(instance)"
-              (mouseout)="visual.hoverInstance(null)"
-              (mousedown)="visual.selectInstance(instance)"
+              (mouseover)="visual.hover(instance)"
+              (mouseout)="visual.hover(null)"
+              (mousedown)="visual.select(instance)"
     ></svg:rect>
     <!-- Instances -->
     <svg:g app-instance *ngFor="let ins of visualInstances(); trackBy: ins" [instance]="ins" aspect="operator">
@@ -91,9 +91,9 @@
   <svg:g *ngIf="aspect === 'text'">
     <svg:text text-anchor="middle" alignment-baseline="middle"
               [attr.x]="instance.getCenterX(instance.getParent())" [attr.y]="instance.getCenterY(instance.getParent())"
-              (mousedown)="visual.selectInstance(instance)"
-              (mouseover)="visual.hoverInstance(instance)"
-              (mouseout)="visual.hoverInstance(null)">
+              (mousedown)="visual.select(instance)"
+              (mouseover)="visual.hover(instance)"
+              (mouseout)="visual.hover(null)">
       {{text()}}
     </svg:text>
 
