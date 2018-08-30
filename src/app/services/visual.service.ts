@@ -80,8 +80,17 @@ export class VisualService {
     return this.selectedEntity;
   }
 
-  public subscribeSelect(callback: (Identifiable) => void) {
+  public subscribeSelect(callback: (Identifiable) => void): (Identifiable) => void {
     this.selectEntitySubscriptions.push(callback);
+    return callback;
+  }
+
+  public unsubscribeSelect(callback: (Identifiable) => void) {
+    this.selectEntitySubscriptions.push(callback);
+    const index = this.selectEntitySubscriptions.indexOf(callback);
+    if (index !== -1) {
+      this.selectEntitySubscriptions.splice(index, 1);
+    }
   }
 
   private broadcastSelect(obj: Identifiable): void {

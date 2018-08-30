@@ -328,16 +328,6 @@ export class EditorComponent implements OnInit, OnDestroy {
     this.refresh();
   }
 
-  public getPropertyNames(): Array<string> {
-    const names = [];
-    for (const propName in this.propertyDefs) {
-      if (this.propertyDefs.hasOwnProperty(propName)) {
-        names.push(propName);
-      }
-    }
-    return names;
-  }
-
   private displayYaml() {
     this.yamlRepr = safeDump(this.operatorDef.getDef());
   }
@@ -404,9 +394,6 @@ export class EditorComponent implements OnInit, OnDestroy {
     this.mouse.setDragging();
     this.selectedEntity.entity = ins;
     this.newInstanceName = ins.getName();
-    setTimeout(() => {
-      this.ref.detectChanges();
-    }, 300);
   }
 
   public selectConnection(conn: Connection) {
@@ -469,11 +456,6 @@ export class EditorComponent implements OnInit, OnDestroy {
       return (this.selectedEntity.entity as OperatorInstance).lastName();
     }
     return '';
-  }
-
-  public renameInstance(ins: OperatorInstance, newName: string) {
-    this.operator.renameInstance(ins.getName(), newName);
-    this.refresh();
   }
 
   public genericNames(ins: OperatorInstance): Array<string> {

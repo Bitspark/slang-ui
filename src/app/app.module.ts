@@ -18,6 +18,9 @@ import {ConnectionComponent} from './components/connection.component';
 import {TypeDefFormComponent} from './components/type-def-form.component';
 import {TypeValueFormComponent} from './components/type-value-form.component';
 import {PreviewObjectComponent} from './components/preview-object.component';
+import {EditorSidebarComponent} from './components/editor-sidebar.component';
+import {EditorDebugPanelComponent} from './components/editor-debug-panel.component';
+
 
 import {ApiService} from './services/api.service';
 import {OperatorService} from './services/operator.service';
@@ -27,12 +30,11 @@ import {MouseService} from './services/mouse.service';
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 
-
 @NgModule({
   declarations: [
     AppComponent, IndexComponent, TypeDefFormComponent, TypeValueFormComponent,
     OperatorListComponent, EditorComponent, InstanceComponent, PortComponent, ConnectionComponent,
-    PreviewObjectComponent
+    PreviewObjectComponent, EditorSidebarComponent, EditorDebugPanelComponent
   ],
   imports: [
     NgbModule.forRoot(),

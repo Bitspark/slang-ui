@@ -1,10 +1,21 @@
-import {Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges} from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  EventEmitter,
+  Input,
+  OnChanges,
+  OnInit,
+  Output,
+  SimpleChanges
+} from '@angular/core';
 import {createDefaultValue} from '../utils';
 
 @Component({
   selector: 'app-type-value-form',
   templateUrl: './type-value-form.component.html',
-  styleUrls: ['./type-value-form.component.scss']
+  styleUrls: ['./type-value-form.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TypeValueFormComponent implements OnInit, OnChanges {
 
@@ -33,7 +44,8 @@ export class TypeValueFormComponent implements OnInit, OnChanges {
     }
   };
 
-  constructor() {
+  constructor(private ref: ChangeDetectorRef) {
+    // def.detach();
   }
 
   // TYPE DEF

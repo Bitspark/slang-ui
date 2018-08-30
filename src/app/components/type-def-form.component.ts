@@ -1,10 +1,11 @@
-import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {OperatorDef, Type} from '../classes/operator';
 
 @Component({
   selector: 'app-type-def-form',
   templateUrl: './type-def-form.component.html',
-  styleUrls: ['./type-def-form.component.scss']
+  styleUrls: ['./type-def-form.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TypeDefFormComponent implements OnInit {
   public typeDef_: any = TypeDefFormComponent.newDefaultTypeDef('primitive');
@@ -27,7 +28,8 @@ export class TypeDefFormComponent implements OnInit {
   public newMapPortName = '';
   public newMapPortType = 'primitive';
 
-  constructor() {
+  constructor(private ref: ChangeDetectorRef) {
+    // ref.detach();
   }
 
   public static newDefaultTypeDef(type: string): any {
