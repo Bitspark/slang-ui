@@ -1,4 +1,4 @@
-import {Component, HostListener, OnInit, ChangeDetectionStrategy, ChangeDetectorRef} from '@angular/core';
+import {Component, HostListener, OnInit, ChangeDetectionStrategy, ChangeDetectorRef, OnDestroy} from '@angular/core';
 import {animate, state, style, transition, trigger} from '@angular/animations';
 import {ActivatedRoute} from '@angular/router';
 import {OperatorService} from '../services/operator.service';
@@ -35,7 +35,7 @@ import {MouseService} from '../services/mouse.service';
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class EditorComponent implements OnInit {
+export class EditorComponent implements OnInit, OnDestroy {
   // General
   public operatorName = '';
   public operatorDef: OperatorDef = null;
@@ -86,6 +86,8 @@ export class EditorComponent implements OnInit {
   public debuggingProps = {};
   public operatorEndpoint = '';
 
+  private mouseCallback: (event: string, actionPhase: string) => void;
+
   // Dragging
   private mouseAction(event, phase) {
     const update = phase === 'ongoing';
@@ -104,6 +106,12 @@ export class EditorComponent implements OnInit {
       }
       selectedInstance.translate([xDiff / this.scale, yDiff / this.scale]);
       this.visual.update(selectedInstance);
+      // Also update connections
+      this.operator.getConnections().forEach(conn => {
+        if (conn.getSource().getOperator() === selectedInstance || conn.getDestination().getOperator() === selectedInstance) {
+          this.visual.update(conn);
+        }
+      });
     } else if (this.mouse.isResizing()) {
       if (!this.operator) {
         return;
@@ -153,13 +161,6 @@ export class EditorComponent implements OnInit {
               private cd: ChangeDetectorRef,
               public mouse: MouseService) {
     cd.detach();
-    visual.subscribeInstanceSelect(ins => {
-      this.selectInstance(ins);
-    });
-    visual.subscribePortSelect(port => {
-      this.selectPort(port);
-    });
-    mouse.subscribe((event: any, actionPhase: string) => this.mouseAction(event, actionPhase));
   }
 
   ngOnInit() {
@@ -171,6 +172,17 @@ export class EditorComponent implements OnInit {
         this.loadOperator(this.operatorName);
       }
     });
+    this.visual.subscribeInstanceSelect(ins => {
+      this.selectInstance(ins);
+    });
+    this.visual.subscribePortSelect(port => {
+      this.selectPort(port);
+    });
+    this.mouseCallback = this.mouse.subscribe((event: any, actionPhase: string) => this.mouseAction(event, actionPhase));
+  }
+
+  ngOnDestroy() {
+    this.mouse.unsubscribe(this.mouseCallback);
   }
 
   // General
@@ -354,24 +366,6 @@ export class EditorComponent implements OnInit {
     if (this.isInstanceSelected()) {
       this.selectedEntity.entity.scale([-1, 1]);
     }
-  }
-
-  public connectionPoints(conn: Connection, outer: OperatorInstance): string {
-    return SVGConnectionLineGenerator.generateRoundPath(this.operator, conn);
-  }
-
-  public visualInstances(): Array<OperatorInstance> {
-    if (!this.operator) {
-      return [];
-    }
-    return Array.from(this.operator.getInstances().values()).filter(ins => ins.isVisible());
-  }
-
-  public visualConnections(): Array<Connection> {
-    if (!this.operator) {
-      return [];
-    }
-    return Array.from(this.operator.getConnections().values());
   }
 
   public hover(e: Port | Connection | null) {

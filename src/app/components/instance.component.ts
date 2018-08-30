@@ -1,5 +1,5 @@
-import {Component, EventEmitter, Input, OnInit, Output, ChangeDetectorRef, ChangeDetectionStrategy} from '@angular/core';
-import {OperatorInstance, Transformable} from '../classes/operator';
+import {Component, EventEmitter, Input, OnInit, Output, ChangeDetectorRef, ChangeDetectionStrategy, OnDestroy} from '@angular/core';
+import {Connection, OperatorInstance, Transformable} from '../classes/operator';
 import {generateSvgTransform} from '../utils';
 import {VisualService} from "../services/visual.service";
 import {MouseService} from "../services/mouse.service";
@@ -10,7 +10,9 @@ import {MouseService} from "../services/mouse.service";
   styleUrls: [],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class InstanceComponent implements OnInit {
+export class InstanceComponent implements OnInit, OnDestroy {
+  private callback: () => void;
+
   @Input()
   public aspect: string;
 
@@ -19,7 +21,7 @@ export class InstanceComponent implements OnInit {
   @Input()
   set instance(ins: OperatorInstance) {
     this.instance_ = ins;
-    this.visual.registerCallback(ins, () => {
+    this.callback = this.visual.registerCallback(ins, () => {
       this.ref.detectChanges();
     });
     this.ref.detectChanges();
@@ -56,6 +58,10 @@ export class InstanceComponent implements OnInit {
     this.ref.detectChanges();
   }
 
+  ngOnDestroy(): void {
+    this.visual.unregisterCallback(this.instance, this.callback);
+  }
+
   public transform(trans: Transformable): string {
     return generateSvgTransform(trans);
   }
@@ -87,6 +93,14 @@ export class InstanceComponent implements OnInit {
       default:
         return this.instance.lastName();
     }
+  }
+
+  public visualInstances(): Array<OperatorInstance> {
+    return Array.from(this.instance.getInstances().values()).filter(ins => ins.isVisible());
+  }
+
+  public visualConnections(): Array<Connection> {
+    return Array.from(this.instance.getConnections().values());
   }
 
 }

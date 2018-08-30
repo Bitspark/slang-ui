@@ -1,8 +1,8 @@
-import {Component, Input, ChangeDetectorRef, ChangeDetectionStrategy} from '@angular/core';
+import {Component, Input, ChangeDetectorRef, ChangeDetectionStrategy, OnDestroy} from '@angular/core';
 import {generateSvgTransform} from '../utils';
-import {Connection, Port, Transformable, Type} from '../classes/operator';
+import {Port, Transformable, Type} from '../classes/operator';
 import {VisualService} from '../services/visual.service';
-import {Orientation} from "../classes/vector";
+import {Orientation} from '../classes/vector';
 
 @Component({
   selector: 'app-port,[app-port]',
@@ -10,9 +10,15 @@ import {Orientation} from "../classes/vector";
   styleUrls: [],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class PortComponent {
+export class PortComponent implements OnDestroy {
+  private callback: () => void;
+
   constructor(private cd: ChangeDetectorRef, public visual: VisualService) {
     cd.detach();
+  }
+
+  ngOnDestroy(): void {
+    this.visual.unregisterCallback(this.port, this.callback);
   }
 
   @Input()
@@ -24,7 +30,7 @@ export class PortComponent {
   @Input()
   set port(port: Port) {
     this.port_ = port;
-    this.visual.registerCallback(port, () => {
+    this.callback = this.visual.registerCallback(port, () => {
       this.cd.detectChanges();
     });
     this.cd.detectChanges();

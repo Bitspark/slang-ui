@@ -68,8 +68,16 @@ export class MouseService {
     return false;
   }
 
-  public subscribe(callback: (event: string, actionPhase: string) => void) {
+  public unsubscribe(callback: (event: string, actionPhase: string) => void) {
+    const index = this.callbacks.indexOf(callback);
+    if (index !== -1) {
+      this.callbacks.splice(index, 1);
+    }
+  }
+
+  public subscribe(callback: (event: string, actionPhase: string) => void): (event: string, actionPhase: string) => void {
     this.callbacks.push(callback);
+    return callback;
   }
 
   private broadcast(event: string, actionPhase: string) {

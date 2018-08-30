@@ -52,56 +52,6 @@
                (mousemove)="mouse.track($event)">
 
             <svg:g *ngIf="operator" app-instance [instance]="operator" aspect="surrounding">
-              <!-- Instances -->
-              <svg:g app-instance *ngFor="let ins of visualInstances(); trackBy: ins" [instance]="ins" aspect="operator">
-              </svg:g>
-
-              <!-- Visible Connections -->
-              <svg:path *ngFor="let conn of visualConnections(); trackBy:conn"
-                        class="sl-svg-conn"
-                        [attr.d]="connectionPoints(conn, operator)"></svg:path>
-
-              <!-- Highlighted Connections -->
-              <svg:path *ngFor="let conn of visualConnections(); trackBy:conn"
-                        class="sl-svg-conn-highlight"
-                        [ngClass]="{selected: isSelected(conn), hovered: visual.isConnectionHovered(conn)}"
-                        [attr.d]="connectionPoints(conn, operator)"></svg:path>
-
-              <!-- Clickable Invisible Connections -->
-              <svg:path *ngFor="let conn of visualConnections(); trackBy:conn"
-                        class="sl-svg-conn-click-overlay"
-                        (click)="selectConnection(conn)"
-                        (mouseover)="visual.hoverConnection(conn)" (mouseout)="visual.hoverConnection(null)"
-                        [attr.d]="connectionPoints(conn, operator)"></svg:path>
-
-              <svg:g app-instance *ngFor="let ins of visualInstances(); trackBy: ins" [instance]="ins" aspect="text">
-              </svg:g>
-
-              <svg:g app-instance *ngFor="let ins of visualInstances(); trackBy: ins" [instance]="ins" aspect="port-text">
-              </svg:g>
-
-              <!-- Delegates -->
-              <svg:g *ngFor="let dlg of operator.getDelegates()" [attr.transform]="transform(dlg)">
-                <svg:g [attr.transform]="transform(dlg.getIn())" app-port [port]="dlg.getIn()" aspect="port"></svg:g>
-                <svg:g [attr.transform]="transform(dlg.getOut())" app-port [port]="dlg.getOut()" aspect="port"></svg:g>
-              </svg:g>
-              <svg:g *ngFor="let dlg of operator.getDelegates()" [attr.transform]="transform(dlg)">
-                <svg:g [attr.transform]="transform(dlg.getIn())" app-port [port]="dlg.getIn()" aspect="text"></svg:g>
-                <svg:g [attr.transform]="transform(dlg.getOut())" app-port [port]="dlg.getOut()" aspect="text"></svg:g>
-              </svg:g>
-
-              <!-- Services -->
-              <svg:g>
-                <svg:g [attr.transform]="transform(operator.getMainIn())" app-port [port]="operator.getMainIn()" aspect="port"></svg:g>
-                <svg:g [attr.transform]="transform(operator.getMainOut())" app-port [port]="operator.getMainOut()" aspect="port"></svg:g>
-              </svg:g>
-              <svg:g>
-                <svg:g app-port [port]="operator.getMainIn()" aspect="text"></svg:g>
-                <svg:g app-port [port]="operator.getMainOut()" aspect="text"></svg:g>
-              </svg:g>
-
-              <!-- Instance ports -->
-              <svg:g app-instance *ngFor="let ins of visualInstances(); trackBy: ins" [instance]="ins" aspect="port"></svg:g>
             </svg:g>
           </svg>
 

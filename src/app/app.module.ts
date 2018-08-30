@@ -14,6 +14,7 @@ import {EditorComponent} from './components/editor.component';
 import {OperatorListComponent} from './components/operator-list.component';
 import {InstanceComponent} from './components/instance.component';
 import {PortComponent} from './components/port.component';
+import {ConnectionComponent} from './components/connection.component';
 import {TypeDefFormComponent} from './components/type-def-form.component';
 import {TypeValueFormComponent} from './components/type-value-form.component';
 import {PreviewObjectComponent} from './components/preview-object.component';
@@ -30,7 +31,7 @@ import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 @NgModule({
   declarations: [
     AppComponent, IndexComponent, TypeDefFormComponent, TypeValueFormComponent,
-    OperatorListComponent, EditorComponent, InstanceComponent, PortComponent,
+    OperatorListComponent, EditorComponent, InstanceComponent, PortComponent, ConnectionComponent,
     PreviewObjectComponent
   ],
   imports: [

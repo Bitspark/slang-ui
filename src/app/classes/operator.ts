@@ -223,6 +223,10 @@ export class OperatorDef {
 
 }
 
+export interface Identifiable {
+  getIdentity(): string;
+}
+
 export class Transformable {
   protected dim: [number, number];
   protected mat: Mat3;
@@ -375,7 +379,7 @@ export class Composable extends Transformable {
 
 }
 
-export class OperatorInstance extends Composable {
+export class OperatorInstance extends Composable implements Identifiable {
   private static style = {
     opMinWidth: 150,
     opMinHeight: 150,
@@ -777,6 +781,26 @@ export class OperatorInstance extends Composable {
     const opName = this.getFullyQualifiedName().split('.');
     return opName[opName.length - 1];
   }
+
+  getIdentity(): string {
+    return this.getName();
+  }
+
+  // redraw(visual: VisualService): void {
+  //   visual.update(this);
+  //   if (this.mainIn) {
+  //     this.mainIn.redraw(visual);
+  //   }
+  //   if (this.mainOut) {
+  //     this.mainOut.redraw(visual);
+  //   }
+  //   if (this.services) {
+  //     this.services.forEach(srv => srv.redraw(visual));
+  //   }
+  //   if (this.delegates) {
+  //     this.delegates.forEach(dlg => dlg.redraw(visual));
+  //   }
+  // }
 }
 
 export class Connection {
@@ -796,9 +820,13 @@ export class Connection {
   public getDestination(): Port {
     return this.dst;
   }
+
+  public getIdentity(): string {
+    return this.src.getRefString() + '$' + this.dst.getRefString();
+  }
 }
 
-export class PortGroup extends Composable {
+export class PortGroup extends Composable implements Identifiable {
   private in: Port;
   private out: Port;
 
@@ -826,6 +854,12 @@ export class PortGroup extends Composable {
   public getPrimitivePorts(): Array<Port> {
     return this.in.getPrimitivePorts().concat(this.out.getPrimitivePorts());
   }
+
+  // redraw(visual: VisualService): void {
+  //   console.log('port group');
+  //   this.in.redraw(visual);
+  //   this.out.redraw(visual);
+  // }
 }
 
 export class Service extends PortGroup {
@@ -846,7 +880,7 @@ export class Delegate extends PortGroup {
   }
 }
 
-export class Port extends Composable {
+export class Port extends Composable implements Identifiable {
   /**
    * x: width [px]
    * y: height [px]
@@ -1129,5 +1163,19 @@ export class Port extends Composable {
       portName = this.name;
     }
     return portName;
+  }
+
+  // redraw(visual: VisualService): void {
+  //   visual.update(this);
+  //   if (this.map) {
+  //     this.map.forEach(entry => entry.redraw(visual));
+  //   }
+  //   if (this.stream) {
+  //     this.stream.redraw(visual);
+  //   }
+  // }
+
+  public getIdentity(): string {
+    return this.getRefString();
   }
 }

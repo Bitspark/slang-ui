@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {ApiService} from './api.service';
-import {Connection, OperatorInstance, Port} from '../classes/operator';
+import {Connection, Identifiable, OperatorInstance, Port} from '../classes/operator';
 
 @Injectable()
 export class VisualService {
@@ -56,14 +56,14 @@ export class VisualService {
 
   // CONNECTION
 
-  public async hoverConnection(conn: Connection) {
+  public hoverConnection(conn: Connection) {
     const oldConn = this.hoveredConnection;
     this.hoveredConnection = conn;
     this.update(conn);
     this.update(oldConn);
   }
 
-  public async selectConnection(conn: Connection) {
+  public selectConnection(conn: Connection) {
     if (conn !== null) {
       this.unselectAll();
     }
@@ -74,11 +74,17 @@ export class VisualService {
   }
 
   public isConnectionHovered(conn: Connection): boolean {
-    return this.hoveredConnection === conn;
+    if (!this.hoveredConnection) {
+      return false;
+    }
+    return this.hoveredConnection.getIdentity() === conn.getIdentity();
   }
 
   public isConnectionSelected(conn: Connection): boolean {
-    return this.selectedConnection === conn;
+    if (!this.selectedConnection) {
+      return false;
+    }
+    return this.selectedConnection.getIdentity() === conn.getIdentity();
   }
 
   // PORT
@@ -93,14 +99,14 @@ export class VisualService {
     }
   }
 
-  public async hoverPort(port: Port) {
+  public hoverPort(port: Port) {
     const oldPort = this.hoveredPort;
     this.hoveredPort = port;
     this.update(port);
     this.update(oldPort);
   }
 
-  public async selectPort(port: Port) {
+  public selectPort(port: Port) {
     if (port !== null) {
       this.broadcastPortSelect(port);
       this.unselectAll();
@@ -112,11 +118,17 @@ export class VisualService {
   }
 
   public isPortHovered(port: Port): boolean {
-    return this.hoveredPort === port;
+    if (!this.hoveredPort) {
+      return false;
+    }
+    return this.hoveredPort.getIdentity() === port.getIdentity();
   }
 
   public isPortSelected(port: Port): boolean {
-    return this.selectedPort === port;
+    if (!this.selectedPort) {
+      return false;
+    }
+    return this.selectedPort.getIdentity() === port.getIdentity();
   }
 
   // INSTANCE
@@ -163,24 +175,40 @@ export class VisualService {
 
   // CALLBACK HANDLING
 
-  public registerCallback(obj: Object, callback: () => void) {
-    const callbacks = this.updateCallbacks.get(obj);
+  public registerCallback(obj: Identifiable, callback: () => void): () => void {
+    const id = obj.getIdentity();
+    const callbacks = this.updateCallbacks.get(id);
     if (callbacks) {
       callbacks.push(callback);
     } else {
-      this.updateCallbacks.set(obj, [callback]);
+      this.updateCallbacks.set(id, [callback]);
+    }
+    return callback;
+  }
+
+  public unregisterCallback(obj: Identifiable, callback: () => void) {
+    const id = obj.getIdentity();
+    const callbacks = this.updateCallbacks.get(id);
+    if (callbacks) {
+      const index = callbacks.indexOf(callback);
+      if (index !== -1) {
+        callbacks.splice(index, 1);
+      }
     }
   }
 
-  public update(obj: Object) {
+  public update(obj: Identifiable) {
     if (!obj) {
       return;
     }
-    const callbacks = this.updateCallbacks.get(obj);
+    const id = obj.getIdentity();
+    const callbacks = this.updateCallbacks.get(id);
     if (callbacks) {
       for (const callback of callbacks) {
         callback();
       }
+    } else {
+      console.log('no callbacks found for', id);
     }
   }
 
