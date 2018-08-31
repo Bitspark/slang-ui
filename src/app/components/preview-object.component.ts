@@ -1,5 +1,6 @@
 import {Component, Input} from '@angular/core';
 import {DomSanitizer, SafeUrl} from '@angular/platform-browser';
+import {isType} from '../utils';
 
 @Component({
   selector: 'app-preview-object',
@@ -18,6 +19,10 @@ export class PreviewObjectComponent {
     return ['string', 'number', 'boolean'].indexOf(typeof obj) !== -1;
   }
 
+  public isPlaceholder(obj: any): boolean {
+    return typeof obj === 'string' && (obj as string).startsWith('@PH ');
+  }
+
   public colorClass(obj: any): string {
     if (typeof obj === 'string' && (obj as string).startsWith('base64:')) {
       return 'binary';
@@ -25,35 +30,16 @@ export class PreviewObjectComponent {
     return typeof obj;
   }
 
-  public isType(obj: any, entries: Array<string>): boolean {
-    if (!obj) {
-      return false;
-    }
-    for (const entry of entries) {
-      if (!obj.hasOwnProperty(entry)) {
-        return false;
-      }
-    }
-    for (const entry of obj) {
-      if (obj.hasOwnProperty(entry)) {
-        if (entries.indexOf(entry) === -1) {
-          return false;
-        }
-      }
-    }
-    return true;
-  }
-
   public isImage(obj: any): boolean {
-    return this.isType(obj, ['image', 'name']);
+    return isType(obj, ['image', 'name']);
   }
 
   public isFile(obj: any): boolean {
-    return this.isType(obj, ['file', 'name']);
+    return isType(obj, ['file', 'name']);
   }
 
   public isColor(obj: any): boolean {
-    return this.isType(obj, ['red', 'green', 'blue']);
+    return isType(obj, ['red', 'green', 'blue']);
   }
 
   public colorHex(obj: any): string {

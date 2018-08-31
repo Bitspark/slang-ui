@@ -1,5 +1,9 @@
 <div>
-  <div *ngIf="isPrimitive(object) && !expand" class="value" [ngClass]="colorClass(object)" (click)="expand = true">
+  <div *ngIf="isPlaceholder(object)" class="value primitive">
+    <i class="fa fa-spinner fa-spin"></i>
+  </div>
+
+  <div *ngIf="isPrimitive(object) && !expand && !isPlaceholder(object)" class="value" [ngClass]="colorClass(object)" (click)="expand = true">
     {{toString(object)}}
   </div>
   <textarea class="value" *ngIf="expand" [value]="object"></textarea>

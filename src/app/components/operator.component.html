@@ -153,14 +153,19 @@
           <div>
             <div *ngIf="debugState === 'debugging'">
               <h4><i class="fas fa-arrow-up"></i> Input</h4>
-              <app-type-value-form [(typeValue)]="inputValue" [typeDef]="debuggingInPort"></app-type-value-form>
-              <div>
-                <button [disabled]="!running" (click)="sendInputValue(inputValue)">Send</button>
+              <div *ngIf="!httpInput()">
+                <app-type-value-form [(typeValue)]="inputValue" [typeDef]="debuggingInPort"></app-type-value-form>
+                <div>
+                  <button [disabled]="!running" (click)="sendInputValue(inputValue)">Send</button>
+                </div>
+                <h6>Preview object</h6>
+                <div class="preview">
+                  <app-preview-object [object]="inputValue"></app-preview-object>
+                </div>
               </div>
-              <h6>Preview object</h6>
-              <div class="preview">
-                <app-preview-object [object]="inputValue"></app-preview-object>
-              </div>
+              <p *ngIf="httpInput()">
+                This operator is directly accessible via HTTP (see debug panel).
+              </p>
             </div>
             <div *ngIf="debugState === 'specifying'">
               <h4><i class="fas fa-plug"></i> Generics</h4>
@@ -178,12 +183,17 @@
           <div>
             <div *ngIf="debugState === 'debugging'">
               <h4><i class="fas fa-arrow-down"></i> Output</h4>
-              <div class="output-options">
-                <button *ngIf="debuggingReponses.length > 0" (click)="clearOutput()"><i class="fa fa-broom"></i> clear</button>
+              <div *ngIf="!httpOutput()">
+                <div class="output-options">
+                  <button *ngIf="debuggingReponses.length > 0" (click)="clearOutput()"><i class="fa fa-broom"></i> clear</button>
+                </div>
+                <div *ngFor="let resp of debuggingReponses" class="preview">
+                  <app-preview-object [object]="resp"></app-preview-object>
+                </div>
               </div>
-              <div *ngFor="let resp of debuggingReponses" class="preview">
-                <app-preview-object [object]="resp"></app-preview-object>
-              </div>
+              <p *ngIf="httpOutput()">
+                This operator is directly accessible via HTTP (see debug panel).
+              </p>
             </div>
             <div *ngIf="debugState === 'specifying'">
               <h4><i class="fas fa-stream"></i> Properties</h4>
