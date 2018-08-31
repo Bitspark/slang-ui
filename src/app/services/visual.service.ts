@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {ApiService} from './api.service';
-import {Connection, Identifiable, OperatorInstance, Port} from '../classes/operator';
+import {Identifiable} from '../classes/operator';
 
 @Injectable()
 export class VisualService {
@@ -9,14 +9,11 @@ export class VisualService {
   private selectedEntity: Identifiable = null;
   private hoveredEntity: Identifiable = null;
 
-  private updateCallbacks: Map<Object, Array<() => void>>;
-
+  private updateSubscriptions: Map<Object, Array<() => void>>;
   private selectEntitySubscriptions: Array<(Identifiable) => void>;
 
   constructor(private api: ApiService) {
-    this.updateCallbacks = new Map<Object, Array<() => void>>();
-
-    this.selectEntitySubscriptions = [];
+    this.updateSubscriptions = new Map<Object, Array<() => void>>();
     this.selectEntitySubscriptions = [];
   }
 
@@ -42,6 +39,13 @@ export class VisualService {
   }
 
   // HOVERING AND SELECTING
+
+  public clear() {
+    this.selectedEntity = null;
+    this.hoveredEntity = null;
+    this.updateSubscriptions = new Map<Object, Array<() => void>>();
+    this.selectEntitySubscriptions = [];
+  }
 
   public hover(obj: Identifiable) {
     const oldObj = this.hoveredEntity;
@@ -86,7 +90,6 @@ export class VisualService {
   }
 
   public unsubscribeSelect(callback: (Identifiable) => void) {
-    this.selectEntitySubscriptions.push(callback);
     const index = this.selectEntitySubscriptions.indexOf(callback);
     if (index !== -1) {
       this.selectEntitySubscriptions.splice(index, 1);
@@ -103,18 +106,18 @@ export class VisualService {
 
   public registerCallback(obj: Identifiable, callback: () => void): () => void {
     const id = obj.getIdentity();
-    const callbacks = this.updateCallbacks.get(id);
+    const callbacks = this.updateSubscriptions.get(id);
     if (callbacks) {
       callbacks.push(callback);
     } else {
-      this.updateCallbacks.set(id, [callback]);
+      this.updateSubscriptions.set(id, [callback]);
     }
     return callback;
   }
 
   public unregisterCallback(obj: Identifiable, callback: () => void) {
     const id = obj.getIdentity();
-    const callbacks = this.updateCallbacks.get(id);
+    const callbacks = this.updateSubscriptions.get(id);
     if (callbacks) {
       const index = callbacks.indexOf(callback);
       if (index !== -1) {
@@ -128,7 +131,7 @@ export class VisualService {
       return;
     }
     const id = obj.getIdentity();
-    const callbacks = this.updateCallbacks.get(id);
+    const callbacks = this.updateSubscriptions.get(id);
     if (callbacks) {
       for (const callback of callbacks) {
         callback();

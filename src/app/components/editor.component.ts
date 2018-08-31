@@ -2,7 +2,7 @@ import {Component, HostListener, OnInit, ChangeDetectionStrategy, ChangeDetector
 import {animate, state, style, transition, trigger} from '@angular/animations';
 import {ActivatedRoute} from '@angular/router';
 import {OperatorService} from '../services/operator.service';
-import {Composable, Connection, OperatorDef, OperatorInstance, Port, Transformable} from '../classes/operator';
+import {Composable, Connection, Identifiable, OperatorDef, OperatorInstance, Port, Transformable} from '../classes/operator';
 import {safeDump, safeLoad} from 'js-yaml';
 import {
   createDefaultValue, deepEquals,
@@ -86,6 +86,7 @@ export class EditorComponent implements OnInit, OnDestroy {
   public operatorEndpoint = '';
 
   private mouseCallback: (event: string, actionPhase: string) => void;
+  private callback: (Identifiable) => void;
 
   // Dragging
   private mouseAction(event, phase) {
@@ -161,6 +162,7 @@ export class EditorComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
+    this.visual.clear();
     this.route.params.subscribe(routeParams => {
       this.loadOperator(routeParams.operatorName);
     });
@@ -169,7 +171,7 @@ export class EditorComponent implements OnInit, OnDestroy {
         this.loadOperator(this.operatorName);
       }
     });
-    this.visual.subscribeSelect(obj => {
+    this.callback = this.visual.subscribeSelect(obj => {
       if (obj instanceof OperatorInstance) {
         this.selectInstance(obj);
       } else if (obj instanceof Port) {
@@ -181,6 +183,7 @@ export class EditorComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     this.mouse.unsubscribe(this.mouseCallback);
+    this.visual.unsubscribeSelect(this.callback);
   }
 
   // General
@@ -218,7 +221,7 @@ export class EditorComponent implements OnInit, OnDestroy {
       /*
        * We compare selectedEntity by identity, so after re-initializing all operators, that comparsion fails
        */
-      const newOperator = new OperatorInstance(this.operators, this.operatorName, '', this.operatorDef, {}, null, def, dim);
+      const newOperator = new OperatorInstance(this.operators, this.operatorName, 'Main', this.operatorDef, {}, null, def, dim);
       if (this.isSelected(this.operator)) {
         this.selectedEntity.entity = newOperator;
       }
@@ -280,10 +283,6 @@ export class EditorComponent implements OnInit, OnDestroy {
     this.updateDef(def);
   }
 
-  public stringify(val: any): string {
-    return JSON.stringify(val, undefined, 2);
-  }
-
   private updateInstance(ins: OperatorInstance) {
     this.visual.update(ins);
     // Also update connections
@@ -334,70 +333,10 @@ export class EditorComponent implements OnInit, OnDestroy {
 
   // Visual
 
-  public transform(trans: Transformable): string {
-    return generateSvgTransform(trans);
-  }
-
-  public translate(comp: Composable): string {
-    return `translate(${comp.getAbsX()},${comp.getAbsY()})`;
-  }
-
-  public rotateRight() {
-    const ins = this.getSelectedInstance();
-    if (!!ins) {
-      ins.rotate(Math.PI / 2);
-      this.updateInstance(ins);
-    }
-  }
-
-  public rotateLeft() {
-    const ins = this.getSelectedInstance();
-    if (!!ins) {
-      ins.rotate(-Math.PI / 2);
-      this.updateInstance(ins);
-    }
-  }
-
-  public mirrorVertically() {
-    const ins = this.getSelectedInstance();
-    if (!!ins) {
-      ins.scale([1, -1]);
-      this.updateInstance(ins);
-    }
-  }
-
-  public mirrorHorizontally() {
-    const ins = this.getSelectedInstance();
-    if (!!ins) {
-      ins.scale([-1, 1]);
-      this.updateInstance(ins);
-    }
-  }
-
-  public hover(e: Port | Connection | null) {
-    this.hoveredEntity.entity = e;
-  }
-
-  public isAnyEntityHovered(): boolean {
-    return this.hoveredEntity.entity !== null;
-  }
-
-  public isHovered(e: Port | Connection): boolean {
-    return this.hoveredEntity.entity === e;
-  }
-
-  public isConnectionHovered(): boolean {
-    return this.isAnyEntityHovered() && this.hoveredEntity.entity instanceof Connection;
-  }
-
   public selectInstance(ins: OperatorInstance) {
     this.mouse.setDragging();
     this.selectedEntity.entity = ins;
     this.newInstanceName = ins.getName();
-  }
-
-  public selectConnection(conn: Connection) {
-    this.selectedEntity.entity = conn;
   }
 
   public isAnyEntitySelected(): boolean {
@@ -408,74 +347,26 @@ export class EditorComponent implements OnInit, OnDestroy {
     return this.isAnyEntitySelected() && this.visual.getSelected() === entity;
   }
 
-  public isInstanceSelected(): boolean {
-    return this.isAnyEntitySelected() && this.visual.getSelected() !== this.operator &&
-      this.visual.getSelected() instanceof OperatorInstance;
-  }
-
-  public isConnectionSelected(): boolean {
-    return this.isAnyEntitySelected() && this.visual.getSelected() instanceof Connection;
-  }
-
-  public isPortRelatedToConnection(c: Connection, p: Port): boolean {
-    const srcPorts = c.getSource().getPrimitivePorts();
-    if (srcPorts.filter(_p => _p === p).length) {
-      return true;
-    }
-    const dstPorts = c.getDestination().getPrimitivePorts();
-    if (dstPorts.filter(_p => _p === p).length) {
-      return true;
-    }
-    return false;
-  }
-
-  public getSelectedInstance(): OperatorInstance {
-    const selected = this.visual.getSelected();
-    if (!(selected instanceof OperatorInstance)) {
-      return null;
-    }
-    return selected;
-  }
-
-  public getSelectedInstanceName(): string {
-    if (this.isInstanceSelected()) {
-      return (this.selectedEntity.entity as OperatorInstance).getName();
-    }
-    return '';
-  }
-
-  public getSelectedInstanceFQName(): string {
-    if (this.isInstanceSelected()) {
-      return (this.selectedEntity.entity as OperatorInstance).getFullyQualifiedName();
-    }
-    return '';
-  }
-
-  public getSelectedInstanceLastName(): string {
-    if (this.isInstanceSelected()) {
-      return (this.selectedEntity.entity as OperatorInstance).lastName();
-    }
-    return '';
-  }
-
   public genericNames(ins: OperatorInstance): Array<string> {
     return Array.from(ins.getGenericNames());
   }
 
   public displayUserMessage(msg: string) {
     this.userMessage = msg;
+    this.ref.detectChanges();
     if (this.userMessageTimeout != null) {
       clearTimeout(this.userMessageTimeout);
     }
     const that = this;
     this.userMessageTimeout = setTimeout(function () {
       that.userMessage = '';
+      that.ref.detectChanges();
     }, 5000);
   }
 
   public selectPort(port1: Port) {
     if (port1.isUnspecifiedGeneric()) {
-      this.displayUserMessage(`Cannot select unspecified generic port. Specify generic type '${port1.getGeneric()}'.`);
+      this.displayUserMessage(`Cannot connect unspecified generic port. Specify generic type '${port1.getGeneric()}'.`);
       return;
     }
 
@@ -559,14 +450,6 @@ export class EditorComponent implements OnInit, OnDestroy {
     this.updateDef(def);
   }
 
-  public addPropertyDef(propName: string) {
-    if (this.propertyDefs[propName]) {
-      return;
-    }
-    this.propertyDefs[propName] = TypeDefFormComponent.newDefaultTypeDef('primitive');
-    this.refresh();
-  }
-
   public removePropertyDef(propName: string) {
     delete this.propertyDefs[propName];
     this.refresh();
@@ -580,16 +463,6 @@ export class EditorComponent implements OnInit, OnDestroy {
         Array.from(this.operators.getElementaries().values()));
   }
 
-  public isGenericSpecified(ins: OperatorInstance, genName: string): boolean {
-    const generics = this.getGenerics(ins);
-    return generics && generics[genName];
-  }
-
-  public getGenerics(ins: OperatorInstance): any {
-    const oDef = this.operatorDef.getDef();
-    return oDef.operators[ins.getName()].generics;
-  }
-
   public addGeneric(ins: OperatorInstance, genName: string) {
     const oDef = this.operatorDef.getDef();
     const insOpDef = oDef.operators[ins.getName()];
@@ -601,32 +474,6 @@ export class EditorComponent implements OnInit, OnDestroy {
 
   public specifyGeneric(gens, name) {
     gens[name] = TypeDefFormComponent.newDefaultTypeDef('primitive');
-  }
-
-  public isPropertySpecified(ins: OperatorInstance, prop: { name: string, def: any }): boolean {
-    const props = this.getProperties(ins);
-    return props && typeof props[prop.name] !== 'undefined';
-  }
-
-  public getPropertyDefs(ins: OperatorInstance): Array<{ name: string, def: any }> {
-    const def = this.insPropDefs.get(ins.getName());
-    if (def) {
-      return def;
-    }
-
-    const generics = this.getGenerics(ins);
-    const arr = Array.from(ins.getPropertyDefs().entries()).map(each => {
-      const defCopy = JSON.parse(JSON.stringify(each[1]));
-      OperatorDef.specifyTypeDef(defCopy, generics, {}, {});
-      return {name: each[0], def: defCopy};
-    });
-    this.insPropDefs.set(ins.getName(), arr);
-    return arr;
-  }
-
-  public getProperties(ins: OperatorInstance): any {
-    const oDef = this.operatorDef.getDef();
-    return oDef.operators[ins.getName()].properties;
   }
 
   public addProperty(ins: OperatorInstance, prop: { name: string, def: any }): any {

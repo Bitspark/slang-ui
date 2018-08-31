@@ -1,6 +1,6 @@
-import {ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnDestroy} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnDestroy, OnInit} from '@angular/core';
 import {VisualService} from '../services/visual.service';
-import {Connection, Identifiable, OperatorDef, OperatorInstance, Port} from '../classes/operator';
+import {Identifiable, OperatorDef, OperatorInstance} from '../classes/operator';
 
 @Component({
   selector: 'app-editor-sidebar',
@@ -8,7 +8,7 @@ import {Connection, Identifiable, OperatorDef, OperatorInstance, Port} from '../
   styleUrls: [],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class EditorSidebarComponent implements OnDestroy {
+export class EditorSidebarComponent implements OnInit, OnDestroy {
   public surrounding_: OperatorInstance;
 
   @Input()
@@ -46,13 +46,16 @@ export class EditorSidebarComponent implements OnDestroy {
   public mainSrvPort: any;
   public propertyDefs: any;
 
-  private readonly callback: (Identifiable) => void;
+  private callback: (Identifiable) => void;
 
   private insPropDefs = new Map<string, Array<{ name: string, def: any }>>();
 
   constructor(private ref: ChangeDetectorRef, public visual: VisualService) {
-    this.callback = visual.subscribeSelect((ins: Identifiable) => {
-      ref.detectChanges();
+  }
+
+  public ngOnInit() {
+    this.callback = this.visual.subscribeSelect((ins: Identifiable) => {
+      this.ref.detectChanges();
     });
   }
 
@@ -93,7 +96,7 @@ export class EditorSidebarComponent implements OnDestroy {
 
   public getGenerics(ins: OperatorInstance): any {
     const oDef = this.definition.getDef();
-    return oDef.operators[ins.getName()].generics;
+    return oDef.operators[ins.getName()] ? oDef.operators[ins.getName()].generics : {};
   }
 
   public genericNames(ins: OperatorInstance): Array<string> {
@@ -138,4 +141,49 @@ export class EditorSidebarComponent implements OnDestroy {
     }
     return '';
   }
+
+
+  public rotateRight() {
+    const ins = this.getSelectedInstance();
+    if (!!ins) {
+      ins.rotate(Math.PI / 2);
+      this.updateInstance(ins);
+    }
+  }
+
+  public rotateLeft() {
+    const ins = this.getSelectedInstance();
+    if (!!ins) {
+      ins.rotate(-Math.PI / 2);
+      this.updateInstance(ins);
+    }
+  }
+
+  public mirrorVertically() {
+    const ins = this.getSelectedInstance();
+    if (!!ins) {
+      ins.scale([1, -1]);
+      this.updateInstance(ins);
+    }
+  }
+
+  public mirrorHorizontally() {
+    const ins = this.getSelectedInstance();
+    if (!!ins) {
+      ins.scale([-1, 1]);
+      this.updateInstance(ins);
+    }
+  }
+
+  // TODO: Move this logic!
+  private updateInstance(ins: OperatorInstance) {
+    this.visual.update(ins);
+    // Also update connections
+    this.surrounding.getConnections().forEach(conn => {
+      if (conn.getSource().getOperator() === ins || conn.getDestination().getOperator() === ins) {
+        this.visual.update(conn);
+      }
+    });
+  }
+
 }

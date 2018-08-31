@@ -822,7 +822,7 @@ export class Connection implements Identifiable {
   }
 
   public getIdentity(): string {
-    return this.src.getRefString() + '$' + this.dst.getRefString();
+    return this.src.getRefString() + ':' + this.dst.getRefString();
   }
 }
 
