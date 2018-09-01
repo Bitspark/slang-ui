@@ -9,10 +9,21 @@ import {compareOperatorDefs} from '../utils';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class OperatorListComponent implements OnInit {
+  private operatorList_: Array<OperatorDef>;
+
   @Input()
-  private operatorList: Array<OperatorDef>;
+  public set operatorList(list: Array<OperatorDef>) {
+    this.operatorList_ = list;
+    this.ref.detectChanges();
+  }
+
+  public get operatorList() {
+    return this.operatorList_;
+  }
+
   @Input()
   public buttonIcon = '';
+
   @Output()
   public operatorSelected = new EventEmitter();
 
@@ -63,8 +74,7 @@ export class OperatorListComponent implements OnInit {
   }
 
   public filteredOperatorList(): Array<OperatorDef> {
-    return this.operatorList
-      .filter(opDef => opDef.getName().toLowerCase().indexOf(this.filterString.toLowerCase()) !== -1);
+    return this.operatorList.filter(opDef => opDef.getName().toLowerCase().indexOf(this.filterString.toLowerCase()) !== -1);
   }
 
   public emitOperatorSelected(op: OperatorDef) {

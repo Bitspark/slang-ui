@@ -18,27 +18,27 @@ export class OperatorService {
     this.refresh();
   }
 
-        public async refresh() {
-          const response = await this.api.get(OperatorService.pathOperatorDefList);
-          this.localOperators = new Set<OperatorDef>();
-          this.libraryOperators = new Set<OperatorDef>();
-          this.elementaryOperators = new Set<OperatorDef>();
+  public async refresh() {
+    const response = await this.api.get(OperatorService.pathOperatorDefList);
+    this.localOperators = new Set<OperatorDef>();
+    this.libraryOperators = new Set<OperatorDef>();
+    this.elementaryOperators = new Set<OperatorDef>();
 
-          for (const operatorData of (response['objects'] as Array<any>)) {
-            operatorData.saved = true;
-            const operator = new OperatorDef(operatorData);
-            switch (operator.getType()) {
-              case 'local':
-                this.localOperators.add(operator);
-                break;
-              case 'library':
-                this.libraryOperators.add(operator);
-                break;
-              case 'elementary':
-                this.elementaryOperators.add(operator);
-                break;
-              default:
-              // TODO
+    for (const operatorData of (response['objects'] as Array<any>)) {
+      operatorData.saved = true;
+      const operator = new OperatorDef(operatorData);
+      switch (operator.getType()) {
+        case 'local':
+          this.localOperators.add(operator);
+          break;
+        case 'library':
+          this.libraryOperators.add(operator);
+          break;
+        case 'elementary':
+          this.elementaryOperators.add(operator);
+          break;
+        default:
+        // TODO
       }
     }
     this.loadedEmitter.emit(true);
