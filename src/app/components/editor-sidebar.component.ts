@@ -94,7 +94,7 @@ export class EditorSidebarComponent implements OnInit, OnDestroy {
       this.insGenericNames = [];
       this.insGenericSpecs = {};
       this.insPropertyDefs = [];
-      this.insPropertyValues = {};
+      this.insPropertyValues = undefined;
       if (this.surrounding !== ins) {
         this.insUpdateGenerics(ins);
         this.insUpdatePropertyDefs(ins);
@@ -152,6 +152,15 @@ export class EditorSidebarComponent implements OnInit, OnDestroy {
   }
 
   public insSpecifyProperty(ins: OperatorInstance, prop: { name: string, def: any }): any {
+    if (!this.insPropertyValues) {
+      const oDef = this.definition.getDef();
+      const insDef = oDef.operators[ins.getName()];
+      if (!insDef.properties) {
+        this.insPropertyValues = insDef.properties = {};
+      } else {
+        this.insPropertyValues = insDef.properties;
+      }
+    }
     this.insPropertyValues[prop.name] = createDefaultValue(prop.def);
     this.definitionChange.emit();
     this.ref.detectChanges();
@@ -180,8 +189,6 @@ export class EditorSidebarComponent implements OnInit, OnDestroy {
     }
     if (insDef.properties) {
       this.insPropertyValues = insDef.properties;
-    } else {
-      this.insPropertyValues = insDef.properties = {};
     }
   }
 
