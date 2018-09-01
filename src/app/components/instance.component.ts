@@ -3,6 +3,7 @@ import {Connection, OperatorInstance, Transformable} from '../classes/operator';
 import {generateSvgTransform} from '../utils';
 import {VisualService} from "../services/visual.service";
 import {MouseService} from "../services/mouse.service";
+import {BroadcastService} from "../services/broadcast.service";
 
 @Component({
   selector: 'app-instance,[app-instance]',
@@ -21,7 +22,7 @@ export class InstanceComponent implements OnInit, OnDestroy {
   @Input()
   set instance(ins: OperatorInstance) {
     this.instance_ = ins;
-    this.callback = this.visual.registerCallback(ins, () => {
+    this.callback = this.broadcast.registerCallback(ins, () => {
       this.ref.detectChanges();
     });
     this.ref.detectChanges();
@@ -33,14 +34,14 @@ export class InstanceComponent implements OnInit, OnDestroy {
 
   private fqn = '';
 
-  public constructor(private ref: ChangeDetectorRef, public visual: VisualService, public mouse: MouseService) {
+  public constructor(private ref: ChangeDetectorRef, public broadcast: BroadcastService, public mouse: MouseService) {
     ref.detach();
   }
 
   public getCSSClass(): any {
     const cssClass = {};
-    cssClass['selected'] = this.visual.isSelected(this.instance);
-    cssClass['hovered'] = this.visual.isHovered(this.instance);
+    cssClass['selected'] = this.broadcast.isSelected(this.instance);
+    cssClass['hovered'] = this.broadcast.isHovered(this.instance);
     cssClass['sl-svg-op-type'] = true;
     cssClass[this.instance.getOperatorType()] = true;
     return cssClass;
@@ -52,7 +53,7 @@ export class InstanceComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.visual.unregisterCallback(this.instance, this.callback);
+    this.broadcast.unregisterCallback(this.instance, this.callback);
   }
 
   public transform(trans: Transformable): string {

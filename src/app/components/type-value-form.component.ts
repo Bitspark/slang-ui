@@ -4,12 +4,15 @@ import {
   Component,
   EventEmitter,
   Input,
-  OnChanges,
+  OnChanges, OnDestroy,
   OnInit,
   Output,
   SimpleChanges
 } from '@angular/core';
 import {createDefaultValue} from '../utils';
+import {Identifiable} from '../classes/operator';
+import {BroadcastService} from '../services/broadcast.service';
+import * as deepEqual from 'deep-equal';
 
 @Component({
   selector: 'app-type-value-form',
@@ -17,7 +20,7 @@ import {createDefaultValue} from '../utils';
   styleUrls: ['./type-value-form.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class TypeValueFormComponent implements OnInit, OnChanges {
+export class TypeValueFormComponent implements OnInit, OnDestroy, OnChanges {
 
   private specialTypes = {
     'file': {
@@ -44,11 +47,12 @@ export class TypeValueFormComponent implements OnInit, OnChanges {
     }
   };
 
-  constructor(private ref: ChangeDetectorRef) {
-    // def.detach();
+  constructor(private ref: ChangeDetectorRef, private broadcast: BroadcastService) {
+    ref.detach();
   }
 
   // TYPE DEF
+  private oldTypeDef_: any;
   private typeDef_: any;
 
   get typeDef() {
@@ -58,6 +62,9 @@ export class TypeValueFormComponent implements OnInit, OnChanges {
   @Input()
   set typeDef(val) {
     this.typeDef_ = val;
+    if (this.typeValue) {
+      this.ref.detectChanges();
+    }
   }
 
   // TYPE VALUE
@@ -66,17 +73,41 @@ export class TypeValueFormComponent implements OnInit, OnChanges {
   @Output()
   public typeValueChange = new EventEmitter();
 
-  @Input()
   get typeValue() {
     return this.typeVal_;
   }
 
+  @Input()
   set typeValue(val) {
     this.typeVal_ = val;
     this.emitChange();
+    this.ref.detectChanges();
   }
 
+  // TYPE DEF CHANGE CALLBACK
+
+  private callback: any;
+
+  @Input()
+  public subscribe: Identifiable;
+
   ngOnInit() {
+    if (!!this.subscribe) {
+      this.oldTypeDef_ = JSON.parse(JSON.stringify(this.typeDef));
+      this.callback = this.broadcast.registerCallback(this.subscribe, () => {
+        if (!deepEqual(this.typeDef, this.oldTypeDef_)) {
+          this.typeValue = createDefaultValue(this.typeDef);
+        }
+        this.ref.detectChanges();
+        this.oldTypeDef_ = JSON.parse(JSON.stringify(this.typeDef));
+      });
+    }
+  }
+
+  ngOnDestroy() {
+    if (!!this.subscribe) {
+      this.broadcast.unregisterCallback(this.subscribe, this.callback);
+    }
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -94,7 +125,7 @@ export class TypeValueFormComponent implements OnInit, OnChanges {
           entries.push(key);
         }
       }
-    } else {
+    } else if (this.typeValue) {
       for (let i = 0; i < this.typeValue.length; i++) {
         entries.push(i);
       }
@@ -105,6 +136,7 @@ export class TypeValueFormComponent implements OnInit, OnChanges {
   public add(): void {
     const ne = createDefaultValue(this.typeDef.stream);
     this.typeValue.push(ne);
+    this.ref.detectChanges();
   }
 
   public setIndex(i: number, val: any) {
@@ -113,6 +145,7 @@ export class TypeValueFormComponent implements OnInit, OnChanges {
 
   public removeIndex(i: number) {
     this.typeValue.splice(i, 1);
+    this.ref.detectChanges();
   }
 
   public selectFile(event) {
@@ -121,7 +154,7 @@ export class TypeValueFormComponent implements OnInit, OnChanges {
     const file = event.srcElement.files[0];
     const reader = new FileReader();
     const that = this;
-    reader.onload = function() {
+    reader.onload = function () {
       const data = reader.result;
       const base64 = data.substr(data.indexOf(',') + 1);
       if (!special) {

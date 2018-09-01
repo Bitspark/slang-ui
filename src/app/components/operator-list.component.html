@@ -2,7 +2,7 @@
   <div class="input-group-prepend">
     <div class="input-group-text"><i class="fas fa-search"></i></div>
   </div>
-  <input placeholder="Search operators" type="text" class="form-control" [(ngModel)]="filterString"/>
+  <input placeholder="Search operators" type="text" class="form-control" [ngModel]="filterString" (ngModelChange)="filterStringChanged($event)"/>
 </div>
 <div class="sl-ui-scrollable">
   <div class="sl-operator-list">

@@ -1,11 +1,12 @@
-import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {OperatorDef} from '../classes/operator';
 import {compareOperatorDefs} from '../utils';
 
 @Component({
   selector: 'app-operator-list',
   templateUrl: './operator-list.component.html',
-  styleUrls: ['./operator-list.component.scss']
+  styleUrls: ['./operator-list.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class OperatorListComponent implements OnInit {
   @Input()
@@ -17,7 +18,8 @@ export class OperatorListComponent implements OnInit {
 
   public filterString = '';
 
-  constructor() {
+  constructor(private ref: ChangeDetectorRef) {
+    ref.detach();
   }
 
   private static groupOperatorList(opList: Array<OperatorDef>,
@@ -53,6 +55,7 @@ export class OperatorListComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.ref.detectChanges();
   }
 
   public hasGlobals(): boolean {
@@ -84,5 +87,11 @@ export class OperatorListComponent implements OnInit {
       (opNameList: string[]) => opNameList[opNameList.length - 1]
     );
   }
+
+  public filterStringChanged(filterString: string) {
+    this.filterString = filterString;
+    this.ref.detectChanges();
+  }
+
 }
 

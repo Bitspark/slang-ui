@@ -16,8 +16,8 @@
             d="M 0 14 L 17 14 L 8 0 z"></path>
       <!-- Clickable port -->
       <svg:rect class="sl-svg-port-click-overlay"
-                (click)="visual.select(port)"
-                (mouseover)="visual.hover(port)" (mouseout)="visual.hover(null)"
+                (click)="broadcast.select(port)"
+                (mouseover)="broadcast.hover(port)" (mouseout)="broadcast.hover(null)"
                 [attr.width]="port.getWidth()" [attr.height]="port.getHeight()"/>
     </svg:g>
 

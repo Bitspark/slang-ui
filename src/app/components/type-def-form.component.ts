@@ -1,5 +1,6 @@
 import {ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {OperatorDef, Type} from '../classes/operator';
+import {Identifiable, OperatorDef, Type} from '../classes/operator';
+import {BroadcastService} from "../services/broadcast.service";
 
 @Component({
   selector: 'app-type-def-form',
@@ -21,15 +22,22 @@ export class TypeDefFormComponent implements OnInit {
     this.typeDef_ = val;
     this.mapToSubs();
     this.typeDefChange.emit(this.typeDef_);
+    if (!!this.typeDefIdentity) {
+      this.broadcast.update(this.typeDefIdentity);
+    }
+    this.ref.detectChanges();
   }
+
+  @Input()
+  public typeDefIdentity: Identifiable;
 
   public subs: Array<{ name: string, def: any }> = [];
   public types = Object.keys(Type).filter(t => typeof Type[t] === 'number');
-  public newMapPortName = '';
-  public newMapPortType = 'primitive';
+  public newSubName = '';
+  public newSubType = 'primitive';
 
-  constructor(private ref: ChangeDetectorRef) {
-    // ref.detach();
+  constructor(private ref: ChangeDetectorRef, private broadcast: BroadcastService) {
+    ref.detach();
   }
 
   public static newDefaultTypeDef(type: string): any {
@@ -106,7 +114,8 @@ export class TypeDefFormComponent implements OnInit {
         this.typeDef[tp] = 'itemType';
         break;
     }
-    this.handleTypeDefChanged();
+    this.typeDefChanged();
+    this.ref.detectChanges();
   }
 
   private getSub(name: string): any | null {
@@ -123,7 +132,8 @@ export class TypeDefFormComponent implements OnInit {
     }
     this.subs.push({name: name, def: TypeDefFormComponent.newDefaultTypeDef(type)});
     this.resetNewMapPortName();
-    this.handleTypeDefChanged();
+    this.typeDefChanged();
+    this.ref.detectChanges();
   }
 
   public renameSubName(oldName, newName: string) {
@@ -139,28 +149,37 @@ export class TypeDefFormComponent implements OnInit {
       return;
     }
     existingMapEntry.name = newName;
-    this.handleTypeDefChanged();
+    this.typeDefChanged();
   }
 
   public renameGenericName(newName: string) {
-    this.handleTypeDefChanged();
+    this.typeDefChanged();
   }
 
-  public removeMapPort(name: string) {
+  public removeSub(name: string) {
     const idx = this.getMapEntryIndex(name);
     if (idx > -1) {
       this.subs.splice(idx, 1);
     }
-    this.handleTypeDefChanged();
+    this.typeDefChanged();
+    this.ref.detectChanges();
   }
 
-  public handleTypeDefChanged() {
+  public setMapPortName(name: string) {
+    this.newSubName = name;
+    this.ref.detectChanges();
+  }
+
+  public typeDefChanged() {
     this.subsToMap();
     this.typeDefChange.emit(this.typeDef_);
+    if (!!this.typeDefIdentity) {
+      this.broadcast.update(this.typeDefIdentity);
+    }
   }
 
   public resetNewMapPortName() {
-    this.newMapPortName = '';
+    this.newSubName = '';
   }
 
   public isMap(): boolean {

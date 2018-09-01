@@ -131,7 +131,7 @@
         </div>
       </div>
       <div id="sl-instance-sidebar" class="d-none d-md-block sl-ui-sidebar col-2" *ngIf="!debugState">
-        <app-editor-sidebar [definition]="operatorDef" [surrounding]="operator"></app-editor-sidebar>
+        <app-editor-sidebar [definition]="operatorDef" [surrounding]="operator" (definitionChange)="sidebarDefinitionChange()"></app-editor-sidebar>
       </div>
     </div>
   </div>

@@ -95,6 +95,7 @@ export class OperatorDef {
         }
       }
       if (def['type'] === 'undefined') {
+        console.log(def, gens, props, propDefs);
         def['type'] = 'generic';
         def['generic'] += '?';
       }
@@ -225,6 +226,22 @@ export class OperatorDef {
 
 export interface Identifiable {
   getIdentity(): string;
+}
+
+export class Identity implements Identifiable {
+  private readonly id: string;
+
+  constructor (id: any) {
+    if (typeof id !== 'string') {
+      this.id = JSON.stringify(id);
+    } else {
+      this.id = id;
+    }
+  }
+
+  public getIdentity(): string {
+    return this.id;
+  }
 }
 
 export class Transformable {

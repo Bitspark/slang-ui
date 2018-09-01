@@ -25,7 +25,7 @@
     <div *ngIf="typeDef.type === 'map'" class="sl-map-box" style="padding-left: 5px; margin-left: 5px">
       <div *ngFor="let key of getEntries()">
         {{key}}
-        <app-type-value-form [(typeValue)]="typeValue[key]" (typeValueChange)="emitChange()" [typeDef]="typeDef.map[key]"></app-type-value-form>
+        <app-type-value-form [subscribe]="subscribe" [(typeValue)]="typeValue[key]" (typeValueChange)="emitChange()" [typeDef]="typeDef.map[key]"></app-type-value-form>
       </div>
     </div>
 
@@ -33,7 +33,7 @@
       <div *ngFor="let i of getEntries()">
         <button (click)="removeIndex(i)"><i class="fa fa-trash"></i></button>
         {{i + 1}}.
-        <app-type-value-form [(typeValue)]="typeValue[i]" (typeValueChange)="emitChange()" [typeDef]="typeDef.stream"></app-type-value-form>
+        <app-type-value-form [subscribe]="subscribe" [(typeValue)]="typeValue[i]" (typeValueChange)="emitChange()" [typeDef]="typeDef.stream"></app-type-value-form>
       </div>
       <button (click)="add()">Add</button>
     </div>

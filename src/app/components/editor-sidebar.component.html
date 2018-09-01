@@ -1,34 +1,34 @@
 <div>
   <div *ngIf="isAnyEntitySelected()" class="text-muted small">
-    ID: <span class="text-monospace">{{visual.getSelected().getIdentity()}}</span>
+    ID: <span class="text-monospace">{{broadcast.getSelected().getIdentity()}}</span>
   </div>
   <div *ngIf="!isAnyEntitySelected()" class="text-muted small">
     Nothing selected.
   </div>
-  <div class="sl-ui-scrollable" *ngIf="visual.getSelected() === surrounding">
+  <div class="sl-ui-scrollable" *ngIf="broadcast.getSelected() === surrounding">
     <h4>Main operator</h4>
     <h5>
       In-ports
     </h5>
     <div class="sl-form-box" style="display: inline-block" *ngIf="mainSrvPort">
-      <app-type-def-form [(typeDef)]="mainSrvPort.in" (typeDefChange)="refresh()"></app-type-def-form>
+      <app-type-def-form [(typeDef)]="mainSrvPort.in" (typeDefChange)="typeDefChanged()"></app-type-def-form>
     </div>
     <h5>
       Out-ports
     </h5>
     <div class="sl-form-box" style="display: inline-block" *ngIf="mainSrvPort">
-      <app-type-def-form [(typeDef)]="mainSrvPort.out" (typeDefChange)="refresh()"></app-type-def-form>
+      <app-type-def-form [(typeDef)]="mainSrvPort.out" (typeDefChange)="typeDefChanged()"></app-type-def-form>
     </div>
     <h5>Properties</h5>
     <div class="sl-form-box" *ngFor="let propName of getPropertyNames()">
       <h6>{{propName}}</h6>
       <button (click)="removePropertyDef(propName)"><i class="fa fa-trash"></i></button>
-      <app-type-def-form [(typeDef)]="propertyDefs[propName]" (typeDefChange)="refresh()"></app-type-def-form>
+      <app-type-def-form [(typeDef)]="mainPropertyDefs[propName]" (typeDefChange)="propertyChanged()"></app-type-def-form>
     </div>
     <div class="sl-form-box">
       <h6><label for="newPropName">New property</label></h6>
-      <input id="newPropName" [(ngModel)]="newPropName">
-      <button (click)="addPropertyDef(newPropName); newPropName = '';">add</button>
+      <input id="newPropName" [(ngModel)]="mainNewPropName">
+      <button (click)="addPropertyDef(newPropName); mainNewPropName = '';">add</button>
     </div>
   </div>
 
@@ -49,38 +49,31 @@
       <button class="btn btn-outline-secondary" (click)="mirrorVertically()"><i
         class="fas fa-arrows-alt-v"></i></button>
     </div>
-    <!--
-    <h5><label for="instanceName">Rename</label></h5>
-    <div class="sl-form-box">
-      <input id="instanceName" [(ngModel)]="newInstanceName"/>
-      <button (click)="renameInstance(selectedEntity.entity, newInstanceName); selectedEntity.entity = null">
-        rename
-      </button>
-    </div>
-    -->
-    <div *ngIf="genericNames(getSelectedInstance()).length > 0">
+    <div *ngIf="insGenericNames.length > 0">
       <h5>Generics</h5>
-      <div class="sl-form-box" *ngFor="let genName of genericNames(getSelectedInstance())">
+      <div class="sl-form-box" *ngFor="let genName of insGenericNames">
         <h6>{{ genName }}</h6>
-        <app-type-def-form *ngIf="isGenericSpecified(getSelectedInstance(), genName)"
-                           [(typeDef)]="getGenerics(getSelectedInstance())[genName]"
-                           (typeDefChange)="refresh()"></app-type-def-form>
-        <button *ngIf="!isGenericSpecified(getSelectedInstance(), genName)"
-                (click)="addGeneric(getSelectedInstance(), genName)">Specify
+        <app-type-def-form *ngIf="insGenericSpecified(getSelectedInstance(), genName)"
+                           [(typeDef)]="insGenericSpecs[genName]"
+                           (typeDefChange)="insGenericTypeChanged()"></app-type-def-form>
+        <button *ngIf="!insGenericSpecified(getSelectedInstance(), genName)"
+                (click)="insSpecifyGeneric(getSelectedInstance(), genName)">Specify
         </button>
       </div>
     </div>
-    <div *ngIf="getPropertyDefs(getSelectedInstance()).length > 0">
+    <div *ngIf="insPropertyDefs.length > 0">
       <h5>Properties</h5>
-      <div class="sl-form-box" *ngFor="let prop of getPropertyDefs(getSelectedInstance())">
+      <div class="sl-form-box" *ngFor="let prop of insPropertyDefs">
         <h6>{{ prop.name }}</h6>
-        <app-type-value-form *ngIf="isPropertySpecified(getSelectedInstance(), prop)"
+        <app-type-value-form *ngIf="insPropertyValueSpecified(getSelectedInstance(), prop)"
                              [typeDef]="prop.def"
-                             [(typeValue)]="getProperties(getSelectedInstance())[prop.name]"
-                             (typeValueChange)="refresh(true)"></app-type-value-form>
-        <button *ngIf="!isPropertySpecified(getSelectedInstance(), prop)"
-                [disabled]="prop.def.type === 'generic' && !isGenericSpecified(getSelectedInstance(), prop.def.generic)"
-                (click)="addProperty(getSelectedInstance(), prop)">Specify
+                             [(typeValue)]="insPropertyValues[prop.name]"
+                             [subscribe]="insEditorSidebarIdentity"
+                             (typeValueChange)="insPropertyValueChanged()">
+        </app-type-value-form>
+        <button *ngIf="!insPropertyValueSpecified(getSelectedInstance(), prop)"
+                [disabled]="!insTypeSpecified(prop.def)"
+                (click)="insSpecifyProperty(getSelectedInstance(), prop)">Specify
         </button>
       </div>
     </div>

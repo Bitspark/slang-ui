@@ -3,6 +3,7 @@ import {generateSvgTransform} from '../utils';
 import {Port, Transformable, Type} from '../classes/operator';
 import {VisualService} from '../services/visual.service';
 import {Orientation} from '../classes/vector';
+import {BroadcastService} from "../services/broadcast.service";
 
 @Component({
   selector: 'app-port,[app-port]',
@@ -13,12 +14,12 @@ import {Orientation} from '../classes/vector';
 export class PortComponent implements OnDestroy {
   private callback: () => void;
 
-  constructor(private cd: ChangeDetectorRef, public visual: VisualService) {
+  constructor(private cd: ChangeDetectorRef, public broadcast: BroadcastService) {
     cd.detach();
   }
 
   ngOnDestroy(): void {
-    this.visual.unregisterCallback(this.port, this.callback);
+    this.broadcast.unregisterCallback(this.port, this.callback);
   }
 
   @Input()
@@ -30,7 +31,7 @@ export class PortComponent implements OnDestroy {
   @Input()
   set port(port: Port) {
     this.port_ = port;
-    this.callback = this.visual.registerCallback(port, () => {
+    this.callback = this.broadcast.registerCallback(port, () => {
       this.cd.detectChanges();
     });
     this.cd.detectChanges();
@@ -43,8 +44,8 @@ export class PortComponent implements OnDestroy {
   public getCSSClass(): any {
     const cssClass = {};
 
-    cssClass['selected'] = this.visual.isSelected(this.port);
-    cssClass['hovered'] = this.visual.isHovered(this.port);
+    cssClass['selected'] = this.broadcast.isSelected(this.port);
+    cssClass['hovered'] = this.broadcast.isHovered(this.port);
 
     cssClass[Type[this.port.getType()]] = true;
     cssClass[this.port.getOrientation().name()] = true;
@@ -113,7 +114,7 @@ export class PortComponent implements OnDestroy {
 
   public getPortLabelCSSClass(): any {
     const cssClasses = {};
-    cssClasses['displayed'] = this.visual.isHovered(this.port) || this.visual.isSelected(this.port);
+    cssClasses['displayed'] = this.broadcast.isHovered(this.port) || this.broadcast.isSelected(this.port);
     return cssClasses;
   }
 }

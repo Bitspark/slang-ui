@@ -2,6 +2,7 @@ import {Component, ChangeDetectionStrategy, Input, ChangeDetectorRef, OnDestroy}
 import {Connection, OperatorInstance, Type} from '../classes/operator';
 import {VisualService} from '../services/visual.service';
 import {SVGConnectionLineGenerator} from '../utils';
+import {BroadcastService} from "../services/broadcast.service";
 
 @Component({
   selector: 'app-connection,[app-connection]',
@@ -43,7 +44,7 @@ export class ConnectionComponent implements OnDestroy {
     return this.aspect_;
   }
 
-  constructor(private cd: ChangeDetectorRef, public visual: VisualService) {
+  constructor(private cd: ChangeDetectorRef, public broadcast: BroadcastService) {
     cd.detach();
   }
 
@@ -54,25 +55,25 @@ export class ConnectionComponent implements OnDestroy {
   public getCSSClass(): any {
     const cssClass = {};
 
-    cssClass['selected'] = this.visual.isSelected(this.connection);
-    cssClass['hovered'] = this.visual.isHovered(this.connection);
+    cssClass['selected'] = this.broadcast.isSelected(this.connection);
+    cssClass['hovered'] = this.broadcast.isHovered(this.connection);
 
     return cssClass;
   }
 
   public normalVisible(): boolean {
-    return !this.visual.isSelected(this.connection) && !this.visual.isHovered(this.connection);
+    return !this.broadcast.isSelected(this.connection) && !this.broadcast.isHovered(this.connection);
   }
 
   private subscribe() {
-    this.callback = this.visual.registerCallback(this.connection, () => {
+    this.callback = this.broadcast.registerCallback(this.connection, () => {
       this.cd.detectChanges();
     });
     this.cd.detectChanges();
   }
 
   ngOnDestroy(): void {
-    this.visual.unregisterCallback(this.connection, this.callback);
+    this.broadcast.unregisterCallback(this.connection, this.callback);
   }
 
 }

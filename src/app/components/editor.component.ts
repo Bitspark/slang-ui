@@ -1,21 +1,21 @@
 import {Component, HostListener, OnInit, ChangeDetectionStrategy, ChangeDetectorRef, OnDestroy} from '@angular/core';
-import {animate, state, style, transition, trigger} from '@angular/animations';
 import {ActivatedRoute} from '@angular/router';
-import {OperatorService} from '../services/operator.service';
-import {Composable, Connection, Identifiable, OperatorDef, OperatorInstance, Port, Transformable} from '../classes/operator';
-import {safeDump, safeLoad} from 'js-yaml';
-import {
-  createDefaultValue, deepEquals,
-  generateSvgTransform, HTTP_REQUEST_DEF, HTTP_RESPONSE_DEF,
-  normalizeConnections,
-  stringifyConnections
-} from '../utils';
-import {ApiService} from '../services/api.service';
-import {VisualService} from '../services/visual.service';
-import 'codemirror/mode/yaml/yaml.js';
-import {TypeDefFormComponent} from './type-def-form.component';
 import {HttpClient} from '@angular/common/http';
+import {animate, state, style, transition, trigger} from '@angular/animations';
+
+import {ApiService} from '../services/api.service';
+import {BroadcastService} from '../services/broadcast.service';
 import {MouseService} from '../services/mouse.service';
+import {OperatorService} from '../services/operator.service';
+import {VisualService} from '../services/visual.service';
+
+import {TypeDefFormComponent} from './type-def-form.component';
+
+import {Connection, OperatorDef, OperatorInstance, Port} from '../classes/operator';
+import {safeDump, safeLoad} from 'js-yaml';
+import {createDefaultValue, normalizeConnections, stringifyConnections, deepEquals, HTTP_REQUEST_DEF, HTTP_RESPONSE_DEF} from '../utils';
+
+import 'codemirror/mode/yaml/yaml.js';
 
 @Component({
   templateUrl: './editor.component.html',
@@ -42,7 +42,6 @@ export class EditorComponent implements OnInit, OnDestroy {
   public mainSrvPort: any = null;
   public propertyDefs: any = null;
   public status;
-  public newPropName = '';
   public newInstanceName = '';
   public userMessage = '';
   public userMessageTimeout: any = null;
@@ -100,7 +99,7 @@ export class EditorComponent implements OnInit, OnDestroy {
     const yDiff = event.screenY - this.mouse.getLastY();
 
     if (this.mouse.isDragging()) {
-      const selectedInstance = this.visual.getSelected();
+      const selectedInstance = this.broadcast.getSelected();
       if (!selectedInstance || !(selectedInstance instanceof OperatorInstance)) {
         return;
       }
@@ -131,20 +130,20 @@ export class EditorComponent implements OnInit, OnDestroy {
         break;
       case 'Delete':
       case 'Backspace':
-        const selectedEntity = this.visual.getSelected();
+        const selectedEntity = this.broadcast.getSelected();
         if (!selectedEntity) {
           return;
         }
         if (selectedEntity instanceof OperatorInstance) {
           this.removeInstance(selectedEntity);
-          this.visual.select(null);
-          this.visual.update(this.operator);
+          this.broadcast.select(null);
+          this.broadcast.update(this.operator);
           break;
         }
         if (selectedEntity instanceof Connection) {
           this.removeConnection(selectedEntity);
-          this.visual.select(null);
-          this.visual.update(this.operator);
+          this.broadcast.select(null);
+          this.broadcast.update(this.operator);
           break;
         }
         break;
@@ -155,6 +154,7 @@ export class EditorComponent implements OnInit, OnDestroy {
               private http: HttpClient,
               public operators: OperatorService,
               public visual: VisualService,
+              public broadcast: BroadcastService,
               public api: ApiService,
               private ref: ChangeDetectorRef,
               public mouse: MouseService) {
@@ -162,7 +162,7 @@ export class EditorComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.visual.clear();
+    this.broadcast.clear();
     this.route.params.subscribe(routeParams => {
       this.loadOperator(routeParams.operatorName);
     });
@@ -171,7 +171,7 @@ export class EditorComponent implements OnInit, OnDestroy {
         this.loadOperator(this.operatorName);
       }
     });
-    this.callback = this.visual.subscribeSelect(obj => {
+    this.callback = this.broadcast.subscribeSelect(obj => {
       if (obj instanceof OperatorInstance) {
         this.selectInstance(obj);
       } else if (obj instanceof Port) {
@@ -183,7 +183,7 @@ export class EditorComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     this.mouse.unsubscribe(this.mouseCallback);
-    this.visual.unsubscribeSelect(this.callback);
+    this.broadcast.unsubscribeSelect(this.callback);
   }
 
   // General
@@ -195,6 +195,7 @@ export class EditorComponent implements OnInit, OnDestroy {
     await this.operators.refresh();
     await this.loadOperator(this.operatorName);
     this.isOperatorSaved = false;
+    this.ref.detectChanges();
   }
 
   public download() {
@@ -284,11 +285,11 @@ export class EditorComponent implements OnInit, OnDestroy {
   }
 
   private updateInstance(ins: OperatorInstance) {
-    this.visual.update(ins);
+    this.broadcast.update(ins);
     // Also update connections
     this.operator.getConnections().forEach(conn => {
       if (conn.getSource().getOperator() === ins || conn.getDestination().getOperator() === ins) {
-        this.visual.update(conn);
+        this.broadcast.update(conn);
       }
     });
   }
@@ -340,11 +341,11 @@ export class EditorComponent implements OnInit, OnDestroy {
   }
 
   public isAnyEntitySelected(): boolean {
-    return !!this.visual.getSelected();
+    return !!this.broadcast.getSelected();
   }
 
   public isSelected(entity: any): boolean {
-    return this.isAnyEntitySelected() && this.visual.getSelected() === entity;
+    return this.isAnyEntitySelected() && this.broadcast.getSelected() === entity;
   }
 
   public genericNames(ins: OperatorInstance): Array<string> {
@@ -428,7 +429,7 @@ export class EditorComponent implements OnInit, OnDestroy {
   private displayVisual() {
     const def = this.operatorDef.getDef();
     this.operator.updateOperator(def, undefined);
-    this.visual.update(this.operator);
+    this.broadcast.update(this.operator);
   }
 
   public addInstance(op: any) {
@@ -450,11 +451,6 @@ export class EditorComponent implements OnInit, OnDestroy {
     this.updateDef(def);
   }
 
-  public removePropertyDef(propName: string) {
-    delete this.propertyDefs[propName];
-    this.refresh();
-  }
-
   public getOperatorList(): Array<OperatorDef> {
     return []
       .concat(
@@ -463,31 +459,22 @@ export class EditorComponent implements OnInit, OnDestroy {
         Array.from(this.operators.getElementaries().values()));
   }
 
-  public addGeneric(ins: OperatorInstance, genName: string) {
-    const oDef = this.operatorDef.getDef();
-    const insOpDef = oDef.operators[ins.getName()];
-    if (!insOpDef.generics) {
-      insOpDef.generics = {};
-    }
-    insOpDef.generics[genName] = TypeDefFormComponent.newDefaultTypeDef('primitive');
-  }
-
   public specifyGeneric(gens, name) {
     gens[name] = TypeDefFormComponent.newDefaultTypeDef('primitive');
   }
 
-  public addProperty(ins: OperatorInstance, prop: { name: string, def: any }): any {
-    const oDef = this.operatorDef.getDef();
-    const insOpDef = oDef.operators[ins.getName()];
-    if (!insOpDef.properties) {
-      insOpDef.properties = {};
-    }
-    insOpDef.properties[prop.name] = createDefaultValue(prop.def);
-    this.ref.detectChanges();
-  }
-
   public specifyProperty(props, name, def) {
     props[name] = createDefaultValue(def);
+  }
+
+  public getPropertyNames(): Array<string> {
+    const names = [];
+    for (const propName in this.propertyDefs) {
+      if (this.propertyDefs.hasOwnProperty(propName)) {
+        names.push(propName);
+      }
+    }
+    return names;
   }
 
   public setUIMode(mode: string): string {
@@ -619,6 +606,10 @@ export class EditorComponent implements OnInit, OnDestroy {
   public closeDebugPanel() {
     this.debugState = null;
     this.ref.detectChanges();
+  }
+
+  public sidebarDefinitionChange() {
+    this.refresh();
   }
 
 }
