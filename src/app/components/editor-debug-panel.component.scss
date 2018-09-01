@@ -1,0 +1,64 @@
+@import "../../styles/variables.scss";
+
+#sl-debug-panel {
+  height: 45vh;
+  background: $pane-border-color;
+  overflow: hidden;
+  padding: 8px 0 8px 0;
+  display: flex;
+  width: 100%;
+
+  .preview-object {
+    font-size: 0.7em;
+    color: $body-color;
+  }
+
+  .preview {
+    border: 1px solid $gray;
+    padding: 5px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    background-color: white;
+  }
+
+  .output-options {
+    padding: 5px;
+  }
+
+  h6 {
+    margin-top: 10px;
+  }
+
+  > div:nth-child(1) {
+    width: 37.5%;
+  }
+
+  > div:nth-child(2) {
+    width: 37.5%;
+  }
+
+  > div:nth-child(3) {
+    width: 25%;
+  }
+
+  > div {
+    height: 100%;
+    background: $body-bg;
+    overflow: auto;
+    padding: 5px;
+    position: relative;
+
+    .close-pane {
+      font-size: 16px;
+      display: block;
+      position: absolute;
+      right: 5px;
+      top: 5px;
+      cursor: pointer;
+    }
+  }
+
+  > div:not(:first-child) {
+    margin-left: 8px;
+  }
+}

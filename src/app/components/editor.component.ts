@@ -13,7 +13,7 @@ import {TypeDefFormComponent} from './type-def-form.component';
 
 import {Connection, OperatorDef, OperatorInstance, Port} from '../classes/operator';
 import {safeDump, safeLoad} from 'js-yaml';
-import {createDefaultValue, normalizeConnections, stringifyConnections, deepEquals, HTTP_REQUEST_DEF, HTTP_RESPONSE_DEF} from '../utils';
+import {createDefaultValue, normalizeConnections, stringifyConnections, HTTP_REQUEST_DEF, HTTP_RESPONSE_DEF} from '../utils';
 
 import 'codemirror/mode/yaml/yaml.js';
 
@@ -39,9 +39,7 @@ export class EditorComponent implements OnInit, OnDestroy {
   public operatorName = '';
   public operatorDef: OperatorDef = null;
   public operator: OperatorInstance = null;
-  public mainSrvPort: any = null;
-  public propertyDefs: any = null;
-  public status;
+  public debugState: string = null;
   public newInstanceName = '';
   public userMessage = '';
   public userMessageTimeout: any = null;
@@ -69,20 +67,6 @@ export class EditorComponent implements OnInit, OnDestroy {
   public canvasFocus = false;
 
   private insPropDefs = new Map<string, Array<{ name: string, def: any }>>();
-
-  // Executing
-  public inputValue: any = {};
-  public debugState = null;
-  public running = false;
-  public runningHandle = '';
-  public debuggingLog: Array<string> = [];
-  public debuggingReponses: Array<any> = [];
-  public debuggingGens = {};
-  public debuggingPropDefs = {};
-  public debuggingInPort = {};
-  public debuggingOutPort = {};
-  public debuggingProps = {};
-  public operatorEndpoint = '';
 
   private mouseCallback: (event: string, actionPhase: string) => void;
   private callback: (Identifiable) => void;
@@ -222,7 +206,7 @@ export class EditorComponent implements OnInit, OnDestroy {
       /*
        * We compare selectedEntity by identity, so after re-initializing all operators, that comparsion fails
        */
-      const newOperator = new OperatorInstance(this.operators, this.operatorName, 'Main', this.operatorDef, {}, null, def, dim);
+      const newOperator = new OperatorInstance(this.operators, this.operatorName, '', this.operatorDef, {}, null, def, dim);
       if (this.isSelected(this.operator)) {
         this.selectedEntity.entity = newOperator;
       }
@@ -233,8 +217,6 @@ export class EditorComponent implements OnInit, OnDestroy {
         this.operator.updateVisual(visual);
       }
       this.ref.detectChanges();
-    } else {
-      this.status = `Operator "${this.operatorName}" not found.`;
     }
   }
 
@@ -311,20 +293,11 @@ export class EditorComponent implements OnInit, OnDestroy {
     try {
       const newDef = safeLoad(this.yamlRepr);
       this.updateDef(newDef);
-    } catch (e) {
-      this.status = e.toString();
-    }
+    } catch (e) {}
   }
 
   private updateDef(def: any) {
     this.operatorDef.setDef(def);
-    const opDef = this.operatorDef.getDef();
-    this.mainSrvPort = opDef.services.main;
-    if (!opDef.properties) {
-      opDef.properties = {};
-    }
-    this.propertyDefs = opDef.properties;
-    this.status = `Updated definition of operator "${this.operatorName}".`;
     this.refresh();
   }
 
@@ -346,10 +319,6 @@ export class EditorComponent implements OnInit, OnDestroy {
 
   public isSelected(entity: any): boolean {
     return this.isAnyEntitySelected() && this.broadcast.getSelected() === entity;
-  }
-
-  public genericNames(ins: OperatorInstance): Array<string> {
-    return Array.from(ins.getGenericNames());
   }
 
   public displayUserMessage(msg: string) {
@@ -459,24 +428,6 @@ export class EditorComponent implements OnInit, OnDestroy {
         Array.from(this.operators.getElementaries().values()));
   }
 
-  public specifyGeneric(gens, name) {
-    gens[name] = TypeDefFormComponent.newDefaultTypeDef('primitive');
-  }
-
-  public specifyProperty(props, name, def) {
-    props[name] = createDefaultValue(def);
-  }
-
-  public getPropertyNames(): Array<string> {
-    const names = [];
-    for (const propName in this.propertyDefs) {
-      if (this.propertyDefs.hasOwnProperty(propName)) {
-        names.push(propName);
-      }
-    }
-    return names;
-  }
-
   public setUIMode(mode: string): string {
     this.uiMode = mode.toLowerCase();
     this.ref.detectChanges();
@@ -491,125 +442,26 @@ export class EditorComponent implements OnInit, OnDestroy {
     return this.uiMode === 'yaml';
   }
 
-  // Executing
-
-  public debugLog(msg: string) {
-    this.debuggingLog.push(msg);
+  public sidebarDefinitionChange() {
+    this.refresh();
   }
 
-  public async startDebugging() {
-    await this.save();
-    this.refreshDebugVariables();
-    if (this.operator.getGenericNames().size > 0 || this.operator.getPropertyDefs().size > 0) {
-      this.specifyOperator();
-    } else {
-      this.runOperator();
-    }
-  }
-
-  public specifyOperator() {
-    this.debugState = 'specifying';
+  public startDebugging() {
+    this.debugState = 'startDebugging';
     this.ref.detectChanges();
-  }
-
-  public refreshDebugVariables() {
-    this.debuggingPropDefs = JSON.parse(JSON.stringify(this.propertyDefs));
-    for (const propName in this.debuggingPropDefs) {
-      if (this.debuggingPropDefs.hasOwnProperty(propName)) {
-        OperatorDef.specifyTypeDef(this.debuggingPropDefs[propName], this.debuggingGens, {}, {});
-        this.debuggingProps[propName] = createDefaultValue(this.debuggingPropDefs[propName]);
-      }
-    }
-
-    this.debuggingInPort = JSON.parse(JSON.stringify(this.mainSrvPort.in));
-    OperatorDef.specifyTypeDef(this.debuggingInPort, this.debuggingGens, {}, {});
-
-    this.debuggingOutPort = JSON.parse(JSON.stringify(this.mainSrvPort.out));
-    OperatorDef.specifyTypeDef(this.debuggingOutPort, this.debuggingGens, {}, {});
-  }
-
-  public runOperator() {
-    this.debugState = 'debugging';
-    this.inputValue = createDefaultValue(this.debuggingInPort);
-    this.debugLog('Request daemon to start operator...');
-    this.ref.detectChanges();
-
-    const isStream = !this.httpInput() && !this.httpOutput();
-
-    this.http.post('http://localhost:5149/run/', {
-      fqn: this.operatorName,
-      gens: this.debuggingGens,
-      props: this.debuggingProps,
-      stream: isStream
-    }).toPromise()
-      .then(data => {
-        if (data['status'] === 'success') {
-          this.operatorEndpoint = data['url'];
-          this.debugLog('Operator is running at ' + this.operatorEndpoint);
-          this.running = true;
-          this.runningHandle = data['handle'];
-
-          if (isStream) {
-            let interval = null;
-            const that = this;
-            const fetchItems = function () {
-              that.http.get(that.operatorEndpoint).toPromise()
-                .then(responses => {
-                  that.debuggingReponses = responses as Array<any>;
-                })
-                .catch(() => {
-                  clearInterval(interval);
-                });
-              that.ref.detectChanges();
-            };
-            fetchItems();
-            interval = setInterval(fetchItems, 2000);
-          }
-        } else {
-          const error = data['error'];
-          this.debugLog(`Error ${error.code} occurred: ${error.msg}`);
-        }
-        this.ref.detectChanges();
-      });
-  }
-
-  public httpInput(): boolean {
-    return deepEquals(this.operatorDef.getDef().services.main.in, HTTP_REQUEST_DEF);
-  }
-
-  public httpOutput(): boolean {
-    return deepEquals(this.operatorDef.getDef().services.main.out, HTTP_RESPONSE_DEF);
-  }
-
-  public async sendInputValue(obj: any) {
-    await this.http.post(this.operatorEndpoint, JSON.stringify(obj)).toPromise();
   }
 
   public stopOperator() {
-    this.http.request('delete', 'http://localhost:5149/run/', {
-      body: {
-        handle: this.runningHandle
-      }
-    }).toPromise()
-      .then(data => {
-        if (data['status'] === 'success') {
-          this.running = false;
-          this.runningHandle = '';
-        } else {
-          const error = data['error'];
-          this.debugLog(`Error ${error.code} occurred: ${error.msg}`);
-        }
-        this.ref.detectChanges();
-      });
-  }
-
-  public closeDebugPanel() {
-    this.debugState = null;
+    this.debugState = 'stopOperator';
     this.ref.detectChanges();
   }
 
-  public sidebarDefinitionChange() {
-    this.refresh();
+  public debugStateChanged(state: string) {
+    this.ref.detectChanges();
+  }
+
+  public running(): boolean {
+    return ['debugging'].indexOf(this.debugState) !== -1;
   }
 
 }

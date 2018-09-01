@@ -15,9 +15,9 @@
   </div>
   <div class="btn-group btn-group-sm btn-group-toggle ml-3">
     <button type="button" class="btn btn-outline-light" (click)="startDebugging()"
-            [ngClass]="{'active': running}"><i class="fas fa-play"></i></button>
+            [ngClass]="{'active': running()}"><i class="fas fa-play"></i></button>
     <button type="button" class="btn btn-outline-light" (click)="stopOperator()"
-            [ngClass]="{'active': !running}"><i class="fas fa-stop"></i></button>
+            [ngClass]="{'active': !running()}"><i class="fas fa-stop"></i></button>
   </div>
   <div class="pl-3 navbar-text" [@operatorSaved]="isOperatorSaved">
     Operator saved...
@@ -58,76 +58,8 @@
           <div id="sl-message-box" *ngIf="userMessage"><i class="fas fa-info-circle"></i> {{ userMessage }}</div>
 
         </div>
-        <div id="sl-main-bottom" *ngIf="!!debugState">
-          <div>
-            <div *ngIf="debugState === 'debugging'">
-              <h4><i class="fas fa-arrow-up"></i> Input</h4>
-              <div *ngIf="!httpInput()">
-                <app-type-value-form [(typeValue)]="inputValue" [typeDef]="debuggingInPort"></app-type-value-form>
-                <div>
-                  <button [disabled]="!running" (click)="sendInputValue(inputValue)">Send</button>
-                </div>
-                <h6>Preview object</h6>
-                <div class="preview">
-                  <app-preview-object [object]="inputValue"></app-preview-object>
-                </div>
-              </div>
-              <p *ngIf="httpInput()">
-                This operator is directly accessible via HTTP (see debug panel).
-              </p>
-            </div>
-            <div *ngIf="debugState === 'specifying'">
-              <h4><i class="fas fa-plug"></i> Generics</h4>
-              <div class="sl-form-box" *ngFor="let genName of genericNames(operator)">
-                <h6>{{ genName }}</h6>
-                <app-type-def-form *ngIf="debuggingGens[genName]" [(typeDef)]="debuggingGens[genName]"
-                                   (typeDefChange)="refreshDebugVariables()">
-                </app-type-def-form>
-                <button *ngIf="!debuggingGens[genName]" (click)="specifyGeneric(debuggingGens, genName)">
-                  Specify
-                </button>
-              </div>
-            </div>
-          </div>
-          <div>
-            <div *ngIf="debugState === 'debugging'">
-              <h4><i class="fas fa-arrow-down"></i> Output</h4>
-              <div *ngIf="!httpOutput()">
-                <div class="output-options">
-                  <button *ngIf="debuggingReponses.length > 0" (click)="clearOutput()"><i class="fa fa-broom"></i> clear</button>
-                </div>
-                <div *ngFor="let resp of debuggingReponses" class="preview">
-                  <app-preview-object [object]="resp"></app-preview-object>
-                </div>
-              </div>
-              <p *ngIf="httpOutput()">
-                This operator is directly accessible via HTTP (see debug panel).
-              </p>
-            </div>
-            <div *ngIf="debugState === 'specifying'">
-              <h4><i class="fas fa-stream"></i> Properties</h4>
-              <div class="sl-form-box" *ngFor="let propName of getPropertyNames()">
-                <h6>{{propName}}</h6>
-                <app-type-value-form *ngIf="debuggingPropDefs[propName] !== undefined"
-                                     [typeDef]="debuggingPropDefs[propName]"
-                                     [(typeValue)]="debuggingProps[propName]">
-                </app-type-value-form>
-                <button *ngIf="debuggingPropDefs[propName] === undefined"
-                        (click)="specifyProperty(debuggingProps, propName, debuggingPropDefs[propName])">Specify
-                </button>
-              </div>
-            </div>
-          </div>
-          <div>
-            <div *ngIf="debugState === 'debugging'">
-              <h4><i class="fas fa-bug"></i> Debugging</h4>
-              <a class="close-pane" (click)="closeDebugPanel()"><i class="far fa-times-circle"></i></a>
-              <p *ngFor="let msg of debuggingLog">{{ msg }}</p>
-            </div>
-            <div *ngIf="debugState === 'specifying'">
-              <button (click)="runOperator()">start operator</button>
-            </div>
-          </div>
+        <div id="sl-main-bottom" [hidden]="!debugState">
+          <app-editor-debug-panel [definition]="operatorDef" [operator]="operator" [operatorName]="operatorName" [(debugState)]="debugState" (debugStateChange)="debugStateChanged($event)" style="width: 100%"></app-editor-debug-panel>
         </div>
       </div>
       <div id="sl-instance-sidebar" class="d-none d-md-block sl-ui-sidebar col-2" *ngIf="!debugState">

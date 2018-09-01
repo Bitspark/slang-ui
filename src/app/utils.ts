@@ -628,33 +628,6 @@ export function isType(obj: any, entries: Array<string>): boolean {
   return true;
 }
 
-function objContains(sub: any, sup: any): boolean {
-  if (!sup) {
-    return true;
-  }
-  if (!sub) {
-    return false;
-  }
-  if (sup === sub) {
-    return true;
-  }
-  if (typeof sup !== 'object') {
-    return false;
-  }
-  for (const entry in sub) {
-    if (!sub.hasOwnProperty(entry)) {
-      continue;
-    }
-    if (!sup.hasOwnProperty(entry)) {
-      return false;
-    }
-    if (!objContains(sub[entry], sup[entry])) {
-      return false;
-    }
-  }
-  return true;
-}
-
 export const HTTP_REQUEST_DEF = JSON.parse(
   '{"type":"map","map":{"body":{"type":"binary"},"headers":{"type":"stream","stream":{"type":"map","map":{"key":{"type":"strin' +
   'g"},"values":{"type":"stream","stream":{"type":"string"}}}}},"method":{"type":"string"},"params":{"type":"stream","stream":{"typ' +
@@ -664,7 +637,3 @@ export const HTTP_REQUEST_DEF = JSON.parse(
 export const HTTP_RESPONSE_DEF = JSON.parse(
   '{"type":"map","map":{"body":{"type":"binary"},"headers":{"type":"stream","stream":{"type":"map","map":{"key":{"type":"strin' +
   'g"},"value":{"type":"string"}}}},"status":{"type":"number"}}}');
-
-export function deepEquals(obj1: any, obj2: any): boolean {
-  return objContains(obj1, obj2) && objContains(obj2, obj1);
-}
