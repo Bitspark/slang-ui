@@ -216,7 +216,7 @@ export function createDefaultValue(typeDef: any): any {
       }
       return typeValue;
     case 'stream':
-      return [];
+      return [createDefaultValue(typeDef.stream)];
     case 'generic':
       return '$value';
   }

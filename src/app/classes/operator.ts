@@ -95,7 +95,6 @@ export class OperatorDef {
         }
       }
       if (def['type'] === 'undefined') {
-        console.log(def, gens, props, propDefs);
         def['type'] = 'generic';
         def['generic'] += '?';
       }

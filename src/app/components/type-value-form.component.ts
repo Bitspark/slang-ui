@@ -136,15 +136,18 @@ export class TypeValueFormComponent implements OnInit, OnDestroy, OnChanges {
   public add(): void {
     const ne = createDefaultValue(this.typeDef.stream);
     this.typeValue.push(ne);
+    this.emitChange();
     this.ref.detectChanges();
   }
 
   public setIndex(i: number, val: any) {
     this.typeValue[i] = val;
+    this.emitChange();
   }
 
   public removeIndex(i: number) {
     this.typeValue.splice(i, 1);
+    this.emitChange();
     this.ref.detectChanges();
   }
 

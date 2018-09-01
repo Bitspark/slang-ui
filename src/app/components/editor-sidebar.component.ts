@@ -117,6 +117,10 @@ export class EditorSidebarComponent implements OnInit, OnDestroy {
       this.broadcast.getSelected() instanceof OperatorInstance;
   }
 
+  public isSurroundingSelected(): boolean {
+    return this.isAnyEntitySelected() && this.broadcast.getSelected() === this.surrounding;
+  }
+
   public getSelectedInstance(): OperatorInstance {
     const selected = this.broadcast.getSelected();
     if (!(selected instanceof OperatorInstance)) {
@@ -125,7 +129,17 @@ export class EditorSidebarComponent implements OnInit, OnDestroy {
     return selected;
   }
 
-  public getPropertyNames(): Array<string> {
+  // MAIN INSTANCE
+
+  public insLastName(): string {
+    const ins = this.getSelectedInstance();
+    if (!!ins) {
+      return ins.lastName();
+    }
+    return '';
+  }
+
+  public mainPropertyNames(): Array<string> {
     const names = [];
     for (const propName in this.mainPropertyDefs) {
       if (this.mainPropertyDefs.hasOwnProperty(propName)) {
@@ -135,11 +149,43 @@ export class EditorSidebarComponent implements OnInit, OnDestroy {
     return names;
   }
 
-  public refresh(): void {
+  public mainRemoveProperty(propName: string) {
+    delete this.mainPropertyDefs[propName];
+    this.definitionChange.emit();
     this.ref.detectChanges();
   }
 
-  public insSpecifyGeneric(ins: OperatorInstance, genName: string) {
+  public mainAddProperty() {
+    const propName = this.mainNewPropName;
+    if (this.mainPropertyDefs[propName]) {
+      return;
+    }
+    this.mainPropertyDefs[propName] = TypeDefFormComponent.newDefaultTypeDef('primitive');
+    this.mainNewPropName = '';
+    this.definitionChange.emit();
+    this.ref.detectChanges();
+  }
+
+  public mainNewPropNameChange() {
+    this.ref.detectChanges();
+  }
+
+  public mainPropertyNameValid(): boolean {
+    return !!this.mainNewPropName && !this.mainPropertyDefs[this.mainNewPropName];
+  }
+
+  public mainServiceChanged(): void {
+    this.definitionChange.emit();
+  }
+
+  public mainPropertyChanged(): void {
+    this.definitionChange.emit();
+  }
+
+  // CHILD INSTANCES
+
+  public insSpecifyGeneric(genName: string) {
+    const ins = this.getSelectedInstance();
     const oDef = this.definition.getDef();
     const insDef = oDef.operators[ins.getName()];
     if (!insDef.generics) {
@@ -151,8 +197,9 @@ export class EditorSidebarComponent implements OnInit, OnDestroy {
     this.ref.detectChanges();
   }
 
-  public insSpecifyProperty(ins: OperatorInstance, prop: { name: string, def: any }): any {
+  public insSpecifyProperty(prop: { name: string, def: any }): any {
     if (!this.insPropertyValues) {
+      const ins = this.getSelectedInstance();
       const oDef = this.definition.getDef();
       const insDef = oDef.operators[ins.getName()];
       if (!insDef.properties) {
@@ -246,73 +293,12 @@ export class EditorSidebarComponent implements OnInit, OnDestroy {
     return !!this.insGenericSpecs[propDef.generic];
   }
 
-  public insPropertyValueSpecified(ins: OperatorInstance, prop: { name: string, def: any }): boolean {
+  public insPropertyValueSpecified(prop: { name: string, def: any }): boolean {
     return this.insPropertyValues && typeof this.insPropertyValues[prop.name] !== 'undefined';
   }
 
-  public insGenericSpecified(ins: OperatorInstance, genName: string): boolean {
+  public insGenericSpecified(genName: string): boolean {
     return !!this.insGenericSpecs[genName];
-  }
-
-  public getSelectedInstanceLastName(): string {
-    const ins = this.getSelectedInstance();
-    if (!!ins) {
-      return ins.lastName();
-    }
-    return '';
-  }
-
-  public removePropertyDef(propName: string) {
-    delete this.mainPropertyDefs[propName];
-    this.refresh();
-  }
-
-  public addPropertyDef(propName: string) {
-    if (this.mainPropertyDefs[propName]) {
-      return;
-    }
-    this.mainPropertyDefs[propName] = TypeDefFormComponent.newDefaultTypeDef('primitive');
-    this.refresh();
-  }
-
-  public rotateRight() {
-    const ins = this.getSelectedInstance();
-    if (!!ins) {
-      ins.rotate(Math.PI / 2);
-      this.updateInstance(ins);
-    }
-  }
-
-  public rotateLeft() {
-    const ins = this.getSelectedInstance();
-    if (!!ins) {
-      ins.rotate(-Math.PI / 2);
-      this.updateInstance(ins);
-    }
-  }
-
-  public mirrorVertically() {
-    const ins = this.getSelectedInstance();
-    if (!!ins) {
-      ins.scale([1, -1]);
-      this.updateInstance(ins);
-    }
-  }
-
-  public mirrorHorizontally() {
-    const ins = this.getSelectedInstance();
-    if (!!ins) {
-      ins.scale([-1, 1]);
-      this.updateInstance(ins);
-    }
-  }
-
-  public typeDefChanged(): void {
-    this.definitionChange.emit();
-  }
-
-  public propertyChanged(): void {
-    this.definitionChange.emit();
   }
 
   public insGenericTypeChanged(): void {
@@ -327,6 +313,40 @@ export class EditorSidebarComponent implements OnInit, OnDestroy {
     this.definitionChange.emit();
     this.broadcast.update(this.getSelectedInstance());
   }
+
+  public insRotateRight() {
+    const ins = this.getSelectedInstance();
+    if (!!ins) {
+      ins.rotate(Math.PI / 2);
+      this.updateInstance(ins);
+    }
+  }
+
+  public insRotateLeft() {
+    const ins = this.getSelectedInstance();
+    if (!!ins) {
+      ins.rotate(-Math.PI / 2);
+      this.updateInstance(ins);
+    }
+  }
+
+  public insMirrorVertically() {
+    const ins = this.getSelectedInstance();
+    if (!!ins) {
+      ins.scale([1, -1]);
+      this.updateInstance(ins);
+    }
+  }
+
+  public insMirrorHorizontally() {
+    const ins = this.getSelectedInstance();
+    if (!!ins) {
+      ins.scale([-1, 1]);
+      this.updateInstance(ins);
+    }
+  }
+
+  // GENERAL
 
   // TODO: Move this logic!
   private updateInstance(ins: OperatorInstance) {
