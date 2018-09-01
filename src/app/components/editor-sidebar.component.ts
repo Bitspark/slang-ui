@@ -193,6 +193,7 @@ export class EditorSidebarComponent implements OnInit, OnDestroy {
     }
     this.insGenericSpecs = insDef.generics;
     this.insGenericSpecs[genName] = TypeDefFormComponent.newDefaultTypeDef('primitive');
+    this.insUpdatePropertyDefs(ins);
     this.definitionChange.emit();
     this.ref.detectChanges();
   }

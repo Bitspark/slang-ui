@@ -113,8 +113,6 @@ export class BroadcastService {
       for (const callback of callbacks) {
         callback();
       }
-    } else {
-      console.log('no callbacks found for', id);
     }
   }
 

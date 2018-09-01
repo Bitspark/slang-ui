@@ -80,7 +80,6 @@ export class TypeValueFormComponent implements OnInit, OnDestroy, OnChanges {
   @Input()
   set typeValue(val) {
     this.typeVal_ = val;
-    this.emitChange();
     this.ref.detectChanges();
   }
 
@@ -97,6 +96,7 @@ export class TypeValueFormComponent implements OnInit, OnDestroy, OnChanges {
       this.callback = this.broadcast.registerCallback(this.subscribe, () => {
         if (!deepEqual(this.typeDef, this.oldTypeDef_)) {
           this.typeValue = createDefaultValue(this.typeDef);
+          this.emitChange();
         }
         this.ref.detectChanges();
         this.oldTypeDef_ = JSON.parse(JSON.stringify(this.typeDef));

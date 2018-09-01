@@ -1,6 +1,6 @@
 import {ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {Identifiable, OperatorDef, Type} from '../classes/operator';
-import {BroadcastService} from "../services/broadcast.service";
+import {BroadcastService} from '../services/broadcast.service';
 
 @Component({
   selector: 'app-type-def-form',
@@ -11,25 +11,21 @@ import {BroadcastService} from "../services/broadcast.service";
 export class TypeDefFormComponent implements OnInit {
   public typeDef_: any = TypeDefFormComponent.newDefaultTypeDef('primitive');
 
-  @Input()
   get typeDef() {
     return this.typeDef_;
   }
 
   @Output() typeDefChange: EventEmitter<any> = new EventEmitter();
 
+  @Input()
   set typeDef(val) {
     this.typeDef_ = val;
     this.mapToSubs();
-    this.typeDefChange.emit(this.typeDef_);
-    if (!!this.typeDefIdentity) {
-      this.broadcast.update(this.typeDefIdentity);
-    }
     this.ref.detectChanges();
   }
 
   @Input()
-  public typeDefIdentity: Identifiable;
+  public broadcastTo: Identifiable;
 
   public subs: Array<{ name: string, def: any }> = [];
   public types = Object.keys(Type).filter(t => typeof Type[t] === 'number');
@@ -172,9 +168,9 @@ export class TypeDefFormComponent implements OnInit {
 
   public typeDefChanged() {
     this.subsToMap();
-    this.typeDefChange.emit(this.typeDef_);
-    if (!!this.typeDefIdentity) {
-      this.broadcast.update(this.typeDefIdentity);
+    this.typeDefChange.emit(this.typeDef);
+    if (!!this.broadcastTo) {
+      this.broadcast.update(this.broadcastTo);
     }
   }
 

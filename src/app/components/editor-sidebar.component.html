@@ -56,6 +56,7 @@
         <h6>{{ genName }}</h6>
         <app-type-def-form *ngIf="insGenericSpecified(genName)"
                            [(typeDef)]="insGenericSpecs[genName]"
+                           [broadcastTo]="insEditorSidebarIdentity"
                            (typeDefChange)="insGenericTypeChanged()"></app-type-def-form>
         <button *ngIf="!insGenericSpecified(genName)"
                 (click)="insSpecifyGeneric(genName)">Specify
