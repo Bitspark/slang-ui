@@ -16,7 +16,6 @@ export class IndexComponent {
 
   public newOperatorName = '';
   public creatingOperatorFailed = false;
-  public filterString = '';
 
   public feedbackURL = 'https://bitspark.de/send-email';
   public feedbackEmail = '';

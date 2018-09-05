@@ -1,47 +1,58 @@
-import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {Component, Input, ChangeDetectorRef, ChangeDetectionStrategy, OnDestroy} from '@angular/core';
 import {generateSvgTransform} from '../utils';
 import {Port, Transformable, Type} from '../classes/operator';
+import {Orientation} from '../classes/vector';
+import {BroadcastService} from '../services/broadcast.service';
 
 @Component({
   selector: 'app-port,[app-port]',
   templateUrl: './port.component.svg.html',
-  styleUrls: []
+  styleUrls: [],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class PortComponent {
-  public hovered: boolean;
+export class PortComponent implements OnDestroy {
+  private callback: () => void;
+
+  constructor(private cd: ChangeDetectorRef, public broadcast: BroadcastService) {
+    cd.detach();
+  }
+
+  ngOnDestroy(): void {
+    this.broadcast.unregisterCallback(this.port, this.callback);
+  }
 
   @Input()
-  public port: Port;
+  public aspect: string;
 
-  @Output()
-  public select: EventEmitter<Port> = new EventEmitter();
-  @Output()
-  public hover: EventEmitter<Port> = new EventEmitter();
   @Input()
-  public selectedEntity: any;
+  public port_: Port;
+
+  @Input()
+  set port(port: Port) {
+    this.port_ = port;
+    this.callback = this.broadcast.registerCallback(port, () => {
+      this.cd.detectChanges();
+    });
+    this.cd.detectChanges();
+  }
+
+  get port() {
+    return this.port_;
+  }
 
   public getCSSClass(): any {
     const cssClass = {};
-    cssClass['selected'] = this.isSelected();
+
+    cssClass['selected'] = this.broadcast.isSelected(this.port);
+    cssClass['hovered'] = this.broadcast.isHovered(this.port);
+
     cssClass[Type[this.port.getType()]] = true;
     cssClass[this.port.getOrientation().name()] = true;
+
     cssClass['in'] = this.port.isIn();
     cssClass['out'] = this.port.isOut();
-    cssClass['hovered'] = this.hovered;
+
     return cssClass;
-  }
-
-  public handleHover(port: Port) {
-    this.hovered = port != null;
-    if (this.hovered) {
-      this.hover.emit(port);
-    } else {
-      this.hover.emit(null);
-    }
-  }
-
-  public isSelected() {
-    return this.selectedEntity.entity && this.selectedEntity.entity === this.port;
   }
 
   public getEntries(): Array<Port> {
@@ -50,5 +61,59 @@ export class PortComponent {
 
   public transform(trans: Transformable): string {
     return generateSvgTransform(trans);
+  }
+
+  public translatePort(): string {
+    const outer = this.port.getOperator().getParent() || this.port.getOperator();
+    return `translate(${this.port.getCenterX(outer)},${this.port.getCenterY(outer)})`;
+  }
+
+  public transformLabel(): string {
+    return `rotate(-55 ${this.getPortLabelX()},${this.getPortLabelY()})`;
+  }
+
+  public getPortLabelX(): number {
+    switch (this.port.getOrientation().value()) {
+      case Orientation.north:
+        return 0;
+      case Orientation.west:
+        return 15;
+      case Orientation.south:
+        return 0;
+      case Orientation.east:
+        return -15;
+    }
+  }
+
+  public getPortLabelY(): number {
+    switch (this.port.getOrientation().value()) {
+      case Orientation.north:
+        return 15;
+      case Orientation.west:
+        return 0;
+      case Orientation.south:
+        return -15;
+      case Orientation.east:
+        return 0;
+    }
+  }
+
+  public getPortLabelAnchor(): string {
+    switch (this.port.getOrientation().value()) {
+      case Orientation.north:
+        return 'end';
+      case Orientation.west:
+        return 'begin';
+      case Orientation.south:
+        return 'begin';
+      case Orientation.east:
+        return 'end';
+    }
+  }
+
+  public getPortLabelCSSClass(): any {
+    const cssClasses = {};
+    cssClasses['displayed'] = this.broadcast.isHovered(this.port) || this.broadcast.isSelected(this.port);
+    return cssClasses;
   }
 }

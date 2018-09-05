@@ -1,12 +1,12 @@
 import {Injectable} from '@angular/core';
 import {ApiService} from './api.service';
+import {Identifiable} from '../classes/operator';
 
 @Injectable()
 export class VisualService {
   private static pathMetaVisual = '/operator/meta/visual/';
 
   constructor(private api: ApiService) {
-
   }
 
   public loadVisual(opName: string): Promise<any> {
@@ -29,4 +29,5 @@ export class VisualService {
       resolve();
     });
   }
+
 }

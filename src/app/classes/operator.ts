@@ -223,6 +223,26 @@ export class OperatorDef {
 
 }
 
+export interface Identifiable {
+  getIdentity(): string;
+}
+
+export class Identity implements Identifiable {
+  private readonly id: string;
+
+  constructor (id: any) {
+    if (typeof id !== 'string') {
+      this.id = JSON.stringify(id);
+    } else {
+      this.id = id;
+    }
+  }
+
+  public getIdentity(): string {
+    return this.id;
+  }
+}
+
 export class Transformable {
   protected dim: [number, number];
   protected mat: Mat3;
@@ -328,16 +348,19 @@ export class Composable extends Transformable {
     return this.parent;
   }
 
-  protected getAbsMat3(): Mat3 {
-    return !!this.parent ? this.mat.copy().multiply(this.parent.getAbsMat3()) : this.mat.copy();
+  protected getAbsMat3(origin?: any): Mat3 {
+    if (!!this.parent && (!origin || this.parent !== origin)) {
+      return this.mat.copy().multiply(this.parent.getAbsMat3(origin));
+    }
+    return this.mat.copy();
   }
 
-  private getCenterMat3(): Mat3 {
+  private getCenterMat3(origin?: Transformable): Mat3 {
     return (new Mat3([
       0, 0, this.getWidth() / 2,
       0, 0, this.getHeight() / 2,
       0, 0, 1
-    ]).multiply(this.getAbsMat3()));
+    ]).multiply(this.getAbsMat3(origin)));
   }
 
   public getAbs(): [number, number] {
@@ -352,26 +375,27 @@ export class Composable extends Transformable {
     return this.getAbsMat3().at(5);
   }
 
-  public getCenter(): [number, number] {
-    return [this.getCenterX(), this.getCenterY()];
+  public getCenter(origin?: Transformable): [number, number] {
+    const centerMat = this.getCenterMat3(origin);
+    return [centerMat.at(2), centerMat.at(5)];
   }
 
-  public getCenterX(): number {
-    return this.getCenterMat3().at(2);
+  public getCenterX(origin?: Transformable): number {
+    return this.getCenterMat3(origin).at(2);
   }
 
-  public getCenterY(): number {
-    return this.getCenterMat3().at(5);
+  public getCenterY(origin?: Transformable): number {
+    return this.getCenterMat3(origin).at(5);
   }
 
-  public getOrientation(): Orientation {
-    const mat = this.getAbsMat3();
+  public getOrientation(origin?: Transformable): Orientation {
+    const mat = this.getAbsMat3(origin);
     return Orientation.fromMat3(Mat3.fromVec2([0, 1]).multiply(mat));
   }
 
 }
 
-export class OperatorInstance extends Composable {
+export class OperatorInstance extends Composable implements Identifiable {
   private static style = {
     opMinWidth: 150,
     opMinHeight: 150,
@@ -768,9 +792,34 @@ export class OperatorInstance extends Composable {
       dlg.translate([0, centerY]);
     });
   }
+
+  public lastName(): string {
+    const opName = this.getFullyQualifiedName().split('.');
+    return opName[opName.length - 1];
+  }
+
+  getIdentity(): string {
+    return this.getName();
+  }
+
+  // redraw(visual: VisualService): void {
+  //   visual.update(this);
+  //   if (this.mainIn) {
+  //     this.mainIn.redraw(visual);
+  //   }
+  //   if (this.mainOut) {
+  //     this.mainOut.redraw(visual);
+  //   }
+  //   if (this.services) {
+  //     this.services.forEach(srv => srv.redraw(visual));
+  //   }
+  //   if (this.delegates) {
+  //     this.delegates.forEach(dlg => dlg.redraw(visual));
+  //   }
+  // }
 }
 
-export class Connection {
+export class Connection implements Identifiable {
   constructor(private src: Port, private dst: Port) {
     if (!src) {
       console.error('source null', src);
@@ -786,6 +835,10 @@ export class Connection {
 
   public getDestination(): Port {
     return this.dst;
+  }
+
+  public getIdentity(): string {
+    return this.src.getRefString() + ':' + this.dst.getRefString();
   }
 }
 
@@ -817,6 +870,12 @@ export class PortGroup extends Composable {
   public getPrimitivePorts(): Array<Port> {
     return this.in.getPrimitivePorts().concat(this.out.getPrimitivePorts());
   }
+
+  // redraw(visual: VisualService): void {
+  //   console.log('port group');
+  //   this.in.redraw(visual);
+  //   this.out.redraw(visual);
+  // }
 }
 
 export class Service extends PortGroup {
@@ -837,7 +896,7 @@ export class Delegate extends PortGroup {
   }
 }
 
-export class Port extends Composable {
+export class Port extends Composable implements Identifiable {
   /**
    * x: width [px]
    * y: height [px]
@@ -1120,5 +1179,19 @@ export class Port extends Composable {
       portName = this.name;
     }
     return portName;
+  }
+
+  // redraw(visual: VisualService): void {
+  //   visual.update(this);
+  //   if (this.map) {
+  //     this.map.forEach(entry => entry.redraw(visual));
+  //   }
+  //   if (this.stream) {
+  //     this.stream.redraw(visual);
+  //   }
+  // }
+
+  public getIdentity(): string {
+    return this.getRefString();
   }
 }

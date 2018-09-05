@@ -1,37 +1,107 @@
-<svg:g xmlns:svg="http://www.w3.org/2000/svg" [attr.transform]="transform(instance)">
-  <svg:g *ngIf="aspect === 'operator'">
+<svg:g xmlns:svg="http://www.w3.org/2000/svg">
+  <svg:g *ngIf="aspect === 'operator'" [attr.transform]="transform(instance)">
     <svg:rect *ngIf="form() === 'rect'"
               x="0" y="0" rx="20" ry="20"
               class="sl-svg-op sl-svg-op-ins"
               [ngClass]="getCSSClass()"
               [attr.width]="instance.getWidth()" [attr.height]="instance.getHeight()"
-              (mousedown)="selectInstance.emit(instance)"
               paint-order="stroke fill"
+              (mouseover)="broadcast.hover(instance)"
+              (mouseout)="broadcast.hover(null)"
+              (mousedown)="broadcast.select(instance)"
     ></svg:rect>
     <svg:circle *ngIf="form() === 'circle'"
                 rx="20" ry="20"
                 class="sl-svg-op sl-svg-op-ins"
                 [ngClass]="getCSSClass()"
                 [attr.cx]="radius()" [attr.cy]="radius()" [attr.r]="radius()"
-                (mousedown)="selectInstance.emit(instance)"
                 paint-order="stroke fill"
+                (mouseover)="broadcast.hover(instance)"
+                (mouseout)="broadcast.hover(null)"
+                (mousedown)="broadcast.select(instance)"
     ></svg:circle>
   </svg:g>
 
-  <svg:g *ngIf="aspect === 'port'">
+  <svg:g *ngIf="aspect === 'port'" [attr.transform]="transform(instance)">
     <svg:g *ngFor="let dlg of instance.getDelegates()" [attr.transform]="transform(dlg)">
-      <svg:g [attr.transform]="transform(dlg.getIn())" app-port [port]="dlg.getIn()"
-             (select)="selectPort.emit($event)" (hover)="hoverPort.emit($event)"
-             [selectedEntity]="selectedEntity"></svg:g>
-      <svg:g [attr.transform]="transform(dlg.getOut())" app-port [port]="dlg.getOut()"
-             (select)="selectPort.emit($event)" (hover)="hoverPort.emit($event)"
-             [selectedEntity]="selectedEntity"></svg:g>
+      <svg:g [attr.transform]="transform(dlg.getIn())" app-port [port]="dlg.getIn()" aspect="port"></svg:g>
+      <svg:g [attr.transform]="transform(dlg.getOut())" app-port [port]="dlg.getOut()" aspect="port"></svg:g>
     </svg:g>
-    <svg:g [attr.transform]="transform(instance.getMainIn())" app-port [port]="instance.getMainIn()"
-           (select)="selectPort.emit($event)" (hover)="hoverPort.emit($event)"
-           [selectedEntity]="selectedEntity"></svg:g>
-    <svg:g [attr.transform]="transform(instance.getMainOut())" app-port [port]="instance.getMainOut()"
-           (select)="selectPort.emit($event)" (hover)="hoverPort.emit($event)"
-           [selectedEntity]="selectedEntity"></svg:g>
+    <svg:g [attr.transform]="transform(instance.getMainIn())" app-port [port]="instance.getMainIn()" aspect="port"></svg:g>
+    <svg:g [attr.transform]="transform(instance.getMainOut())" app-port [port]="instance.getMainOut()" aspect="port"></svg:g>
+  </svg:g>
+
+  <svg:g *ngIf="aspect === 'surrounding'" [attr.transform]="transform(instance)">
+    <svg:rect *ngIf="form() === 'rect'"
+              x="0" y="0" rx="20" ry="20"
+              class="sl-svg-op sl-svg-op-surr"
+              [ngClass]="getCSSClass()"
+              [attr.width]="instance.getWidth()" [attr.height]="instance.getHeight()"
+              paint-order="stroke fill"
+              (mouseover)="broadcast.hover(instance)"
+              (mouseout)="broadcast.hover(null)"
+              (mousedown)="broadcast.select(instance)"
+    ></svg:rect>
+    <!-- Instances -->
+    <svg:g app-instance *ngFor="let ins of visualInstances(); trackBy: ins" [instance]="ins" aspect="operator">
+    </svg:g>
+
+    <svg:g app-connection *ngFor="let conn of visualConnections(); trackBy:conn" aspect="visible" [connection]="conn" [instance]="instance">
+    </svg:g>
+    <svg:g app-connection *ngFor="let conn of visualConnections(); trackBy:conn" aspect="highlighted" [connection]="conn" [instance]="instance">
+    </svg:g>
+    <svg:g app-connection *ngFor="let conn of visualConnections(); trackBy:conn" aspect="clickable" [connection]="conn" [instance]="instance">
+    </svg:g>
+
+    <svg:g app-instance *ngFor="let ins of visualInstances(); trackBy: ins" [instance]="ins" aspect="text">
+    </svg:g>
+
+    <svg:g app-instance *ngFor="let ins of visualInstances(); trackBy: ins" [instance]="ins" aspect="port-text">
+    </svg:g>
+
+    <!-- Delegates -->
+    <svg:g *ngFor="let dlg of instance.getDelegates()" [attr.transform]="transform(dlg)">
+      <svg:g [attr.transform]="transform(dlg.getIn())" app-port [port]="dlg.getIn()" aspect="port"></svg:g>
+      <svg:g [attr.transform]="transform(dlg.getOut())" app-port [port]="dlg.getOut()" aspect="port"></svg:g>
+    </svg:g>
+    <svg:g *ngFor="let dlg of instance.getDelegates()" [attr.transform]="transform(dlg)">
+      <svg:g [attr.transform]="transform(dlg.getIn())" app-port [port]="dlg.getIn()" aspect="text"></svg:g>
+      <svg:g [attr.transform]="transform(dlg.getOut())" app-port [port]="dlg.getOut()" aspect="text"></svg:g>
+    </svg:g>
+
+    <!-- Services -->
+    <svg:g>
+      <svg:g [attr.transform]="transform(instance.getMainIn())" app-port [port]="instance.getMainIn()" aspect="port"></svg:g>
+      <svg:g [attr.transform]="transform(instance.getMainOut())" app-port [port]="instance.getMainOut()" aspect="port"></svg:g>
+    </svg:g>
+    <svg:g>
+      <svg:g app-port [port]="instance.getMainIn()" aspect="text"></svg:g>
+      <svg:g app-port [port]="instance.getMainOut()" aspect="text"></svg:g>
+    </svg:g>
+
+    <!-- Instance ports -->
+    <svg:g app-instance *ngFor="let ins of visualInstances(); trackBy: ins" [instance]="ins" aspect="port"></svg:g>
+
+    <!-- Surrounding operator resizer -->
+    <svg:circle [attr.cx]="instance.getWidth() - 20" [attr.cy]="instance.getHeight() - 20"
+                class="sl-svg-op-resize" r="12px" (mousedown)="mouse.setResizing()">
+    </svg:circle>
+  </svg:g>
+
+  <svg:g *ngIf="aspect === 'text'">
+    <svg:text text-anchor="middle" alignment-baseline="middle"
+              [attr.x]="instance.getCenterX(instance.getParent())" [attr.y]="instance.getCenterY(instance.getParent())"
+              (mousedown)="broadcast.select(instance)"
+              (mouseover)="broadcast.hover(instance)"
+              (mouseout)="broadcast.hover(null)">
+      {{text()}}
+    </svg:text>
+
+    <svg:g *ngFor="let dlg of instance.getDelegates()">
+      <svg:g app-port [port]="dlg.getIn()" aspect="text"></svg:g>
+      <svg:g app-port [port]="dlg.getOut()" aspect="text"></svg:g>
+    </svg:g>
+    <svg:g app-port [port]="instance.getMainIn()" aspect="text"></svg:g>
+    <svg:g app-port [port]="instance.getMainOut()" aspect="text"></svg:g>
   </svg:g>
 </svg:g>

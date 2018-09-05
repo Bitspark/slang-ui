@@ -1,23 +1,36 @@
-import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {OperatorDef} from '../classes/operator';
 import {compareOperatorDefs} from '../utils';
 
 @Component({
   selector: 'app-operator-list',
   templateUrl: './operator-list.component.html',
-  styleUrls: ['./operator-list.component.scss']
+  styleUrls: ['./operator-list.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class OperatorListComponent implements OnInit {
+  private operatorList_: Array<OperatorDef>;
+
   @Input()
-  private operatorList: Array<OperatorDef>;
+  public set operatorList(list: Array<OperatorDef>) {
+    this.operatorList_ = list;
+    this.ref.detectChanges();
+  }
+
+  public get operatorList() {
+    return this.operatorList_;
+  }
+
   @Input()
   public buttonIcon = '';
+
   @Output()
   public operatorSelected = new EventEmitter();
 
   public filterString = '';
 
-  constructor() {
+  constructor(private ref: ChangeDetectorRef) {
+    ref.detach();
   }
 
   private static groupOperatorList(opList: Array<OperatorDef>,
@@ -53,6 +66,7 @@ export class OperatorListComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.ref.detectChanges();
   }
 
   public hasGlobals(): boolean {
@@ -60,8 +74,7 @@ export class OperatorListComponent implements OnInit {
   }
 
   public filteredOperatorList(): Array<OperatorDef> {
-    return this.operatorList
-      .filter(opDef => opDef.getName().toLowerCase().indexOf(this.filterString.toLowerCase()) !== -1);
+    return this.operatorList.filter(opDef => opDef.getName().toLowerCase().indexOf(this.filterString.toLowerCase()) !== -1);
   }
 
   public emitOperatorSelected(op: OperatorDef) {
@@ -84,5 +97,11 @@ export class OperatorListComponent implements OnInit {
       (opNameList: string[]) => opNameList[opNameList.length - 1]
     );
   }
+
+  public filterStringChanged(filterString: string) {
+    this.filterString = filterString;
+    this.ref.detectChanges();
+  }
+
 }
 

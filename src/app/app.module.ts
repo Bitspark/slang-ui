@@ -10,27 +10,32 @@ import {AppRoutes} from './app.routes';
 
 import {AppComponent} from './app.component';
 import {IndexComponent} from './components/index.component';
-import {OperatorComponent} from './components/operator.component';
+import {EditorComponent} from './components/editor.component';
 import {OperatorListComponent} from './components/operator-list.component';
 import {InstanceComponent} from './components/instance.component';
 import {PortComponent} from './components/port.component';
+import {ConnectionComponent} from './components/connection.component';
 import {TypeDefFormComponent} from './components/type-def-form.component';
 import {TypeValueFormComponent} from './components/type-value-form.component';
 import {PreviewObjectComponent} from './components/preview-object.component';
+import {EditorSidebarComponent} from './components/editor-sidebar.component';
+import {EditorDebugPanelComponent} from './components/editor-debug-panel.component';
+
 
 import {ApiService} from './services/api.service';
 import {OperatorService} from './services/operator.service';
 import {VisualService} from './services/visual.service';
+import {MouseService} from './services/mouse.service';
+import {BroadcastService} from './services/broadcast.service';
 
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 
-
 @NgModule({
   declarations: [
     AppComponent, IndexComponent, TypeDefFormComponent, TypeValueFormComponent,
-    OperatorListComponent, OperatorComponent, InstanceComponent, PortComponent,
-    PreviewObjectComponent
+    OperatorListComponent, EditorComponent, InstanceComponent, PortComponent, ConnectionComponent,
+    PreviewObjectComponent, EditorSidebarComponent, EditorDebugPanelComponent
   ],
   imports: [
     NgbModule.forRoot(),
@@ -45,7 +50,7 @@ import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
     CodemirrorModule,
     FileUploadModule
   ],
-  providers: [ApiService, OperatorService, VisualService],
+  providers: [ApiService, OperatorService, VisualService, MouseService, BroadcastService],
   bootstrap: [AppComponent]
 })
 export class AppModule {

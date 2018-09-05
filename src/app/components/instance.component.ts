@@ -1,35 +1,46 @@
-import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {OperatorInstance, Transformable} from '../classes/operator';
+import {Component, Input, OnInit, ChangeDetectorRef, ChangeDetectionStrategy, OnDestroy} from '@angular/core';
+import {Connection, OperatorInstance, Transformable} from '../classes/operator';
 import {generateSvgTransform} from '../utils';
+import {MouseService} from '../services/mouse.service';
+import {BroadcastService} from '../services/broadcast.service';
 
 @Component({
   selector: 'app-instance,[app-instance]',
   templateUrl: './instance.component.svg.html',
-  styleUrls: []
+  styleUrls: [],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class InstanceComponent implements OnInit {
+export class InstanceComponent implements OnInit, OnDestroy {
+  private callback: () => void;
+
   @Input()
   public aspect: string;
+
+  public instance_: OperatorInstance;
+
   @Input()
-  public selectedEntity: any = {entity: null};
-  @Input()
-  public instance: OperatorInstance;
+  set instance(ins: OperatorInstance) {
+    this.instance_ = ins;
+    this.callback = this.broadcast.registerCallback(ins, () => {
+      this.ref.detectChanges();
+    });
+    this.ref.detectChanges();
+  }
+
+  get instance() {
+    return this.instance_;
+  }
 
   private fqn = '';
 
-  @Output()
-  public hoverPort: EventEmitter<any> = new EventEmitter();
-  @Output()
-  public selectPort: EventEmitter<any> = new EventEmitter();
-  @Output()
-  public selectInstance: EventEmitter<any> = new EventEmitter();
-
-  public constructor() {
+  public constructor(private ref: ChangeDetectorRef, public broadcast: BroadcastService, public mouse: MouseService) {
+    ref.detach();
   }
 
   public getCSSClass(): any {
     const cssClass = {};
-    cssClass['selected'] = this.isSelected();
+    cssClass['selected'] = this.broadcast.isSelected(this.instance);
+    cssClass['hovered'] = this.broadcast.isHovered(this.instance);
     cssClass['sl-svg-op-type'] = true;
     cssClass[this.instance.getOperatorType()] = true;
     return cssClass;
@@ -37,10 +48,11 @@ export class InstanceComponent implements OnInit {
 
   public ngOnInit() {
     this.fqn = this.instance.getFullyQualifiedName();
+    this.ref.detectChanges();
   }
 
-  public isSelected() {
-    return this.selectedEntity.entity && this.selectedEntity.entity === this.instance;
+  ngOnDestroy(): void {
+    this.broadcast.unregisterCallback(this.instance, this.callback);
   }
 
   public transform(trans: Transformable): string {
@@ -56,16 +68,32 @@ export class InstanceComponent implements OnInit {
     }
   }
 
-  private abbreviate(str: string): string {
-    const maxLength = 15;
-    if (str.length < maxLength) {
-      return str;
-    }
-    return str.substr(0, maxLength - 3) + '...';
-  }
-
   public radius(): number {
     return Math.max(this.instance.getWidth(), this.instance.getHeight()) / 2;
+  }
+
+  public text(): string {
+    const fqn = this.instance.getFullyQualifiedName();
+    const props = this.instance.getProperties();
+
+    switch (fqn) {
+      case 'slang.data.Value':
+        return !!props ? JSON.stringify(props['value']) : 'value?';
+      case 'slang.data.Evaluate':
+        return !!props ? props['expression'] : 'eval?';
+      case 'slang.data.Convert':
+        return '';
+      default:
+        return this.instance.lastName();
+    }
+  }
+
+  public visualInstances(): Array<OperatorInstance> {
+    return Array.from(this.instance.getInstances().values()).filter(ins => ins.isVisible());
+  }
+
+  public visualConnections(): Array<Connection> {
+    return Array.from(this.instance.getConnections().values());
   }
 
 }

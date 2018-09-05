@@ -1,0 +1,70 @@
+<nav class="navbar navbar-expand navbar-dark bg-dark">
+  <div id="sl-navbar-op-viewed">
+    <a class="sl-navbar-go-back" routerLink="/"> <i class="fas fa-arrow-left"></i></a>
+    <div class="navbar-text sl-operator-name">{{operatorName}}</div>
+  </div>
+  <div class="btn-group btn-group-sm ml-3">
+    <button class="btn btn-outline-light" (click)="save()"><i class="fas fa-save"></i></button>
+    <button class="btn btn-outline-light" (click)="download()"><i class="fas fa-download"></i></button>
+  </div>
+  <div class="btn-group btn-group-sm btn-group-toggle ml-3">
+    <button type="button" class="btn btn-outline-light" ngbButton (click)="setUIMode('visual')"
+            [ngClass]="{'active': isUIModeVisual()}"><i class="fas fa-project-diagram"></i></button>
+    <button type="button" class="btn btn-outline-light" ngbButton (click)="setUIMode('yaml')"
+            [ngClass]="{'active': isUIModeYAML()}"><i class="fas fa-code"></i></button>
+  </div>
+  <div class="btn-group btn-group-sm btn-group-toggle ml-3">
+    <button type="button" class="btn btn-outline-light" (click)="startDebugging()"
+            [ngClass]="{'active': running()}"><i class="fas fa-play"></i></button>
+    <button type="button" class="btn btn-outline-light" (click)="stopOperator()"
+            [ngClass]="{'active': !running()}"><i class="fas fa-stop"></i></button>
+  </div>
+  <div class="pl-3 navbar-text" [@operatorSaved]="isOperatorSaved">
+    Operator saved...
+  </div>
+</nav>
+
+<div class="container-fluid">
+  <!-- ui-mode yaml -->
+  <div *ngIf="isUIModeYAML()">
+    <codemirror [ngModel]="yamlRepr"
+                [config]="editorConfig"
+                (ngModelChange)="updateYaml($event)"
+                (blur)="storeYaml()">
+    </codemirror>
+  </div>
+  <!-- ui-mode visual -->
+  <div id="sl-visual-ui" *ngIf="isUIModeVisual()">
+    <div class="row">
+      <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 sl-col" id="sl-operators-col">
+        <app-operator-list [buttonIcon]="'fa-plus'" [operatorList]="getOperatorList()"
+                           (operatorSelected)="addInstance($event)"></app-operator-list>
+      </div>
+      <div class="sl-ui-mainbar col">
+        <div id="sl-svg-container" [ngClass]="{'large': !debugState}">
+
+          <svg (mouseenter)="canvasFocus=true" (mouseleave)="canvasFocus=false"
+               [attr.width]="50000*scale" [attr.height]="50000*scale"
+               viewBox="0 0 50000 50000"
+               xmlns:svg="http://www.w3.org/2000/svg"
+               (mousedown)="mouse.start($event)"
+               (mouseup)="mouse.stop($event)"
+               (mousemove)="mouse.track($event)">
+
+            <svg:g *ngIf="operator" app-instance [instance]="operator" aspect="surrounding">
+            </svg:g>
+          </svg>
+
+          <div id="sl-message-box" *ngIf="userMessage"><i class="fas fa-info-circle"></i> {{ userMessage }}</div>
+
+        </div>
+        <div id="sl-main-bottom" [hidden]="!debugState">
+          <app-editor-debug-panel [definition]="operatorDef" [operator]="operator" [operatorName]="operatorName" [(debugState)]="debugState" (debugStateChange)="debugStateChanged($event)" style="width: 100%"></app-editor-debug-panel>
+        </div>
+      </div>
+      <div id="sl-instance-sidebar" class="d-none d-md-block sl-ui-sidebar col-2" *ngIf="!debugState">
+        <app-editor-sidebar [definition]="operatorDef" [surrounding]="operator" (definitionChange)="sidebarDefinitionChange()"></app-editor-sidebar>
+      </div>
+    </div>
+  </div>
+</div>

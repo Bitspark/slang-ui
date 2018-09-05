@@ -1,0 +1,20 @@
+<svg:g xmlns:svg="http://www.w3.org/2000/svg">
+  <svg:g *ngIf="aspect === 'visible' && normalVisible()">
+    <!-- Visible Connections -->
+    <svg:path class="sl-svg-conn"
+              [attr.d]="connectionPoints()"></svg:path>
+  </svg:g>
+  <svg:g *ngIf="aspect === 'highlighted'">
+    <!-- Highlighted Connections -->
+    <svg:path class="sl-svg-conn-highlight"
+              [ngClass]="getCSSClass()"
+              [attr.d]="connectionPoints()"></svg:path>
+  </svg:g>
+  <svg:g *ngIf="aspect === 'clickable'">
+    <!-- Clickable Invisible Connections -->
+    <svg:path class="sl-svg-conn-click-overlay"
+              (mousedown)="broadcast.select(connection)"
+              (mouseover)="broadcast.hover(connection)" (mouseout)="broadcast.hover(null)"
+              [attr.d]="connectionPoints()"></svg:path>
+  </svg:g>
+</svg:g>
