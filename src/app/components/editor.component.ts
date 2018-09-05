@@ -143,22 +143,12 @@ export class EditorComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.broadcast.clear();
     this.route.params.subscribe(routeParams => {
       this.loadOperator(routeParams.operatorName);
     });
     this.operators.getLoadingObservable().subscribe((success) => {
       if (success) {
         this.loadOperator(this.operatorName);
-      }
-    });
-    this.callback = this.broadcast.subscribeSelect(obj => {
-      if (obj instanceof OperatorInstance) {
-        this.selectInstance(obj);
-      } else if (obj instanceof Port) {
-        this.selectPort(obj);
-      } else if (obj instanceof Connection) {
-        this.selectConnection(obj);
       }
     });
     this.mouseCallback = this.mouse.subscribe((event: any, actionPhase: string) => this.mouseAction(event, actionPhase));
@@ -187,6 +177,7 @@ export class EditorComponent implements OnInit, OnDestroy {
   }
 
   public async loadOperator(operatorName) {
+    this.broadcast.clear();
     this.operatorName = operatorName;
     this.operatorDef = this.operators.getLocal(this.operatorName);
     if (this.operatorDef) {
@@ -217,6 +208,15 @@ export class EditorComponent implements OnInit, OnDestroy {
       }
       this.ref.detectChanges();
     }
+    this.callback = this.broadcast.subscribeSelect(obj => {
+      if (obj instanceof OperatorInstance) {
+        this.selectInstance(obj);
+      } else if (obj instanceof Port) {
+        this.selectPort(obj);
+      } else if (obj instanceof Connection) {
+        this.selectConnection(obj);
+      }
+    });
   }
 
   public removeInstance(ins: OperatorInstance) {
