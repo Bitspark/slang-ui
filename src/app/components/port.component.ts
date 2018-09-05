@@ -1,9 +1,8 @@
 import {Component, Input, ChangeDetectorRef, ChangeDetectionStrategy, OnDestroy} from '@angular/core';
 import {generateSvgTransform} from '../utils';
 import {Port, Transformable, Type} from '../classes/operator';
-import {VisualService} from '../services/visual.service';
 import {Orientation} from '../classes/vector';
-import {BroadcastService} from "../services/broadcast.service";
+import {BroadcastService} from '../services/broadcast.service';
 
 @Component({
   selector: 'app-port,[app-port]',

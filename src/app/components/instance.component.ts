@@ -1,9 +1,8 @@
-import {Component, EventEmitter, Input, OnInit, Output, ChangeDetectorRef, ChangeDetectionStrategy, OnDestroy} from '@angular/core';
+import {Component, Input, OnInit, ChangeDetectorRef, ChangeDetectionStrategy, OnDestroy} from '@angular/core';
 import {Connection, OperatorInstance, Transformable} from '../classes/operator';
 import {generateSvgTransform} from '../utils';
-import {VisualService} from "../services/visual.service";
-import {MouseService} from "../services/mouse.service";
-import {BroadcastService} from "../services/broadcast.service";
+import {MouseService} from '../services/mouse.service';
+import {BroadcastService} from '../services/broadcast.service';
 
 @Component({
   selector: 'app-instance,[app-instance]',

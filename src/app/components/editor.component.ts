@@ -9,11 +9,9 @@ import {MouseService} from '../services/mouse.service';
 import {OperatorService} from '../services/operator.service';
 import {VisualService} from '../services/visual.service';
 
-import {TypeDefFormComponent} from './type-def-form.component';
-
 import {Connection, OperatorDef, OperatorInstance, Port} from '../classes/operator';
 import {safeDump, safeLoad} from 'js-yaml';
-import {createDefaultValue, normalizeConnections, stringifyConnections, HTTP_REQUEST_DEF, HTTP_RESPONSE_DEF} from '../utils';
+import {normalizeConnections, stringifyConnections} from '../utils';
 
 import 'codemirror/mode/yaml/yaml.js';
 
@@ -60,7 +58,6 @@ export class EditorComponent implements OnInit, OnDestroy {
   };
 
   // Visual
-  public hoveredEntity: { entity: Port | Connection } = {entity: null as any};
   public selectedEntity = {entity: null as any};
   public scale = 0.6;
   public isOperatorSaved = false;
@@ -160,6 +157,8 @@ export class EditorComponent implements OnInit, OnDestroy {
         this.selectInstance(obj);
       } else if (obj instanceof Port) {
         this.selectPort(obj);
+      } else if (obj instanceof Connection) {
+        this.selectConnection(obj);
       }
     });
     this.mouseCallback = this.mouse.subscribe((event: any, actionPhase: string) => this.mouseAction(event, actionPhase));
@@ -313,6 +312,10 @@ export class EditorComponent implements OnInit, OnDestroy {
     this.newInstanceName = ins.getName();
   }
 
+  public selectConnection(conn: Connection) {
+    this.selectedEntity.entity = conn;
+  }
+
   public isAnyEntitySelected(): boolean {
     return !!this.broadcast.getSelected();
   }
@@ -446,7 +449,8 @@ export class EditorComponent implements OnInit, OnDestroy {
     this.refresh();
   }
 
-  public startDebugging() {
+  public async startDebugging() {
+    await this.save();
     this.debugState = 'startDebugging';
     this.ref.detectChanges();
   }
