@@ -25,6 +25,7 @@ export class EditorDebugPanelComponent implements OnInit {
   public operatorEndpoint = '';
   public propertyDefs: any = null;
   public mainSrvPort: any = null;
+  public interval: any = null;
 
   // DEBUG STATE
 
@@ -154,6 +155,9 @@ export class EditorDebugPanelComponent implements OnInit {
 
   public async sendInputValue(obj: any) {
     await this.http.post(this.operatorEndpoint, JSON.stringify(obj)).toPromise();
+    if (this.interval) {
+      setTimeout(() => this.fetchItems(), 150);
+    }
   }
 
   public stopOperator() {
@@ -181,6 +185,18 @@ export class EditorDebugPanelComponent implements OnInit {
     this.ref.detectChanges();
   }
 
+  private fetchItems() {
+    this.http.get(this.operatorEndpoint).toPromise()
+      .then(responses => {
+        this.debuggingReponses = responses as Array<any>;
+        this.ref.detectChanges();
+      })
+      .catch(() => {
+        clearInterval(this.interval);
+        this.interval = null;
+      });
+  }
+
   public runOperator() {
     this.inputValue = createDefaultValue(this.debuggingInPort);
     this.debugLog('Request daemon to start operator...');
@@ -200,22 +216,13 @@ export class EditorDebugPanelComponent implements OnInit {
           this.operatorEndpoint = data['url'];
           this.debugLog('Operator is running at ' + this.operatorEndpoint);
           this.runningHandle = data['handle'];
+          this.interval = null;
 
           if (isStream) {
-            let interval = null;
             const that = this;
-            const fetchItems = function () {
-              that.http.get(that.operatorEndpoint).toPromise()
-                .then(responses => {
-                  that.debuggingReponses = responses as Array<any>;
-                })
-                .catch(() => {
-                  clearInterval(interval);
-                });
-              that.ref.detectChanges();
-            };
-            fetchItems();
-            interval = setInterval(fetchItems, 2000);
+            this.interval = setInterval(function () {
+              that.fetchItems();
+            }, 2000);
           }
         } else {
           this.debugState = 'stopped';
