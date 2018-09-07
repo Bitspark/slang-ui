@@ -17,11 +17,8 @@ export class BroadcastService {
 
   // HOVERING AND SELECTING
 
-  public clear() {
-    this.selectedEntity = null;
-    this.hoveredEntity = null;
+  public clearUpdateCallbacks() {
     this.updateSubscriptions = new Map<Object, Array<() => void>>();
-    this.selectEntitySubscriptions = [];
   }
 
   public hover(obj: Identifiable) {
