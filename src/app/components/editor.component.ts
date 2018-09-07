@@ -177,7 +177,7 @@ export class EditorComponent implements OnInit, OnDestroy {
   }
 
   public async loadOperator(operatorName) {
-    this.broadcast.clear();
+    this.broadcast.clearUpdateCallbacks();
     this.operatorName = operatorName;
     this.operatorDef = this.operators.getLocal(this.operatorName);
     if (this.operatorDef) {
