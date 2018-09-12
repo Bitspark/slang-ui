@@ -209,6 +209,10 @@ export class EditorComponent implements OnInit, OnDestroy {
       this.ref.detectChanges();
     }
     this.callback = this.broadcast.subscribeSelect(obj => {
+      if (!obj) {
+        this.selectedEntity.entity = null;
+        return;
+      }
       if (obj instanceof OperatorInstance) {
         this.selectInstance(obj);
       } else if (obj instanceof Port) {
@@ -392,7 +396,7 @@ export class EditorComponent implements OnInit, OnDestroy {
           }
         }
       }
-      this.selectedEntity.entity = null;
+      this.broadcast.select(null);
     } else {
       this.selectedEntity.entity = port1;
     }
