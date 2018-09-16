@@ -102,10 +102,12 @@ export class EditorComponent implements OnInit, OnDestroy {
     }
     switch (event.key) {
       case '+':
+        event.preventDefault();
         this.scale *= 1.1;
         this.ref.detectChanges();
         break;
       case '-':
+        event.preventDefault();
         this.scale /= 1.1;
         this.ref.detectChanges();
         break;
@@ -115,6 +117,7 @@ export class EditorComponent implements OnInit, OnDestroy {
         if (!selectedEntity) {
           return;
         }
+        event.preventDefault();
         if (selectedEntity instanceof OperatorInstance) {
           this.removeInstance(selectedEntity);
           this.broadcast.select(null);
@@ -208,19 +211,22 @@ export class EditorComponent implements OnInit, OnDestroy {
       }
       this.ref.detectChanges();
     }
-    this.callback = this.broadcast.subscribeSelect(obj => {
-      if (!obj) {
-        this.selectedEntity.entity = null;
-        return;
-      }
-      if (obj instanceof OperatorInstance) {
-        this.selectInstance(obj);
-      } else if (obj instanceof Port) {
-        this.selectPort(obj);
-      } else if (obj instanceof Connection) {
-        this.selectConnection(obj);
-      }
-    });
+    if (!this.callback) {
+      console.log('subscribe');
+      this.callback = this.broadcast.subscribeSelect(obj => {
+        if (!obj) {
+          this.selectedEntity.entity = null;
+          return;
+        }
+        if (obj instanceof OperatorInstance) {
+          this.selectInstance(obj);
+        } else if (obj instanceof Port) {
+          this.selectPort(obj);
+        } else if (obj instanceof Connection) {
+          this.selectConnection(obj);
+        }
+      });
+    }
   }
 
   public removeInstance(ins: OperatorInstance) {
@@ -368,35 +374,49 @@ export class EditorComponent implements OnInit, OnDestroy {
         if (port2.getOperator() === this.operator) {
           if (port1.isIn() && port2.isOut()) {
             this.addConnection(port1, port2);
+            this.broadcast.select(null);
+            return;
           } else if (port2.isIn() && port1.isOut()) {
             this.addConnection(port2, port1);
+            this.broadcast.select(null);
+            return;
           }
         } else {
           if (port1.isIn() && port2.isIn()) {
             this.addConnection(port1, port2);
+            this.broadcast.select(null);
+            return;
           } else if (port2.isOut() && port1.isOut()) {
             this.addConnection(port2, port1);
+            this.broadcast.select(null);
+            return;
           }
         }
       } else {
         if (port2.getOperator() === this.operator) {
           if (port2.isIn() && port1.isIn()) {
             this.addConnection(port2, port1);
+            this.broadcast.select(null);
+            return;
           } else if (port1.isOut() && port2.isOut()) {
             this.addConnection(port1, port2);
+            this.broadcast.select(null);
+            return;
           }
         } else {
           if (port1.isOut() && port2.isIn()) {
             this.addConnection(port1, port2);
+            this.broadcast.select(null);
+            return;
           } else if (port2.isOut() && port1.isIn()) {
             this.addConnection(port2, port1);
-          } else {
-            this.selectedEntity.entity = port1;
+            this.broadcast.select(null);
             return;
           }
         }
       }
-      this.broadcast.select(null);
+      this.selectedEntity.entity = port1;
+      return;
     } else {
       this.selectedEntity.entity = port1;
     }
@@ -464,7 +484,7 @@ export class EditorComponent implements OnInit, OnDestroy {
     this.ref.detectChanges();
   }
 
-  public debugStateChanged(state: string) {
+  public debugStateChanged(newState: string) {
     this.ref.detectChanges();
   }
 
