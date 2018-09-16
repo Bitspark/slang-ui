@@ -1,0 +1,16 @@
+@import "../../styles/variables.scss";
+
+#sl-sidebar {
+  height: calc(100% - 20px);
+}
+
+.sl-ui-scrollable {
+  height: 100%;
+  padding: $spacer;
+  overflow: auto;
+  white-space: nowrap;
+  width: 100%;
+  .sl-operator-name {
+    margin-bottom: 8px;
+  }
+}

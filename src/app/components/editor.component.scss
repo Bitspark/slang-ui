@@ -39,6 +39,10 @@
   }
 }
 
+.sl-editor-container {
+  height: 100%;
+}
+
 .row {
   width: 100%;
 }
@@ -47,21 +51,16 @@
   display: inline-block;
   width: 100vw;
   height: calc(100vh - 36px);
+
+  .row {
+    height: 100%;
+  }
 }
 
 .sl-ui-sidebar {
   background-color: $pane-border-color;
   padding: $spacer;
   height: calc(100vh - 36px);
-  .sl-ui-scrollable {
-    padding: $spacer;
-    overflow: auto;
-    white-space: nowrap;
-    width: 100%;
-    .sl-operator-name {
-      margin-bottom: 8px;
-    }
-  }
 }
 
 .sl-ui-mainbar {
@@ -110,14 +109,7 @@
 }
 
 #sl-instance-sidebar {
-  .sl-ui-scrollable {
-    background-color: $body-bg;
-    height: calc(50% - 0.25rem);
-    width: 100%;
-    box-sizing: border-box;
-    margin-bottom: $spacer;
-    padding: 5px;
-  }
+  height: 100%;
 }
 
 .sl-form-box {

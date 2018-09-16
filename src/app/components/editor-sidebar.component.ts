@@ -10,7 +10,7 @@ import {createDefaultValue} from '../utils';
 @Component({
   selector: 'app-editor-sidebar',
   templateUrl: './editor-sidebar.component.html',
-  styleUrls: [],
+  styleUrls: ['./editor-sidebar.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class EditorSidebarComponent implements OnInit, OnDestroy {
@@ -241,6 +241,9 @@ export class EditorSidebarComponent implements OnInit, OnDestroy {
   }
 
   private insUpdatePropertyDefs(ins: OperatorInstance): void {
+    if (!ins) {
+      return;
+    }
     if (this.insPropertyDefs.length === 0) {
       this.insPropertyDefs = Array.from(ins.getPropertyDefs().entries()).map(each => {
         const defCopy = JSON.parse(JSON.stringify(each[1]));
