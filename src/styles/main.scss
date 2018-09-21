@@ -38,6 +38,15 @@ h1, h2, h3, h4, h5, h6 {
   background-color: $dark-tone;
 }
 
-.CodeMirror {
+#sl-editor-container .CodeMirror {
   height: calc(100vh - 50px);
+}
+
+.sl-bridge .CodeMirror {
+  height: auto;
+  min-height: 200px;
+}
+
+.sl-bridge .CodeMirror-scroll {
+  min-height: 200px;
 }

@@ -20,6 +20,7 @@ import {TypeValueFormComponent} from './components/type-value-form.component';
 import {PreviewObjectComponent} from './components/preview-object.component';
 import {EditorSidebarComponent} from './components/editor-sidebar.component';
 import {EditorDebugPanelComponent} from './components/editor-debug-panel.component';
+import {BridgeCodeComponent} from './components/bridge-code.component';
 
 
 import {ApiService} from './services/api.service';
@@ -35,7 +36,7 @@ import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
   declarations: [
     AppComponent, IndexComponent, TypeDefFormComponent, TypeValueFormComponent,
     OperatorListComponent, EditorComponent, InstanceComponent, PortComponent, ConnectionComponent,
-    PreviewObjectComponent, EditorSidebarComponent, EditorDebugPanelComponent
+    PreviewObjectComponent, EditorSidebarComponent, EditorDebugPanelComponent, BridgeCodeComponent
   ],
   imports: [
     NgbModule.forRoot(),
@@ -51,7 +52,8 @@ import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
     FileUploadModule
   ],
   providers: [ApiService, OperatorService, VisualService, MouseService, BroadcastService],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
+  entryComponents: [BridgeCodeComponent]
 })
 export class AppModule {
 }

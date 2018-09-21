@@ -63,7 +63,7 @@
         </button>
       </div>
     </div>
-    <div *ngIf="insPropertyDefs.length > 0">
+    <div *ngIf="!getSelectedInstance().isBridge() && insPropertyDefs.length > 0">
       <h5>Properties</h5>
       <div class="sl-form-box" *ngFor="let prop of insPropertyDefs">
         <h6>{{ prop.name }}</h6>
@@ -77,6 +77,16 @@
                 [disabled]="!insTypeSpecified(prop.def)"
                 (click)="insSpecifyProperty(prop)">Specify
         </button>
+      </div>
+    </div>
+    <div *ngIf="getSelectedInstance().isBridge()">
+      <h5>Bridge ({{ getSelectedInstance().getBridgeLanguage() }})</h5>
+      <div>
+        <button class="btn" (click)="editCode()">Edit source</button>
+      </div>
+      <div>
+        <h6>Method</h6>
+        <input [ngModel]="insPropertyValues['method']" (ngModelChange)="insPropertyValues['method'] = $event; definitionChange.emit()" />
       </div>
     </div>
   </div>

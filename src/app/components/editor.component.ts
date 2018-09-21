@@ -212,7 +212,6 @@ export class EditorComponent implements OnInit, OnDestroy {
       this.ref.detectChanges();
     }
     if (!this.callback) {
-      console.log('subscribe');
       this.callback = this.broadcast.subscribeSelect(obj => {
         if (!obj) {
           this.selectedEntity.entity = null;

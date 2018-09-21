@@ -1,8 +1,7 @@
 import {Component, ChangeDetectionStrategy, Input, ChangeDetectorRef, OnDestroy} from '@angular/core';
 import {Connection, OperatorInstance, Type} from '../classes/operator';
-import {VisualService} from '../services/visual.service';
 import {SVGConnectionLineGenerator} from '../utils';
-import {BroadcastService} from "../services/broadcast.service";
+import {BroadcastService} from '../services/broadcast.service';
 
 @Component({
   selector: 'app-connection,[app-connection]',

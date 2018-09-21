@@ -773,6 +773,14 @@ export class OperatorInstance extends Composable implements Identifiable {
     return this.fqOperator;
   }
 
+  public isBridge(): boolean {
+    return this.fqOperator.startsWith('slang.bridge.');
+  }
+
+  public getBridgeLanguage(): string {
+    return this.fqOperator.substr('slang.bridge.'.length).toLowerCase();
+  }
+
   public getProperties(): any {
     return this.properties;
   }

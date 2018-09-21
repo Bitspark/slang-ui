@@ -6,6 +6,8 @@ import {TypeDefFormComponent} from './type-def-form.component';
 
 import {Identifiable, Identity, OperatorDef, OperatorInstance} from '../classes/operator';
 import {createDefaultValue} from '../utils';
+import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
+import {BridgeCodeComponent} from "./bridge-code.component";
 
 @Component({
   selector: 'app-editor-sidebar',
@@ -28,9 +30,9 @@ export class EditorSidebarComponent implements OnInit, OnDestroy {
     return this.surrounding_;
   }
 
-  public definition_: OperatorDef;
-
   // OPERATOR DEFINITION
+
+  public definition_: OperatorDef;
 
   @Input()
   public set definition(def: OperatorDef) {
@@ -82,7 +84,7 @@ export class EditorSidebarComponent implements OnInit, OnDestroy {
   // TypeValue components subscribe to this identity and TypeDef components broadcast to it
   public insEditorSidebarIdentity = new Identity('editor-sidebar');
 
-  constructor(private ref: ChangeDetectorRef, public broadcast: BroadcastService) {
+  constructor(private ref: ChangeDetectorRef, public broadcast: BroadcastService, private modalService: NgbModal) {
     ref.detach();
   }
 
@@ -99,6 +101,13 @@ export class EditorSidebarComponent implements OnInit, OnDestroy {
         this.insUpdateGenerics(ins);
         this.insUpdatePropertyDefs(ins);
         this.insUpdatePropertyValues(ins);
+      }
+      if (ins.isBridge()) {
+        for (const prop of this.insPropertyDefs) {
+          if (!this.insPropertyValueSpecified(prop)) {
+            this.insSpecifyProperty(prop);
+          }
+        }
       }
       this.ref.detectChanges();
     });
@@ -348,6 +357,18 @@ export class EditorSidebarComponent implements OnInit, OnDestroy {
       ins.scale([-1, 1]);
       this.updateInstance(ins);
     }
+  }
+
+  // BRIDGE
+
+  public editCode() {
+    const modalRef = this.modalService.open(BridgeCodeComponent, { size: 'lg' });
+    modalRef.componentInstance.language = this.getSelectedInstance().getBridgeLanguage();
+    modalRef.componentInstance.source = this.insPropertyValues['source'];
+    modalRef.componentInstance.sourceChange.subscribe(source => {
+      this.insPropertyValues['source'] = source;
+      this.definitionChange.emit();
+    });
   }
 
   // GENERAL
