@@ -84,6 +84,8 @@ export class EditorSidebarComponent implements OnInit, OnDestroy {
   // TypeValue components subscribe to this identity and TypeDef components broadcast to it
   public insEditorSidebarIdentity = new Identity('editor-sidebar');
 
+  public ipcs: Array<string> = ['pipe', 'http'];
+
   constructor(private ref: ChangeDetectorRef, public broadcast: BroadcastService, private modalService: NgbModal) {
     ref.detach();
   }
@@ -107,6 +109,9 @@ export class EditorSidebarComponent implements OnInit, OnDestroy {
           if (!this.insPropertyValueSpecified(prop)) {
             this.insSpecifyProperty(prop);
           }
+        }
+        if (!this.insPropertyValues['ipc']) {
+          this.insPropertyValues['ipc'] = 'pipe';
         }
       }
       this.ref.detectChanges();

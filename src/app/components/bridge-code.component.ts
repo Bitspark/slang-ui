@@ -3,6 +3,8 @@ import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 
 import 'codemirror/mode/python/python.js';
 import 'codemirror/mode/javascript/javascript.js';
+import 'codemirror/mode/ruby/ruby.js';
+import 'codemirror/mode/go/go.js';
 
 @Component({
   templateUrl: './bridge-code.component.html',
@@ -35,7 +37,9 @@ export class BridgeCodeComponent implements OnInit {
   ngOnInit(): void {
     const modes = {
       python: 'text/x-python',
-      javascript: 'text/javascript'
+      javascript: 'text/javascript',
+      ruby: 'text/x-ruby',
+      go: 'text/x-go'
     };
 
     this.editorConfig = {
@@ -43,8 +47,6 @@ export class BridgeCodeComponent implements OnInit {
       mode: modes[this.language],
       lineNumbers: true
     };
-
-    console.log(JSON.stringify(this.editorConfig));
   }
 
   public save() {

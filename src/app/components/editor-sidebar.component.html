@@ -86,7 +86,13 @@
       </div>
       <div>
         <h6>Method</h6>
-        <input [ngModel]="insPropertyValues['method']" (ngModelChange)="insPropertyValues['method'] = $event; definitionChange.emit()" />
+        <input [ngModel]="insPropertyValues['method']" (ngModelChange)="insPropertyValues['method'] = $event; definitionChange.emit()" title="method" />
+      </div>
+      <div>
+        <h6>IPC</h6>
+        <select [ngModel]="insPropertyValues['ipc']" (ngModelChange)="insPropertyValues['ipc'] = $event; definitionChange.emit()" title="ipc">
+          <option *ngFor="let ipc of ipcs" [value]="ipc">{{ipc}}</option>
+        </select>
       </div>
     </div>
   </div>
