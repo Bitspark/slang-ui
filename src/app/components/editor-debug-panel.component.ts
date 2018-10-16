@@ -138,11 +138,15 @@ export class EditorDebugPanelComponent implements OnInit {
       }
     }
 
+    this.refreshPropertyExpansion();
+  }
+
+  public refreshPropertyExpansion() {
     this.debuggingInPort = JSON.parse(JSON.stringify(this.mainSrvPort.in));
-    OperatorDef.specifyTypeDef(this.debuggingInPort, this.debuggingGens, {}, {});
+    OperatorDef.specifyTypeDef(this.debuggingInPort, this.debuggingGens, this.debuggingProps, this.propertyDefs);
 
     this.debuggingOutPort = JSON.parse(JSON.stringify(this.mainSrvPort.out));
-    OperatorDef.specifyTypeDef(this.debuggingOutPort, this.debuggingGens, {}, {});
+    OperatorDef.specifyTypeDef(this.debuggingOutPort, this.debuggingGens, this.debuggingProps, this.propertyDefs);
   }
 
   public httpInput(): boolean {
@@ -250,6 +254,11 @@ export class EditorDebugPanelComponent implements OnInit {
 
   public inputValueChanged() {
     this.ref.detectChanges();
+  }
+
+  public setDebuggingProp(name: string, value: any) {
+    this.debuggingProps[name] = value;
+    this.refreshPropertyExpansion();
   }
 
 }

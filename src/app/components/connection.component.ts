@@ -57,6 +57,7 @@ export class ConnectionComponent implements OnDestroy {
 
     cssClass['selected'] = this.broadcast.isSelected(this.connection);
     cssClass['hovered'] = this.broadcast.isHovered(this.connection);
+    cssClass['expandable'] = this.connection.getDestination().getName().startsWith('{');
 
     return cssClass;
   }
