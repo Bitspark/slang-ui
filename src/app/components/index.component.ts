@@ -52,7 +52,10 @@ export class IndexComponent {
 
   public async upload() {
     await this.uploader.uploadAll();
-    await this.refreshOperators();
+    const that = this;
+    setTimeout(async function () {
+      await that.refreshOperators();
+    }, 2000);
   }
 
   public async save(opDef: OperatorDef): Promise<boolean> {
