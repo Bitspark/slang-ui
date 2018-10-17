@@ -211,4 +211,8 @@ export class TypeValueFormComponent implements OnInit, OnDestroy, OnChanges {
     return undefined;
   }
 
+  public propertyRedirect(): boolean {
+    return typeof this.typeValue === 'string' && this.typeValue.startsWith('$');
+  }
+
 }

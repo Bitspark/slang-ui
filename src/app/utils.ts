@@ -12,15 +12,23 @@ function expandExpressionPart(exprPart: string, props: any, propDefs: any): Arra
   }
   const propDef = propDefs[exprPart];
   if (propDef['type'] === 'stream') {
-    for (const el of prop) {
-      if (typeof el !== 'string') {
-        vals.push(JSON.stringify(el));
-      } else {
-        vals.push(el);
+    if (typeof prop === 'string' && (prop as string).startsWith('$')) {
+      vals.push(`{${prop.substr(1)}}`);
+    } else {
+      for (const el of prop) {
+        if (typeof el !== 'string') {
+          vals.push(JSON.stringify(el));
+        } else {
+          vals.push(el);
+        }
       }
     }
   } else {
-    vals.push(JSON.stringify(prop));
+    if (typeof prop !== 'string') {
+      vals.push(JSON.stringify(prop));
+    } else {
+      vals.push(prop);
+    }
   }
   return vals;
 }

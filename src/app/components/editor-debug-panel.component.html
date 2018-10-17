@@ -47,7 +47,8 @@
         <h6>{{propName}}</h6>
         <app-type-value-form *ngIf="debuggingPropDefs[propName] !== undefined"
                              [typeDef]="debuggingPropDefs[propName]"
-                             [(typeValue)]="debuggingProps[propName]">
+                             [typeValue]="debuggingProps[propName]"
+                             (typeValueChange)="setDebuggingProp(propName, $event)">
         </app-type-value-form>
         <button *ngIf="debuggingPropDefs[propName] === undefined"
                 (click)="specifyProperty(debuggingProps, propName, debuggingPropDefs[propName])">Specify

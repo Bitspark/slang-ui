@@ -1,49 +1,54 @@
 <div style="display: inline-block; vertical-align: top; margin-bottom: 5px">
-  <div *ngIf="!specialType()">
-    <div *ngIf="typeDef.type === 'generic'">
-      <input [(ngModel)]="typeValue" type="text" title="value" (ngModelChange)="emitChange()" />
+  <div *ngIf="propertyRedirect()">
+    <input [(ngModel)]="typeValue" type="text" title="value" (ngModelChange)="emitChange()" />
+  </div>
+  <div *ngIf="!propertyRedirect()">
+    <div *ngIf="!specialType()">
+      <div *ngIf="typeDef.type === 'generic'">
+        <input [(ngModel)]="typeValue" type="text" title="value" (ngModelChange)="emitChange()" />
+      </div>
+      <div *ngIf="typeDef.type === 'primitive'">
+        <input [(ngModel)]="typeValue" title="value" (ngModelChange)="emitChange()" />
+      </div>
+      <div *ngIf="typeDef.type === 'number'">
+        <input [(ngModel)]="typeValue" type="number" title="value" (ngModelChange)="emitChange()" />
+      </div>
+      <div *ngIf="typeDef.type === 'string'">
+        <input [(ngModel)]="typeValue" type="text" title="value" (ngModelChange)="emitChange()" />
+      </div>
+      <div *ngIf="typeDef.type === 'binary'">
+        <input class="upload" type="file" (change)="selectFile($event)" />
+      </div>
+      <div *ngIf="typeDef.type === 'boolean'">
+        <label><input [(ngModel)]="typeValue" type="checkbox" title="value" [id]="" (ngModelChange)="emitChange()" />{{ typeValue }}</label>
+      </div>
+      <div *ngIf="typeDef.type === 'trigger'">
+        &bull; Trigger
+      </div>
+
+      <div *ngIf="typeDef.type === 'map'" class="sl-map-box" style="padding-left: 5px; margin-left: 5px">
+        <div *ngFor="let key of getEntries()">
+          {{key}}
+          <app-type-value-form [subscribe]="subscribe" [(typeValue)]="typeValue[key]" (typeValueChange)="emitChange()" [typeDef]="typeDef.map[key]"></app-type-value-form>
+        </div>
+      </div>
+
+      <div *ngIf="typeDef.type === 'stream'">
+        <div *ngFor="let i of getEntries()">
+          <button (click)="removeIndex(i)"><i class="fa fa-trash"></i></button>
+          {{i + 1}}.
+          <app-type-value-form [subscribe]="subscribe" [(typeValue)]="typeValue[i]" (typeValueChange)="emitChange()" [typeDef]="typeDef.stream"></app-type-value-form>
+        </div>
+        <button (click)="add()">Add</button>
+      </div>
     </div>
-    <div *ngIf="typeDef.type === 'primitive'">
-      <input [(ngModel)]="typeValue" title="value" (ngModelChange)="emitChange()" />
-    </div>
-    <div *ngIf="typeDef.type === 'number'">
-      <input [(ngModel)]="typeValue" type="number" title="value" (ngModelChange)="emitChange()" />
-    </div>
-    <div *ngIf="typeDef.type === 'string'">
-      <input [(ngModel)]="typeValue" type="text" title="value" (ngModelChange)="emitChange()" />
-    </div>
-    <div *ngIf="typeDef.type === 'binary'">
+    <div *ngIf="specialType() === 'image'">
+      Image file:
       <input class="upload" type="file" (change)="selectFile($event)" />
     </div>
-    <div *ngIf="typeDef.type === 'boolean'">
-      <label><input [(ngModel)]="typeValue" type="checkbox" title="value" [id]="" (ngModelChange)="emitChange()" />{{ typeValue }}</label>
+    <div *ngIf="specialType() === 'file'">
+      File:
+      <input class="upload" type="file" (change)="selectFile($event)" />
     </div>
-    <div *ngIf="typeDef.type === 'trigger'">
-      &bull; Trigger
-    </div>
-
-    <div *ngIf="typeDef.type === 'map'" class="sl-map-box" style="padding-left: 5px; margin-left: 5px">
-      <div *ngFor="let key of getEntries()">
-        {{key}}
-        <app-type-value-form [subscribe]="subscribe" [(typeValue)]="typeValue[key]" (typeValueChange)="emitChange()" [typeDef]="typeDef.map[key]"></app-type-value-form>
-      </div>
-    </div>
-
-    <div *ngIf="typeDef.type === 'stream'">
-      <div *ngFor="let i of getEntries()">
-        <button (click)="removeIndex(i)"><i class="fa fa-trash"></i></button>
-        {{i + 1}}.
-        <app-type-value-form [subscribe]="subscribe" [(typeValue)]="typeValue[i]" (typeValueChange)="emitChange()" [typeDef]="typeDef.stream"></app-type-value-form>
-      </div>
-      <button (click)="add()">Add</button>
-    </div>
-  </div>
-  <div *ngIf="specialType() === 'image'">
-    Image file:
-    <input class="upload" type="file" (change)="selectFile($event)" />
-  </div>
-  <div *ngIf="specialType() === 'file'">
-    File:
-    <input class="upload" type="file" (change)="selectFile($event)" />
   </div>
 </div>

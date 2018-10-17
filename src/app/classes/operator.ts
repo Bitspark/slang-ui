@@ -435,8 +435,11 @@ export class OperatorInstance extends Composable implements Identifiable {
 
     this.properties = props;
 
-    this.mainIn = new Port(this, 'service', 'main', true, null, '', this, def.services['main']['in']);
-    const tmpMainOut = new Port(this, 'service', 'main', false, null, '', this, def.services['main']['out']);
+    const mainIn = JSON.parse(JSON.stringify(def.services['main']['in']));
+    const mainOut = JSON.parse(JSON.stringify(def.services['main']['out']));
+
+    this.mainIn = new Port(this, 'service', 'main', true, null, '', this, mainIn);
+    const tmpMainOut = new Port(this, 'service', 'main', false, null, '', this, mainOut);
     width = Math.max(width, this.mainIn.getWidth(), tmpMainOut.getWidth() + 10, this.getOpMinWidth());
     height = Math.max(height, this.mainIn.getHeight() + 10);
 

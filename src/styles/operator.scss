@@ -35,6 +35,9 @@ svg {
     &.hovered {
       stroke: $svg-hovered;
     }
+    &.expandable {
+      stroke: $svg-expandable;
+    }
   }
 
   .sl-svg-conn {
