@@ -2,7 +2,7 @@
 
 # Slang UI
 
-<img src="http://tryslang.com/slang2.png" height="130">
+<img src="https://files.bitspark.de/slang2.png" height="130">
 
 *Powered by [Bitspark](https://bitspark.de)*
 
