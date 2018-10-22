@@ -1,9 +1,10 @@
-import {Injectable, isDevMode} from '@angular/core';
+import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
+import {environment} from '../../environments/environment';
 
 @Injectable()
 export class ApiService {
-  private static host = isDevMode() ? 'http://localhost:5149' : '';
+  private static host = environment.daemon;
 
   constructor(private http: HttpClient) {
   }
