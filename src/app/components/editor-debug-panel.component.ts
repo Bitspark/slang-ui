@@ -4,6 +4,7 @@ import {OperatorDef, OperatorInstance} from '../classes/operator';
 import * as deepEqual from 'deep-equal';
 import {HttpClient} from '@angular/common/http';
 import {TypeDefFormComponent} from './type-def-form.component';
+import {ApiService} from '../services/api.service';
 
 @Component({
   selector: 'app-editor-debug-panel',
@@ -94,7 +95,7 @@ export class EditorDebugPanelComponent implements OnInit {
   @Input()
   public operatorName: string;
 
-  constructor(private ref: ChangeDetectorRef, private http: HttpClient) {
+  constructor(private ref: ChangeDetectorRef, private http: HttpClient, private api: ApiService) {
     ref.detach();
   }
 
@@ -158,19 +159,16 @@ export class EditorDebugPanelComponent implements OnInit {
   }
 
   public async sendInputValue(obj: any) {
-    await this.http.post(this.operatorEndpoint, JSON.stringify(obj)).toPromise();
+    await this.api.post(this.operatorEndpoint, {}, obj);
     if (this.interval) {
       setTimeout(() => this.fetchItems(), 150);
     }
   }
 
   public stopOperator() {
-    this.http.request('delete', 'http://localhost:5149/run/', {
-      body: {
-        handle: this.runningHandle
-      }
-    }).toPromise()
-      .then(data => {
+    this.api.delete('/run/', {}, {
+      handle: this.runningHandle
+    }).then(data => {
         if (data['status'] === 'success') {
           this.running = false;
           this.runningHandle = '';
@@ -190,7 +188,7 @@ export class EditorDebugPanelComponent implements OnInit {
   }
 
   private fetchItems() {
-    this.http.get(this.operatorEndpoint).toPromise()
+    this.api.get(this.operatorEndpoint)
       .then(responses => {
         this.debuggingReponses = responses as Array<any>;
         this.ref.detectChanges();
@@ -208,13 +206,12 @@ export class EditorDebugPanelComponent implements OnInit {
 
     const isStream = !this.httpInput() && !this.httpOutput();
 
-    this.http.post('http://localhost:5149/run/', {
+    this.api.post('/run/', {}, {
       fqn: this.operatorName,
       gens: this.debuggingGens,
       props: this.debuggingProps,
       stream: isStream
-    }).toPromise()
-      .then(data => {
+    }).then(data => {
         if (data['status'] === 'success') {
           this.debugState = 'debugging';
           this.operatorEndpoint = data['url'];
