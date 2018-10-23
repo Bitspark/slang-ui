@@ -1,23 +1,30 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
+import {environment} from '../../environments/environment';
 
 @Injectable()
 export class ApiService {
-  private static host = 'http://localhost:5149';
+  private static host = environment.daemon;
 
   constructor(private http: HttpClient) {
   }
 
   public async get(path: string, getParams?: any): Promise<Object> {
-    return await this.http.get(ApiService.host + path, {
+    return this.http.get(ApiService.host + path, {
       params: getParams
     }).toPromise();
   }
 
   public async post(path: string, getParams: any, postData: any): Promise<Object> {
-    return await this.http.post(ApiService.host + path, postData, {
+    return this.http.post(ApiService.host + path, postData, {
       params: getParams,
       responseType: 'json'
+    }).toPromise();
+  }
+
+  public async delete(path: string, getParams: any, postData: any): Promise<Object> {
+    return this.http.request('delete', ApiService.host + path, {
+      body: postData
     }).toPromise();
   }
 
