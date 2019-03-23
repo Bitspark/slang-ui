@@ -2,7 +2,9 @@
 
 # Slang UI
 
-<img src="https://files.bitspark.de/slang2.png" height="130">
+<p align="center">
+  <img src="https://raw.githubusercontent.com/Bitspark/slang/master/logo.png" height="130">
+</p>
 
 *Powered by [Bitspark](https://bitspark.de)*
 
