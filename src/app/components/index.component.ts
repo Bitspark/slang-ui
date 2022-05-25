@@ -37,11 +37,12 @@ export class IndexComponent {
 
   public async newOperator(newOperatorName: string) {
     const newOperator = new OperatorDef({
-      name: newOperatorName,
       def: JSON.parse(JSON.stringify(initialDef['default'])),
       type: 'local',
       saved: false
     });
+
+    newOperator.setName(newOperatorName);
 
     this.creatingOperatorFailed = !await this.save(newOperator);
     if (!this.creatingOperatorFailed) {
@@ -63,7 +64,7 @@ export class IndexComponent {
   }
 
   public async openOperator(operator: OperatorDef) {
-    await this.router.navigate(['operator', operator.getName()]);
+    await this.router.navigate(['operator', operator.getId()]);
   }
 
   public getLocals(): Array<OperatorDef> {
@@ -87,5 +88,4 @@ export class IndexComponent {
       }
     });
   }
-
 }

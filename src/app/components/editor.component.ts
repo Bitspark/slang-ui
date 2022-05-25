@@ -34,6 +34,7 @@ import 'codemirror/mode/yaml/yaml.js';
 })
 export class EditorComponent implements OnInit, OnDestroy {
   // General
+  public operatorId = '';
   public operatorName = '';
   public operatorDef: OperatorDef = null;
   public operator: OperatorInstance = null;
@@ -147,11 +148,11 @@ export class EditorComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.route.params.subscribe(routeParams => {
-      this.loadOperator(routeParams.operatorName);
+      this.loadOperator(routeParams.operatorId);
     });
     this.operators.getLoadingObservable().subscribe((success) => {
       if (success) {
-        this.loadOperator(this.operatorName);
+        this.loadOperator(this.operatorId);
       }
     });
     this.mouseCallback = this.mouse.subscribe((event: any, actionPhase: string) => this.mouseAction(event, actionPhase));
@@ -169,7 +170,7 @@ export class EditorComponent implements OnInit, OnDestroy {
     await this.visual.storeVisual(this.operatorName, this.operator.getVisual());
     this.isOperatorSaved = true;
     await this.operators.refresh();
-    await this.loadOperator(this.operatorName);
+    await this.loadOperator(this.operatorId);
     this.isOperatorSaved = false;
     this.ref.detectChanges();
   }
@@ -179,13 +180,16 @@ export class EditorComponent implements OnInit, OnDestroy {
     window.location.href = url;
   }
 
-  public async loadOperator(operatorName) {
+  public async loadOperator(operatorId) {
+    this.operatorId = operatorId;
     this.broadcast.clearUpdateCallbacks();
-    this.operatorName = operatorName;
-    this.operatorDef = this.operators.getLocal(this.operatorName);
+    this.operatorDef = this.operators.getLocal(operatorId);
+
     if (this.operatorDef) {
       const def = this.operatorDef.getDef();
-      const visual = await this.visual.loadVisual(operatorName);
+      this.operatorName = def.meta.name;
+
+      const visual = await this.visual.loadVisual(this.operatorName);
       let dim: [number, number] = [1200, 1100];
       let pos: [number, number] = [50, 50];
       if (visual && visual.geometry) {
@@ -199,7 +203,7 @@ export class EditorComponent implements OnInit, OnDestroy {
       /*
        * We compare selectedEntity by identity, so after re-initializing all operators, that comparsion fails
        */
-      const newOperator = new OperatorInstance(this.operators, this.operatorName, '', this.operatorDef, {}, null, def, dim);
+      const newOperator = new OperatorInstance(this.operators, operatorId, '', this.operatorDef, {}, null, def, dim);
       if (this.isSelected(this.operator)) {
         this.selectedEntity.entity = newOperator;
       }

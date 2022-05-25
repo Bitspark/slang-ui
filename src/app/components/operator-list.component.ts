@@ -102,6 +102,4 @@ export class OperatorListComponent implements OnInit {
     this.filterString = filterString;
     this.ref.detectChanges();
   }
-
 }
-
