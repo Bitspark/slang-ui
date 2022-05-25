@@ -72,28 +72,28 @@ export class OperatorService {
     this.localOperators.add(operator);
   }
 
-  public getLocal(operatorName: string): OperatorDef {
-    return Array.from(this.localOperators.values()).find(op => op.getName() === operatorName);
+  public getLocal(operatorId: string): OperatorDef {
+    return Array.from(this.localOperators.values()).find(op => op.getId() === operatorId);
   }
 
-  public getLibrary(operatorName: string): OperatorDef {
-    return Array.from(this.libraryOperators.values()).find(op => op.getName() === operatorName);
+  public getLibrary(operatorId: string): OperatorDef {
+    return Array.from(this.libraryOperators.values()).find(op => op.getId() === operatorId);
   }
 
-  public getElementary(operatorName: string): OperatorDef {
-    return Array.from(this.elementaryOperators.values()).find(op => op.getName() === operatorName);
+  public getElementary(operatorId: string): OperatorDef {
+    return Array.from(this.elementaryOperators.values()).find(op => op.getId() === operatorId);
   }
 
-  public getOperator(operatorName: string): [OperatorDef, string] {
-    let op = this.getLocal(operatorName);
+  public getOperator(operatorId: string): [OperatorDef, string] {
+    let op = this.getLocal(operatorId);
     if (op) {
       return [op, 'local'];
     }
-    op = this.getLibrary(operatorName);
+    op = this.getLibrary(operatorId);
     if (op) {
       return [op, 'library'];
     }
-    op = this.getElementary(operatorName);
+    op = this.getElementary(operatorId);
     if (op) {
       return [op, 'elementary'];
     }
