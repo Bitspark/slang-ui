@@ -432,23 +432,31 @@ export class EditorComponent implements OnInit, OnDestroy {
     this.broadcast.update(this.operator);
   }
 
-  public addInstance(op: any) {
+  public addInstance(opr: OperatorDef) {
     const def = this.operatorDef.getDef();
-    const opSplit = op.name.split('.');
-    const opName = opSplit[opSplit.length - 1];
-    let insName = opName;
+    const insName = this.getDistinctInstanceName(opr.getName());
+    def.operators[insName] = {
+      operator: opr.getId()
+    };
+    this.updateDef(def);
+  }
+
+  public getDistinctInstanceName(oprName: string) {
+    const def = this.operatorDef.getDef();
+    const oprSplit = oprName.split('.');
+    const oprShortName = oprSplit[oprSplit.length - 1];
+
+    let insName = oprShortName;
     let i = 1;
     if (!def.operators) {
       def.operators = {};
     }
     while (def.operators[insName]) {
-      insName = opName + i;
+      insName = oprName + i;
       i++;
     }
-    def.operators[insName] = {
-      operator: op.name
-    };
-    this.updateDef(def);
+
+    return insName;
   }
 
   public getOperatorList(): Array<OperatorDef> {

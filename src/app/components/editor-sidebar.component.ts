@@ -131,10 +131,10 @@ export class EditorSidebarComponent implements OnInit, OnDestroy {
 
   // MAIN INSTANCE
 
-  public insLastName(): string {
+  public instanceName(): string {
     const ins = this.getSelectedInstance();
     if (!!ins) {
-      return ins.lastName();
+      return ins.getName();
     }
     return '';
   }

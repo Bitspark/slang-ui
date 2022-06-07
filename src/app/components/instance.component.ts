@@ -84,7 +84,7 @@ export class InstanceComponent implements OnInit, OnDestroy {
       case 'slang.data.Convert':
         return '';
       default:
-        return this.instance.lastName();
+        return this.instance.getName();
     }
   }
 
