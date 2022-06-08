@@ -1,6 +1,6 @@
 <div id="sl-sidebar">
   <div *ngIf="isAnyEntitySelected()" class="text-muted small">
-    ID: <span class="text-monospace">{{broadcast.getSelected().getIdentity()}}</span>
+    ID: <span class="text-monospace">{{broadcast.getSelected().getID()}}</span>
   </div>
   <div *ngIf="!isAnyEntitySelected()" class="text-muted small">
     Nothing selected.
