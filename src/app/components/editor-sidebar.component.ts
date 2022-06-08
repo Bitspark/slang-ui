@@ -108,6 +108,13 @@ export class EditorSidebarComponent implements OnInit, OnDestroy {
     this.broadcast.unsubscribeSelect(this.callback);
   }
 
+  public async copyOperatorID() {
+    const selected = this.getSelectedInstance();
+    if (selected) {
+      await navigator.clipboard.writeText(selected.getID());
+    }
+  } 
+
   public isAnyEntitySelected(): boolean {
     return !!this.broadcast.getSelected();
   }

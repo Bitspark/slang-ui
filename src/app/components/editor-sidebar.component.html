@@ -1,5 +1,5 @@
 <div id="sl-sidebar">
-  <div *ngIf="isAnyEntitySelected()" class="text-muted small">
+  <div *ngIf="isAnyEntitySelected()" class="text-muted small" style="cursor: copy" (click)="copyOperatorID()">
     ID: <span class="text-monospace">{{broadcast.getSelected().getID()}}</span>
   </div>
   <div *ngIf="!isAnyEntitySelected()" class="text-muted small">
