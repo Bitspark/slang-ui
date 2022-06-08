@@ -48,10 +48,12 @@ export class OperatorService {
     }*/
   }
 
-  public async storeDefinition(opName: string, def: any): Promise<boolean> {
+  public async storeDefinition(def: any): Promise<boolean> {
     return new Promise<boolean>(async resolve => {
-      await this.api.post(OperatorService.pathOperatorDef, {fqop: opName}, def)
-        .catch(err => resolve(false));
+      await this.api.post(OperatorService.pathOperatorDef, {}, def)
+        .catch((err) => {
+          resolve(false)
+        });
       resolve(true);
     });
   }

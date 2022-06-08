@@ -60,7 +60,7 @@ export class IndexComponent {
   }
 
   public async save(opDef: OperatorDef): Promise<boolean> {
-    return await this.operators.storeDefinition(opDef.getName(), opDef.getDef());
+    return await this.operators.storeDefinition(opDef.getDef());
   }
 
   public async openOperator(operator: OperatorDef) {
