@@ -111,6 +111,7 @@ export class EditorSidebarComponent implements OnInit, OnDestroy {
   public async copyOperatorID() {
     const selected = this.getSelectedInstance();
     if (selected) {
+      // @ts-nocheck
       await navigator.clipboard.writeText(selected.getID());
     }
   } 
