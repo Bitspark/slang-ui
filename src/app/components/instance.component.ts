@@ -32,6 +32,7 @@ export class InstanceComponent implements OnInit, OnDestroy {
   }
 
   private fqn = '';
+  private id = '';
 
   public constructor(private ref: ChangeDetectorRef, public broadcast: BroadcastService, public mouse: MouseService) {
     ref.detach();
@@ -47,6 +48,7 @@ export class InstanceComponent implements OnInit, OnDestroy {
   }
 
   public ngOnInit() {
+    this.id = this.instance.getID();
     this.fqn = this.instance.getFullyQualifiedName();
     this.ref.detectChanges();
   }
@@ -60,8 +62,9 @@ export class InstanceComponent implements OnInit, OnDestroy {
   }
 
   public form(): string {
-    switch (this.fqn) {
-      case 'slang.data.Value':
+    switch (this.id) {
+      //case 'slang.data.Value':
+      case '8b62495a-e482-4a3e-8020-0ab8a350ad2d':
         return 'circle';
       default:
         return 'rect';
@@ -73,15 +76,16 @@ export class InstanceComponent implements OnInit, OnDestroy {
   }
 
   public text(): string {
-    const fqn = this.instance.getFullyQualifiedName();
     const props = this.instance.getProperties();
 
-    switch (fqn) {
-      case 'slang.data.Value':
+    switch (this.id) {
+      //case 'slang.data.Value':
+      case '8b62495a-e482-4a3e-8020-0ab8a350ad2d':
         return !!props ? JSON.stringify(props['value']) : 'value?';
       case 'slang.data.Evaluate':
         return !!props ? props['expression'] : 'eval?';
-      case 'slang.data.Convert':
+      //case 'slang.data.Convert':
+      case 'd1191456-3583-4eaf-8ec1-e486c3818c60':
         return '';
       default:
         return this.instance.getName();

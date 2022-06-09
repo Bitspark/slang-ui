@@ -706,17 +706,19 @@ export class OperatorInstance extends Composable implements Identifiable {
   }
 
   private getOpMinWidth(): number {
-    switch (this.getFullyQualifiedName()) {
-      case 'slang.data.Convert':
-        return 40;
+    switch (this.getID()) {
+      //case 'slang.data.Convert':
+      case 'd1191456-3583-4eaf-8ec1-e486c3818c60':
+        return 50;
       default:
         return OperatorInstance.style.opMinWidth;
     }
   }
 
   private getOpMinHeight(): number {
-    switch (this.getFullyQualifiedName()) {
-      case 'slang.data.Convert':
+    switch (this.getID()) {
+      //case 'slang.data.Convert':
+      case 'd1191456-3583-4eaf-8ec1-e486c3818c60':
         return 50;
       default:
         return OperatorInstance.style.opMinHeight;
