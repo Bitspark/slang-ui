@@ -1,6 +1,7 @@
 <div id="sl-sidebar">
   <div *ngIf="isAnyEntitySelected()" class="text-muted small" style="cursor: copy" (click)="copyOperatorID()">
-    ID: <span class="text-monospace">{{broadcast.getSelected().getID()}}</span>
+    Id: <span class="text-monospace">{{broadcast.getSelected().getID()}}</span>
+    Operator: <span class="text-monospace">{{broadcast.getSelected().getOperatorName()}}</span>
   </div>
   <div *ngIf="!isAnyEntitySelected()" class="text-muted small">
     Nothing selected.

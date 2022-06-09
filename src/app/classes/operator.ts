@@ -826,6 +826,10 @@ export class OperatorInstance extends Composable implements Identifiable {
     return this.operatorId;
   }
 
+  public getOperatorName(): string {
+    return this.opDef.getName();
+  }
+
   public getName(): string {
     return this.name;
   }
@@ -1174,6 +1178,10 @@ export class Port extends Composable implements Identifiable {
 
   public getType(): Type {
     return this.type;
+  }
+
+  public getTypeName(): string {
+    return Type[this.type];
   }
 
   public getTypeDef(): any {
