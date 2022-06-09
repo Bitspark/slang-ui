@@ -2,6 +2,7 @@ import {buildRefString, connectDeep, expandProperties, parseRefString} from '../
 import {OperatorService} from '../services/operator.service';
 import {Mat2, Mat3} from './matrix';
 import {Orientation} from './vector';
+import {v4 as uuidv4} from 'uuid';
 
 export enum Type {
   number,
@@ -16,6 +17,7 @@ export enum Type {
 }
 
 /*
+{
     "def": {
         "id": "026dabc6-c7e1-4f93-84a6-e75737d62ac5",
         "services": {
@@ -330,7 +332,7 @@ export class OperatorDef {
     this.def = def;
 
     if (!this.def.id) {
-      this.def.id = "7e766bf5-7924-4b69-85fb-32dbeaec4a73";
+      this.def.id = uuidv4();
     }
 
     this.type = type;
@@ -597,7 +599,7 @@ export class OperatorInstance extends Composable implements Identifiable {
   private properties: any;
 
   constructor(private operatorSrv: OperatorService,
-              private fqOperator: string,
+              private operatorId: string,
               private name: string,
               public opDef: OperatorDef,
               properties: any,
@@ -605,7 +607,7 @@ export class OperatorInstance extends Composable implements Identifiable {
               def: any,
               dim?: [number, number]) {
     super(parent);
-    const op = this.operatorSrv.getOperator(fqOperator);
+    const op = this.operatorSrv.getOperator(operatorId);
     this.operatorType = op[1];
     this.instances = new Map<string, OperatorInstance>();
     this.connections = new Set<Connection>();
@@ -669,7 +671,7 @@ export class OperatorInstance extends Composable implements Identifiable {
           const ins = instances[insName];
           let opName = ins.operator;
           if (opName.startsWith('.')) {
-            const opSplit = this.fqOperator.split('.');
+            const opSplit = this.operatorId.split('.');
             opSplit[opSplit.length - 1] = opName.substr(1);
             opName = opSplit.join('.');
           }
@@ -818,6 +820,10 @@ export class OperatorInstance extends Composable implements Identifiable {
     this.visible = false;
   }
 
+  public getID(): string {
+    return this.operatorId;
+  }
+
   public getName(): string {
     return this.name;
   }
@@ -956,7 +962,7 @@ export class OperatorInstance extends Composable implements Identifiable {
   }
 
   public getFullyQualifiedName(): string {
-    return this.fqOperator;
+    return this.opDef.getName();
   }
 
   public getProperties(): any {
@@ -977,11 +983,6 @@ export class OperatorInstance extends Composable implements Identifiable {
     this.delegates.forEach(dlg => {
       dlg.translate([0, centerY]);
     });
-  }
-
-  public lastName(): string {
-    const opName = this.getFullyQualifiedName().split('.');
-    return opName[opName.length - 1];
   }
 
   getIdentity(): string {
