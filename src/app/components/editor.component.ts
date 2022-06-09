@@ -443,16 +443,15 @@ export class EditorComponent implements OnInit, OnDestroy {
 
   public getDistinctInstanceName(oprName: string) {
     const def = this.operatorDef.getDef();
-    const oprSplit = oprName.split('.');
-    const oprShortName = oprSplit[oprSplit.length - 1];
+    const cleanInsName = oprName.replace(/[^a-zA-Z]+/g, "");
 
-    let insName = oprShortName;
+    let insName = cleanInsName;
     let i = 1;
     if (!def.operators) {
       def.operators = {};
     }
     while (def.operators[insName]) {
-      insName = oprName + i;
+      insName = cleanInsName + i;
       i++;
     }
 
