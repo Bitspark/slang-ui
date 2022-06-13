@@ -59,7 +59,7 @@
 
         </div>
         <div id="sl-main-bottom" [hidden]="!debugState">
-          <app-editor-debug-panel [definition]="operatorDef" [operator]="operator" [operatorName]="operatorName" [(debugState)]="debugState" (debugStateChange)="debugStateChanged($event)" style="width: 100%"></app-editor-debug-panel>
+          <app-editor-debug-panel [definition]="operatorDef" [operator]="operator" [operatorId]="operatorId" [(debugState)]="debugState" (debugStateChange)="debugStateChanged($event)" style="width: 100%"></app-editor-debug-panel>
         </div>
       </div>
       <div id="sl-instance-sidebar" class="d-none d-md-block sl-ui-sidebar col-2" *ngIf="!debugState">

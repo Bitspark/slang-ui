@@ -93,7 +93,7 @@ export class EditorDebugPanelComponent implements OnInit {
   // OPERATOR NAME
 
   @Input()
-  public operatorName: string;
+  public operatorId: string;
 
   constructor(private ref: ChangeDetectorRef, private http: HttpClient, private api: ApiService) {
     ref.detach();
@@ -207,7 +207,7 @@ export class EditorDebugPanelComponent implements OnInit {
     const isStream = !this.httpInput() && !this.httpOutput();
 
     this.api.post('/run/', {}, {
-      fqn: this.operatorName,
+      id: this.operatorId,
       gens: this.debuggingGens,
       props: this.debuggingProps,
       stream: isStream
