@@ -1,6 +1,7 @@
 import {Injectable} from '@angular/core';
 import {ApiService} from './api.service';
 import {Identifiable} from '../classes/operator';
+import { resolve } from 'url';
 
 @Injectable()
 export class VisualService {
@@ -25,7 +26,7 @@ export class VisualService {
 
   public async storeVisual(opName: string, visual: any) {
     return new Promise<void>(async resolve => {
-      await this.api.post(VisualService.pathMetaVisual, {fqop: opName}, visual);
+      //await this.api.post(VisualService.pathMetaVisual, {fqop: opName}, visual);
       resolve();
     });
   }
