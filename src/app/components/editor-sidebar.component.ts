@@ -108,6 +108,14 @@ export class EditorSidebarComponent implements OnInit, OnDestroy {
     this.broadcast.unsubscribeSelect(this.callback);
   }
 
+  public async copyOperatorID() {
+    const selected = this.getSelectedInstance();
+    if (selected) {
+      // @ts-nocheck
+      await navigator.clipboard.writeText(selected.getID());
+    }
+  } 
+
   public isAnyEntitySelected(): boolean {
     return !!this.broadcast.getSelected();
   }
@@ -131,10 +139,10 @@ export class EditorSidebarComponent implements OnInit, OnDestroy {
 
   // MAIN INSTANCE
 
-  public insLastName(): string {
+  public instanceName(): string {
     const ins = this.getSelectedInstance();
     if (!!ins) {
-      return ins.lastName();
+      return ins.getName();
     }
     return '';
   }

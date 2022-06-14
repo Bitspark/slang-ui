@@ -4,5 +4,5 @@ import {EditorComponent} from './components/editor.component';
 
 export const AppRoutes: Routes = [
   {path: '', component: IndexComponent},
-  {path: 'operator/:operatorName', component: EditorComponent}
+  {path: 'operator/:operatorId', component: EditorComponent}
 ];

@@ -2,6 +2,7 @@ import {buildRefString, connectDeep, expandProperties, parseRefString} from '../
 import {OperatorService} from '../services/operator.service';
 import {Mat2, Mat3} from './matrix';
 import {Orientation} from './vector';
+import {v4 as uuidv4} from 'uuid';
 
 export enum Type {
   number,
@@ -15,9 +16,181 @@ export enum Type {
   map,
 }
 
+/*
+{
+    "def": {
+        "id": "026dabc6-c7e1-4f93-84a6-e75737d62ac5",
+        "services": {
+            "main": {
+                "in": {
+                    "type": "string"
+                },
+                "out": {
+                    "type": "map",
+                    "map": {
+                        "body": {
+                            "type": "binary"
+                        },
+                        "status": {
+                            "type": "number"
+                        }
+                    }
+                },
+                "geometry": {
+                    "in": {
+                        "position": 10
+                    },
+                    "out": {
+                        "position": 0
+                    }
+                }
+            }
+        },
+        "operators": {
+            "Convert": {
+                "operator": "d1191456-3583-4eaf-8ec1-e486c3818c60",
+                "generics": {
+                    "fromType": {
+                        "type": "string"
+                    },
+                    "toType": {
+                        "type": "binary"
+                    }
+                },
+                "geometry": {
+                    "position": {
+                        "x": -105,
+                        "y": 37.5
+                    }
+                }
+            },
+            "HTTPClient": {
+                "operator": "f7f5907d-758b-4892-8a3e-ae86b877b869",
+                "geometry": {
+                    "position": {
+                        "x": 5,
+                        "y": 129.5
+                    }
+                }
+            },
+            "Value": {
+                "operator": "8b62495a-e482-4a3e-8020-0ab8a350ad2d",
+                "properties": {
+                    "value": ""
+                },
+                "generics": {
+                    "valueType": {
+                        "type": "string"
+                    }
+                },
+                "geometry": {
+                    "position": {
+                        "x": -105,
+                        "y": -117.5
+                    }
+                }
+            },
+            "Value1": {
+                "operator": "8b62495a-e482-4a3e-8020-0ab8a350ad2d",
+                "properties": {
+                    "value": "GET"
+                },
+                "generics": {
+                    "valueType": {
+                        "type": "string"
+                    }
+                },
+                "geometry": {
+                    "position": {
+                        "x": 10,
+                        "y": -82.5
+                    }
+                }
+            },
+            "Value2": {
+                "operator": "8b62495a-e482-4a3e-8020-0ab8a350ad2d",
+                "properties": {
+                    "value": []
+                },
+                "generics": {
+                    "valueType": {
+                        "type": "stream",
+                        "stream": {
+                            "type": "map",
+                            "map": {
+                                "key": {
+                                    "type": "string"
+                                },
+                                "values": {
+                                    "type": "stream",
+                                    "stream": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "geometry": {
+                    "position": {
+                        "x": -30,
+                        "y": -12.5
+                    }
+                }
+            }
+        },
+        "connections": {
+            "(": [
+                "(Value",
+                "(Value2",
+                "(Value1",
+                "url(HTTPClient"
+            ],
+            "Convert)": [
+                "body(HTTPClient"
+            ],
+            "HTTPClient)body": [
+                ")body"
+            ],
+            "HTTPClient)status": [
+                ")status"
+            ],
+            "Value)": [
+                "(Convert"
+            ],
+            "Value1)": [
+                "method(HTTPClient"
+            ],
+            "Value2)~.key": [
+                "headers.~.key(HTTPClient"
+            ],
+            "Value2)~.values.~": [
+                "headers.~.values.~(HTTPClient"
+            ]
+        },
+        "meta": {
+            "name": "HTTP get",
+            "icon": "",
+            "shortDescription": "performs an HTTP get request at a given URL and emits body and status code",
+            "description": "",
+            "docUrl": "https://bitspark.de/slang/docs/operator/http-get",
+            "tags": [
+                "network",
+                "http"
+            ]
+        },
+        "geometry": {
+            "size": {
+                "width": 455,
+                "height": 418.5
+            }
+        }
+    },
+    "type": "library"
+}
+*/
 export class OperatorDef {
 
-  private readonly name: string;
   private def: any;
   private genericNames = new Set<string>();
   private propertyDefs = new Map<string, any>();
@@ -155,9 +328,13 @@ export class OperatorDef {
     }
   }
 
-  constructor({name, def, type, saved}: { name: string, def: any, type: string, saved: boolean }) {
-    this.name = name;
+  constructor({def, type, saved}: {def: any, type: string, saved: boolean }) {
     this.def = def;
+
+    if (!this.def.id) {
+      this.def.id = uuidv4();
+    }
+
     this.type = type;
     this.saved = saved;
     OperatorDef.walkAllPorts(this.def, pDef => {
@@ -177,8 +354,16 @@ export class OperatorDef {
     }
   }
 
+  public getId(): string {
+    return this.def.id;
+  }
+
   public getName(): string {
-    return this.name;
+    return this.def.meta.name;
+  }
+
+  public setName(name: string) {
+    this.def.meta.name = name;
   }
 
   public getGenericNames(): Set<string> {
@@ -414,7 +599,7 @@ export class OperatorInstance extends Composable implements Identifiable {
   private properties: any;
 
   constructor(private operatorSrv: OperatorService,
-              private fqOperator: string,
+              private operatorId: string,
               private name: string,
               public opDef: OperatorDef,
               properties: any,
@@ -422,7 +607,7 @@ export class OperatorInstance extends Composable implements Identifiable {
               def: any,
               dim?: [number, number]) {
     super(parent);
-    const op = this.operatorSrv.getOperator(fqOperator);
+    const op = this.operatorSrv.getOperator(operatorId);
     this.operatorType = op[1];
     this.instances = new Map<string, OperatorInstance>();
     this.connections = new Set<Connection>();
@@ -486,7 +671,7 @@ export class OperatorInstance extends Composable implements Identifiable {
           const ins = instances[insName];
           let opName = ins.operator;
           if (opName.startsWith('.')) {
-            const opSplit = this.fqOperator.split('.');
+            const opSplit = this.operatorId.split('.');
             opSplit[opSplit.length - 1] = opName.substr(1);
             opName = opSplit.join('.');
           }
@@ -521,17 +706,19 @@ export class OperatorInstance extends Composable implements Identifiable {
   }
 
   private getOpMinWidth(): number {
-    switch (this.getFullyQualifiedName()) {
-      case 'slang.data.Convert':
-        return 40;
+    switch (this.getID()) {
+      //case 'slang.data.Convert':
+      case 'd1191456-3583-4eaf-8ec1-e486c3818c60':
+        return 50;
       default:
         return OperatorInstance.style.opMinWidth;
     }
   }
 
   private getOpMinHeight(): number {
-    switch (this.getFullyQualifiedName()) {
-      case 'slang.data.Convert':
+    switch (this.getID()) {
+      //case 'slang.data.Convert':
+      case 'd1191456-3583-4eaf-8ec1-e486c3818c60':
         return 50;
       default:
         return OperatorInstance.style.opMinHeight;
@@ -633,6 +820,14 @@ export class OperatorInstance extends Composable implements Identifiable {
 
   public hide() {
     this.visible = false;
+  }
+
+  public getID(): string {
+    return this.operatorId;
+  }
+
+  public getOperatorName(): string {
+    return this.opDef.getName();
   }
 
   public getName(): string {
@@ -773,7 +968,7 @@ export class OperatorInstance extends Composable implements Identifiable {
   }
 
   public getFullyQualifiedName(): string {
-    return this.fqOperator;
+    return this.opDef.getName();
   }
 
   public getProperties(): any {
@@ -794,11 +989,6 @@ export class OperatorInstance extends Composable implements Identifiable {
     this.delegates.forEach(dlg => {
       dlg.translate([0, centerY]);
     });
-  }
-
-  public lastName(): string {
-    const opName = this.getFullyQualifiedName().split('.');
-    return opName[opName.length - 1];
   }
 
   getIdentity(): string {
@@ -988,6 +1178,10 @@ export class Port extends Composable implements Identifiable {
 
   public getType(): Type {
     return this.type;
+  }
+
+  public getTypeName(): string {
+    return Type[this.type];
   }
 
   public getTypeDef(): any {

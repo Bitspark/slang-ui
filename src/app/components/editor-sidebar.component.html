@@ -1,6 +1,7 @@
 <div id="sl-sidebar">
-  <div *ngIf="isAnyEntitySelected()" class="text-muted small">
-    ID: <span class="text-monospace">{{broadcast.getSelected().getIdentity()}}</span>
+  <div *ngIf="isAnyEntitySelected()" class="text-muted small" style="cursor: copy" (click)="copyOperatorID()">
+    Id: <span class="text-monospace">{{broadcast.getSelected().getID()}}</span>
+    Operator: <span class="text-monospace">{{broadcast.getSelected().getOperatorName()}}</span>
   </div>
   <div *ngIf="!isAnyEntitySelected()" class="text-muted small">
     Nothing selected.
@@ -34,7 +35,7 @@
   </div>
 
   <div class="sl-ui-scrollable" *ngIf="isInstanceSelected()">
-    <h4>{{ insLastName() }}</h4>
+    <h4>{{ instanceName() }}</h4>
 
     <h5>Transform</h5>
     <!-- Instance transformation control -->

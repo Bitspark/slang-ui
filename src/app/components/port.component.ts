@@ -72,6 +72,10 @@ export class PortComponent implements OnDestroy {
     return `rotate(-55 ${this.getPortLabelX()},${this.getPortLabelY()})`;
   }
 
+  public text(): string {
+    return this.port.getName()? `${this.port.getName()}:${this.port.getTypeName()}` : `${this.port.getTypeName()}`;
+  }
+
   public getPortLabelX(): number {
     switch (this.port.getOrientation().value()) {
       case Orientation.north:
