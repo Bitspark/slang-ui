@@ -82,7 +82,8 @@ export class InstanceComponent implements OnInit, OnDestroy {
       //case 'slang.data.Value':
       case '8b62495a-e482-4a3e-8020-0ab8a350ad2d':
         return !!props ? JSON.stringify(props['value']) : 'value?';
-      case 'slang.data.Evaluate':
+      //case 'slang.data.Evaluate':
+      case '37ccdc28-67b0-4bb1-8591-4e0e813e3ec1':
         return !!props ? props['expression'] : 'eval?';
       //case 'slang.data.Convert':
       case 'd1191456-3583-4eaf-8ec1-e486c3818c60':
