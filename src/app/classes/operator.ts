@@ -604,18 +604,19 @@ export class OperatorInstance extends Composable implements Identifiable {
               properties: any,
               parent: Composable,
               def: any,
-              dim?: [number, number]) {
+              ) {
     super(parent);
     const op = this.operatorSrv.getOperator(operatorId);
     this.operatorType = op[1];
     this.instances = new Map<string, OperatorInstance>();
     this.connections = new Set<Connection>();
     this.properties = properties;
-    this.updateOperator(def, properties, dim);
+    this.updateOperator(def, properties);
   }
 
-  public updateOperator(def: any, props: any, dim?: [number, number]) {
-    let [width, height] = (this.dim) ? this.dim : (dim) ? dim : [0, 0];
+  public updateOperator(def: any, props: any) {
+    const size = (def.geometry && def.geometry.size)? def.geometry.size : {width: 0, height: 0}
+    let [width, height] = (this.dim)? this.dim : (size)? [size.width, size.height] : [0,0];
 
     this.properties = props;
 
