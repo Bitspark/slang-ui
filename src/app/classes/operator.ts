@@ -669,28 +669,36 @@ export class OperatorInstance extends Composable implements Identifiable {
       for (const insName in instances) {
         if (instances.hasOwnProperty(insName)) {
           const ins = instances[insName];
-          let opName = ins.operator;
-          if (opName.startsWith('.')) {
-            const opSplit = this.operatorId.split('.');
-            opSplit[opSplit.length - 1] = opName.substr(1);
-            opName = opSplit.join('.');
-          }
-          const op = this.operatorSrv.getOperator(opName);
+          const opId = ins.operator;
+          const op = this.operatorSrv.getOperator(opId);
           if (!op) {
             continue;
           }
-          let opIns = this.instances.get(insName);
+
           let opDef = JSON.parse(JSON.stringify(op[0].getDef()));
           OperatorDef.specifyOperatorDef(opDef, ins['generics'], ins['properties'], opDef['properties']);
           opDef = {
             services: opDef['services'],
-            delegates: opDef['delegates']
+            delegates: opDef['delegates'],
           };
+          
+          let opIns = this.instances.get(insName);
           if (typeof opIns === 'undefined') {
-            opIns = new OperatorInstance(this.operatorSrv, opName, insName, op[0], ins['properties'], this, opDef);
-            opIns.translate([
-              Math.random() * (this.dim[0] - OperatorInstance.style.opMinWidth),
-              Math.random() * (this.dim[1] - OperatorInstance.style.opMinHeight)]);
+            opIns = new OperatorInstance(this.operatorSrv, opId, insName, op[0], ins['properties'], this, opDef);
+
+            const geometry = ins.geometry;
+
+            console.log(geometry)
+
+            if (geometry && geometry.position) {
+              opIns.translate([
+                geometry.position.x + this.dim[0]/2,
+                geometry.position.y + this.dim[1]/2])
+            } else {
+              opIns.translate([
+                Math.random() * (this.dim[0] - OperatorInstance.style.opMinWidth),
+                Math.random() * (this.dim[1] - OperatorInstance.style.opMinHeight)]);
+            }
           } else {
             opIns.updateOperator(opDef, ins['properties']);
           }

@@ -14,7 +14,6 @@ import {safeDump, safeLoad} from 'js-yaml';
 import {normalizeConnections, stringifyConnections} from '../utils';
 
 import 'codemirror/mode/yaml/yaml.js';
-import { ConsoleReporter } from 'jasmine';
 
 @Component({
   templateUrl: './editor.component.html',
@@ -182,6 +181,7 @@ export class EditorComponent implements OnInit, OnDestroy {
   }
 
   public async loadOperator(operatorId) {
+    // in this case operator == blueprint
     this.operatorId = operatorId;
     this.broadcast.clearUpdateCallbacks();
     this.operatorDef = this.operators.getLocal(operatorId);
