@@ -1,6 +1,7 @@
 import {Connection, OperatorDef, OperatorInstance, Port, Transformable} from './classes/operator';
 import {Vec2} from './classes/vector';
 
+
 function expandExpressionPart(exprPart: string, props: any, propDefs: any): Array<string> {
   const vals = [];
   if (!props) {
@@ -31,6 +32,13 @@ function expandExpressionPart(exprPart: string, props: any, propDefs: any): Arra
     }
   }
   return vals;
+}
+
+export function uuidv4() {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+      var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+      return v.toString(16);
+  });
 }
 
 export function expandProperties(str: string, props: any, propDefs: any): Array<string> {

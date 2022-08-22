@@ -1,8 +1,7 @@
-import {buildRefString, connectDeep, expandProperties, parseRefString} from '../utils';
+import {buildRefString, connectDeep, expandProperties, parseRefString, uuidv4} from '../utils';
 import {OperatorService} from '../services/operator.service';
 import {Mat2, Mat3} from './matrix';
 import {Orientation} from './vector';
-import {v4 as uuidv4} from 'uuid';
 
 export enum Type {
   number,
