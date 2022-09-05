@@ -188,6 +188,7 @@ export enum Type {
     "type": "library"
 }
 */
+
 export class OperatorDef {
 
   private def: any;
@@ -521,6 +522,15 @@ export class Transformable {
   public col(idx): number[] {
     return this.mat.col(idx);
   }
+
+  public getGeometry(): any {
+    return {
+      position: {
+        x: this.getPosX(),
+        y: this.getPosY(),
+      }
+    }
+  }
 }
 
 export class Composable extends Transformable {
@@ -680,6 +690,7 @@ export class OperatorInstance extends Composable implements Identifiable {
           opDef = {
             services: opDef['services'],
             delegates: opDef['delegates'],
+            meta: opDef['meta'],
           };
           
           let opIns = this.instances.get(insName);
@@ -687,13 +698,8 @@ export class OperatorInstance extends Composable implements Identifiable {
             opIns = new OperatorInstance(this.operatorSrv, opId, insName, op[0], ins['properties'], this, opDef);
 
             const geometry = ins.geometry;
-
-            console.log(geometry)
-
             if (geometry && geometry.position) {
-              opIns.translate([
-                geometry.position.x + this.dim[0]/2,
-                geometry.position.y + this.dim[1]/2])
+              opIns.translate([geometry.position.x, geometry.position.y])
             } else {
               opIns.translate([
                 Math.random() * (this.dim[0] - OperatorInstance.style.opMinWidth),
@@ -759,6 +765,15 @@ export class OperatorInstance extends Composable implements Identifiable {
       visual.instances[insName] = ins.mat.all();
     });
     return visual;
+  }
+
+  public getDef(): any {
+    const def = this.opDef.getDef()
+    this.instances.forEach((ins, insName) => {
+      def.operators[insName].geometry = ins.getGeometry()
+    });
+
+    return def
   }
 
   public renameInstance(oldName: string, newName: string) {

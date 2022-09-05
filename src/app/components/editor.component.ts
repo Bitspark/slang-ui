@@ -166,7 +166,8 @@ export class EditorComponent implements OnInit, OnDestroy {
   // General
 
   public async save() {
-    await this.operators.storeDefinition(this.operatorDef.getDef());
+
+    await this.operators.storeDefinition(this.operator.getDef());
     await this.visual.storeVisual(this.operatorName, this.operator.getVisual());
     this.isOperatorSaved = true;
     await this.operators.refresh();
@@ -215,7 +216,6 @@ export class EditorComponent implements OnInit, OnDestroy {
       this.ref.detectChanges();
     }
     if (!this.callback) {
-      console.log('subscribe');
       this.callback = this.broadcast.subscribeSelect(obj => {
         if (!obj) {
           this.selectedEntity.entity = null;
