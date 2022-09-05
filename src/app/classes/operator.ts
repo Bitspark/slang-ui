@@ -769,6 +769,12 @@ export class OperatorInstance extends Composable implements Identifiable {
 
   public getDef(): any {
     const def = this.opDef.getDef()
+    def.geometry = {
+      size: {
+        width: this.dim[0],
+        height: this.dim[1],
+      }
+    }
     this.instances.forEach((ins, insName) => {
       def.operators[insName].geometry = ins.getGeometry()
     });
