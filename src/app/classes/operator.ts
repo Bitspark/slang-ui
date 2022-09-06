@@ -188,6 +188,7 @@ export enum Type {
     "type": "library"
 }
 */
+
 export class OperatorDef {
 
   private def: any;
@@ -521,6 +522,15 @@ export class Transformable {
   public col(idx): number[] {
     return this.mat.col(idx);
   }
+
+  public getGeometry(): any {
+    return {
+      position: {
+        x: this.getPosX(),
+        y: this.getPosY(),
+      }
+    }
+  }
 }
 
 export class Composable extends Transformable {
@@ -604,18 +614,19 @@ export class OperatorInstance extends Composable implements Identifiable {
               properties: any,
               parent: Composable,
               def: any,
-              dim?: [number, number]) {
+              ) {
     super(parent);
     const op = this.operatorSrv.getOperator(operatorId);
     this.operatorType = op[1];
     this.instances = new Map<string, OperatorInstance>();
     this.connections = new Set<Connection>();
     this.properties = properties;
-    this.updateOperator(def, properties, dim);
+    this.updateOperator(def, properties);
   }
 
-  public updateOperator(def: any, props: any, dim?: [number, number]) {
-    let [width, height] = (this.dim) ? this.dim : (dim) ? dim : [0, 0];
+  public updateOperator(def: any, props: any) {
+    const size = (def.geometry && def.geometry.size)? def.geometry.size : {width: 0, height: 0}
+    let [width, height] = (this.dim)? this.dim : (size)? [size.width, size.height] : [0,0];
 
     this.properties = props;
 
@@ -668,28 +679,32 @@ export class OperatorInstance extends Composable implements Identifiable {
       for (const insName in instances) {
         if (instances.hasOwnProperty(insName)) {
           const ins = instances[insName];
-          let opName = ins.operator;
-          if (opName.startsWith('.')) {
-            const opSplit = this.operatorId.split('.');
-            opSplit[opSplit.length - 1] = opName.substr(1);
-            opName = opSplit.join('.');
-          }
-          const op = this.operatorSrv.getOperator(opName);
+          const opId = ins.operator;
+          const op = this.operatorSrv.getOperator(opId);
           if (!op) {
             continue;
           }
-          let opIns = this.instances.get(insName);
+
           let opDef = JSON.parse(JSON.stringify(op[0].getDef()));
           OperatorDef.specifyOperatorDef(opDef, ins['generics'], ins['properties'], opDef['properties']);
           opDef = {
             services: opDef['services'],
-            delegates: opDef['delegates']
+            delegates: opDef['delegates'],
+            meta: opDef['meta'],
           };
+          
+          let opIns = this.instances.get(insName);
           if (typeof opIns === 'undefined') {
-            opIns = new OperatorInstance(this.operatorSrv, opName, insName, op[0], ins['properties'], this, opDef);
-            opIns.translate([
-              Math.random() * (this.dim[0] - OperatorInstance.style.opMinWidth),
-              Math.random() * (this.dim[1] - OperatorInstance.style.opMinHeight)]);
+            opIns = new OperatorInstance(this.operatorSrv, opId, insName, op[0], ins['properties'], this, opDef);
+
+            const geometry = ins.geometry;
+            if (geometry && geometry.position) {
+              opIns.translate([geometry.position.x, geometry.position.y])
+            } else {
+              opIns.translate([
+                Math.random() * (this.dim[0] - OperatorInstance.style.opMinWidth),
+                Math.random() * (this.dim[1] - OperatorInstance.style.opMinHeight)]);
+            }
           } else {
             opIns.updateOperator(opDef, ins['properties']);
           }
@@ -750,6 +765,21 @@ export class OperatorInstance extends Composable implements Identifiable {
       visual.instances[insName] = ins.mat.all();
     });
     return visual;
+  }
+
+  public getDef(): any {
+    const def = this.opDef.getDef()
+    def.geometry = {
+      size: {
+        width: this.dim[0],
+        height: this.dim[1],
+      }
+    }
+    this.instances.forEach((ins, insName) => {
+      def.operators[insName].geometry = ins.getGeometry()
+    });
+
+    return def
   }
 
   public renameInstance(oldName: string, newName: string) {

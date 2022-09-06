@@ -166,7 +166,8 @@ export class EditorComponent implements OnInit, OnDestroy {
   // General
 
   public async save() {
-    await this.operators.storeDefinition(this.operatorDef.getDef());
+
+    await this.operators.storeDefinition(this.operator.getDef());
     await this.visual.storeVisual(this.operatorName, this.operator.getVisual());
     this.isOperatorSaved = true;
     await this.operators.refresh();
@@ -181,42 +182,40 @@ export class EditorComponent implements OnInit, OnDestroy {
   }
 
   public async loadOperator(operatorId) {
+    // in this case operator == blueprint
     this.operatorId = operatorId;
     this.broadcast.clearUpdateCallbacks();
     this.operatorDef = this.operators.getLocal(operatorId);
 
     if (this.operatorDef) {
       const def = this.operatorDef.getDef();
+      const geometry = def.geometry = def.geometry?def.geometry:{}
       this.operatorName = def.meta.name;
 
-      const visual = await this.visual.loadVisual(this.operatorName);
-      let dim: [number, number] = [1200, 1100];
-      let pos: [number, number] = [50, 50];
-      if (visual && visual.geometry) {
-        if (typeof visual.geometry.width !== 'undefined' && typeof visual.geometry.height !== 'undefined') {
-          dim = [visual.geometry.width, visual.geometry.height];
-        }
-        if (typeof visual.geometry.x !== 'undefined' && typeof visual.geometry.y !== 'undefined') {
-          pos = [visual.geometry.x, visual.geometry.y];
-        }
+      if (!geometry.size) {
+        geometry.size = {width:1200, height:1100}
       }
+
+      if (!geometry.position) {
+        geometry.position = {x:50, y:50}
+      }
+
       /*
        * We compare selectedEntity by identity, so after re-initializing all operators, that comparsion fails
        */
-      const newOperator = new OperatorInstance(this.operators, operatorId, '', this.operatorDef, {}, null, def, dim);
+      const newOperator = new OperatorInstance(this.operators, operatorId, '', this.operatorDef, {}, null, def);
       if (this.isSelected(this.operator)) {
         this.selectedEntity.entity = newOperator;
       }
+
+      const posxy: [number, number] = [geometry.position.x, geometry.position.y];
+      
       this.operator = newOperator;
-      this.operator.translate(pos);
+      this.operator.translate(posxy);
       this.updateDef(def);
-      if (visual) {
-        this.operator.updateVisual(visual);
-      }
       this.ref.detectChanges();
     }
     if (!this.callback) {
-      console.log('subscribe');
       this.callback = this.broadcast.subscribeSelect(obj => {
         if (!obj) {
           this.selectedEntity.entity = null;
