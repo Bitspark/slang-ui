@@ -1,5 +1,3 @@
-[![CircleCI](https://circleci.com/gh/Bitspark/slang-ui/tree/master.svg?style=svg&circle-token=18bfe412b89c2c92e28e339126829e31451d4ee1)](https://circleci.com/gh/Bitspark/slang-ui/tree/master)
-
 # Slang UI
 
 <p align="center">
