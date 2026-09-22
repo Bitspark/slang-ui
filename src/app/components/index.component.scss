@@ -40,50 +40,28 @@
         color: $dark-gray;
         background-color: $light;
 
-        > iframe {
-          border: 0;
+        #sl-guide {
           height: 100%;
-          width: 100%;
-        }
+          overflow-y: auto;
+          padding: 40px 45px;
+          max-width: 70ch;
 
-        #sl-feedback-box {
-          color: $body-bg;
-          background-color: $orange;
-          position: absolute;
-          right: 0;
-          bottom: 0;
-          padding: 15px;
-          height: 600px;
-          width: 371px;
-          border-top-left-radius: 20px;
-
-          h4 {
-            margin-bottom: 25px;
-          }
-
-          h5 {
-            margin-top: 20px;
+          h1 {
             margin-bottom: 20px;
           }
 
-          #sl-info-box {
-            position: absolute;
-            padding: 15px;
-            bottom: 15px;
-            right: 15px;
-            width: 250px;
-            height: 130px;
-
-            #sl-logo {
-              position: absolute;
-              height: 85px;
-              right: 0;
-              bottom: 0;
-            }
+          h2 {
+            font-size: 1.2rem;
+            margin-top: 30px;
+            margin-bottom: 10px;
           }
 
-          a {
-            color: $white;
+          .sl-guide-intro {
+            font-size: 1.05rem;
+          }
+
+          .btn {
+            margin-top: 5px;
           }
         }
       }

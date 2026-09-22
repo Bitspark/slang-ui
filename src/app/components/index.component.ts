@@ -2,7 +2,6 @@ import {Component} from '@angular/core';
 import {OperatorService} from '../services/operator.service';
 import {OperatorDef} from '../classes/operator';
 import {Router} from '@angular/router';
-import {HttpClient, HttpHeaders, HttpParams} from '@angular/common/http';
 import * as initialDef from '../initial-def.json';
 import {FileUploader} from 'ng2-file-upload';
 import {ApiService} from '../services/api.service';
@@ -17,14 +16,9 @@ export class IndexComponent {
   public newOperatorName = '';
   public creatingOperatorFailed = false;
 
-  public feedbackURL = 'https://bitspark.de/send-email';
-  public feedbackEmail = '';
-  public feedbackMessage = '';
-  public feedbackThankYou = false;
-
   public uploader: FileUploader;
 
-  constructor(private api: ApiService, private http: HttpClient, private router: Router, public operators: OperatorService) {
+  constructor(private api: ApiService, private router: Router, public operators: OperatorService) {
     this.uploader = new FileUploader({url: this.api.uploadUrl(), itemAlias: 'file'});
     this.uploader.onBeforeUploadItem = (item) => {
       item.withCredentials = false;
@@ -72,20 +66,4 @@ export class IndexComponent {
       .from(this.operators.getLocals().values());
   }
 
-  public sendFeedback() {
-    const body = new HttpParams()
-      .set('email', this.feedbackEmail)
-      .set('message', this.feedbackMessage);
-
-    this.http.post(this.feedbackURL, body.toString(), {
-      headers: new HttpHeaders()
-        .set('Content-Type', 'application/x-www-form-urlencoded')
-    }).toPromise().then(response => {
-      if (response) {
-        this.feedbackEmail = '';
-        this.feedbackMessage = '';
-        this.feedbackThankYou = true;
-      }
-    });
-  }
 }
