@@ -13,7 +13,7 @@
 > not where new editor work happens.
 >
 > The current studio is **[slang.run](https://slang.run/)**
-> ([source](https://github.com/Bitspark/slang.run)). Start at the
+> ([source](https://github.com/Bitspark/slang-studio)). Start at the
 > [product website](https://slang.bitspark.com/) and its
 > [quick start](https://slang.bitspark.com/slang-app/index-1/).
 
@@ -58,8 +58,8 @@ Use the [Slang issue tracker](https://github.com/Bitspark/slang/issues).
 ## Related
 
 - [slang](https://github.com/Bitspark/slang) — language runtime, daemon and CLI
-- [slang.run](https://github.com/Bitspark/slang.run) — current studio
-- [slang.bitspark.com](https://github.com/Bitspark/slang.bitspark.com) — product website
+- [slang-studio](https://github.com/Bitspark/slang-studio) — current studio
+- [slang-website](https://github.com/Bitspark/slang-website) — product website
 - [slang-design](https://github.com/Bitspark/slang-design) — shared design system
 
 Apache-2.0; see [LICENSE](LICENSE).
